@@ -26,6 +26,8 @@ from typing import Callable
 
 import pygame
 
+from ..campaign import CHAPTER2_TITLE, ready_for_chapter2
+from ..eventlog import EventLog
 from . import hud
 from . import text as txt
 from .bank import SpriteBank
@@ -61,6 +63,8 @@ def speed_index(speed: int) -> int:
 
 class Tau7Chapter:
     title = "Wilds: Тау-7"
+    log_title = "Тау-7"
+    log_kind = "tau7"
     can_save = True
 
     def __init__(self, make_world: Callable, diary_dir: Path | None = None, save_dir: Path | None = None,
@@ -141,6 +145,8 @@ class Tau7Chapter:
             return None
         path = save_path(app.sim, app.brain.name, self.save_dir)
         save_game(app.sim, path, {"wrecks_done": sorted(getattr(app.brain, "wrecks_done", set()))})
+        if app.eventlog:
+            app.eventlog.meta(f"збережено: {path}")
         if not quiet:
             app.toast(f"Гру збережено: {path}")
         return path
@@ -155,6 +161,8 @@ class Tau7Chapter:
 
 class CityChapter:
     title = "Wilds: Тінемісто"
+    log_title = "Тінемісто"
+    log_kind = "cyberpunk"
     can_save = False
 
     def __init__(self, make_world: Callable, diary_dir: Path | None = None) -> None:
@@ -221,13 +229,49 @@ class CityChapter:
         pass
 
 
+class Campaign:
+    """The whole game in one window: Tau-7 until a rescue writes a legacy, then the
+    city with that legacy. A death retries the same chapter; paying off the debt
+    finishes the campaign and a new one begins on a fresh planet."""
+
+    def __init__(self, tau7: Tau7Chapter, tau7_brain, city_brain, city: Callable) -> None:
+        self.tau7, self.tau7_brain = tau7, tau7_brain
+        self.city_brain = city_brain
+        self.city = city  # Legacy -> CityChapter
+
+    def hint(self, app) -> str:
+        if app.chapter is self.tau7:
+            return f"Глава 2 «{CHAPTER2_TITLE}»" if ready_for_chapter2(app.sim) else "Нова капсула"
+        return "Нова кампанія на Тау-7" if app.sim.world.hero.free else "Нове місто"
+
+    def advance(self, app) -> None:
+        sim = app.sim
+        if app.chapter is self.tau7:
+            if ready_for_chapter2(sim):
+                from ..cyberpunk.legacy import import_legacy
+
+                if app.eventlog:
+                    app.eventlog.meta(f"кампанія: глава 2 «{CHAPTER2_TITLE}», спадок {sim.legacy_path}")
+                app.switch(self.city(import_legacy(sim.legacy_path)), self.city_brain, new_seed=False)
+            else:
+                app.new_world()
+        elif sim.world.hero.free:
+            if app.eventlog:
+                app.eventlog.meta("кампанію завершено: борг погашено; нова кампанія")
+                app.eventlog.close()
+                app.eventlog = None
+            app.switch(self.tau7, self.tau7_brain, new_seed=True)
+        else:
+            app.new_world()
+
+
 # --- the app ---------------------------------------------------------------------------
 
 
 class GfxApp:
     def __init__(self, chapter, brain, seed: int, speed: int = 1, sprites_dir: Path | str | None = None,
                  size: tuple[int, int] = (1360, 820), zoom: int = 3, loaded=None, headless: bool = False,
-                 fullscreen: bool = False, view: str = "2d") -> None:
+                 fullscreen: bool = False, view: str = "2d", campaign: Campaign | None = None) -> None:
         if headless:
             os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
         os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
@@ -267,22 +311,32 @@ class GfxApp:
         self.now = 0.0
         self.running = True
         self.minimap_colors = chapter.minimap_color
+        self.campaign = campaign
+        self.eventlog: EventLog | None = None
         if loaded is not None:
             self.sim = loaded
             self.seed = loaded.world.seed
             chapter.adopt(self, loaded)
-            self._attach(loaded)
+            self._attach(loaded, resumed=True)
         else:
             self.sim = self._new_sim(seed)
         self._set_icon()
 
     # --- lifecycle -------------------------------------------------------------------
-    def _attach(self, sim) -> None:
+    def _attach(self, sim, resumed: bool = False) -> None:
         sim.world.listeners.append(self._on_event)
         self.generation += 1
         self.events.clear()
         for ev in sim.world.events[-60:]:
             self.events.append(ev)
+        # the journal: one file per world, or one for the whole campaign
+        log_dir = getattr(self.chapter, "diary_dir", None)
+        if self.eventlog is None or self.campaign is None:
+            if self.eventlog:
+                self.eventlog.close()
+            self.eventlog = EventLog.for_game(log_dir, self.brain.name, sim.world.seed, self.chapter.log_kind)
+        if self.eventlog:
+            self.eventlog.attach(sim, self.chapter.log_title, self.brain.label, resumed)
 
     def _new_sim(self, seed: int):
         sim = self.chapter.new_sim(self, seed)
@@ -296,6 +350,25 @@ class GfxApp:
         self.sim = self._new_sim(self.seed)
         self.cam = None
         self.scene.reset()
+
+    def switch(self, chapter, brain, new_seed: bool = False) -> None:
+        """Continue in another chapter (the campaign), in the same window."""
+        self.chapter = chapter
+        self.brain = brain
+        if new_seed:
+            self.seed += 1
+        self.scene = chapter.scene(self.renderer)
+        self.minimap_colors = chapter.minimap_color
+        self.ended_at = None
+        self.thinking_since = None
+        self.cam = None
+        self.sim = self._new_sim(self.seed)
+        pygame.display.set_caption(chapter.title)
+        self.toast(chapter.title)
+
+    def next_hint(self) -> str | None:
+        """What comes after this run's ending (for the end screen)."""
+        return self.campaign.hint(self) if self.campaign else None
 
     def restart_in(self) -> float:
         if self.ended_at is None:
@@ -367,10 +440,15 @@ class GfxApp:
         self._drain()
         sim = self.sim
         if sim.over:
+            if self.eventlog:
+                self.eventlog.check_end()
             if self.ended_at is None:
                 self.ended_at = self.now
             elif self.now - self.ended_at > RESTART_AFTER and not self.paused:
-                self.new_world()
+                if self.campaign:
+                    self.campaign.advance(self)
+                else:
+                    self.new_world()
                 return
         elif not self.paused and self.thinking_since is None:
             if sim.pending:
@@ -531,6 +609,8 @@ class GfxApp:
 
     def quit(self) -> None:
         self.chapter.save(self, quiet=True)
+        if self.eventlog:
+            self.eventlog.close()
         self.running = False
 
     def run(self) -> None:

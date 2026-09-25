@@ -11,6 +11,8 @@ from pathlib import Path
 from .brain import ClaudeBrain, CodexBrain, ScriptedBrain
 from .brain.codex import DEFAULT_MODEL as CODEX_DEFAULT_MODEL
 from .actions import ACTION_HELP
+from .campaign import CHAPTER2_TITLE, ready_for_chapter2
+from .eventlog import EventLog
 from .save import SAVE_DIR, latest_save, load_game, save_game, save_path
 from .sim import Simulation
 from .worldgen import generate
@@ -46,6 +48,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                    help="tau7 (типово) - виживання; cyberpunk - друга глава після порятунку")
     p.add_argument("--legacy-dir", default="legacy", help="куди/звідки писати/читати спадок персонажа")
     p.add_argument("--no-legacy", action="store_true", help="не писати спадок при порятунку")
+    p.add_argument("--campaign", action="store_true",
+                   help="уся гра однією командою: Тау-7, а після порятунку - кіберпанк-глава зі спадком")
     add_gfx_args(p)
     return p.parse_args(argv)
 
@@ -90,6 +94,7 @@ def make_brain(args: argparse.Namespace):
 
 
 def headless(args: argparse.Namespace, brain, seed: int, loaded: Simulation | None = None) -> None:
+    """Run Tau-7 without a UI; with --campaign a rescue continues into the city."""
     sim = loaded or Simulation(generate(seed))
     sim.brain_name = brain.name
     world = sim.world
@@ -102,9 +107,15 @@ def headless(args: argparse.Namespace, brain, seed: int, loaded: Simulation | No
         sim.diary_path = Path(args.log_dir) / f"diary-{brain.name}-{seed}.md"
     if not args.no_legacy:
         sim.legacy_dir = Path(args.legacy_dir)
+    log = EventLog.for_game(args.log_dir, brain.name, world.seed)
+    if log:
+        log.attach(sim, "Тау-7", brain.label, resumed=loaded is not None)
     sim.run(brain, args.headless)
     if not sim.over:
-        print(f"збережено: {save_game(sim, save_path(sim, brain.name))}")
+        saved = save_game(sim, save_path(sim, brain.name))
+        print(f"збережено: {saved}")
+        if log:
+            log.meta(f"збережено: {saved}")
     hero = world.hero
     ending = "врятований" if hero.rescued else ("живий" if hero.alive else f"загинув: {hero.cause_of_death}")
     print(f"\n{world.clock()} | {ending} | рішень: {sim.decisions} | артефактів: {hero.inventory['artifact']} | "
@@ -114,6 +125,21 @@ def headless(args: argparse.Namespace, brain, seed: int, loaded: Simulation | No
     print("метрики:", sim.metrics.summary(len(ACTION_HELP)))
     if sim.diary_path and hero.diary:
         print(f"щоденник: {sim.diary_path}")
+    if log:
+        log.check_end()
+    if args.campaign and ready_for_chapter2(sim):
+        from .cyberpunk.__main__ import headless as city_headless, make_brain as make_city_brain
+        from .cyberpunk.legacy import import_legacy
+
+        print(f"\n===== Глава 2: {CHAPTER2_TITLE} (спадок {sim.legacy_path}) =====")
+        if log:
+            log.meta(f"кампанія: глава 2 «{CHAPTER2_TITLE}», спадок {sim.legacy_path}")
+        city_headless(args, make_city_brain(args), world.seed, legacy=import_legacy(sim.legacy_path), eventlog=log)
+    elif args.campaign:
+        print("\nКампанія: порятунку не було, глава 2 не почалась.")
+    if log:
+        log.close()
+        print(f"журнал: {log.path}")
 
 
 def shot(args: argparse.Namespace, brain, seed: int, loaded: Simulation | None = None) -> None:
@@ -149,6 +175,8 @@ def main(argv: list[str] | None = None) -> None:
         if hasattr(brain, "wrecks_done"):
             brain.wrecks_done = set(state.get("wrecks_done", []))
         print(f"Завантажено {path}: {loaded.world.clock()}")
+    if args.campaign and args.no_legacy:
+        sys.exit("--campaign переносить героя в главу 2 через спадок: приберіть --no-legacy.")
     if args.shot:
         shot(args, brain, seed, loaded)
         return
@@ -158,16 +186,37 @@ def main(argv: list[str] | None = None) -> None:
     diary_dir = Path(args.log_dir) if args.log_dir else None
     legacy_dir = None if args.no_legacy else Path(args.legacy_dir)
     if args.gfx:
-        from .gfx.app import GfxApp, Tau7Chapter
+        from .gfx.app import Campaign, CityChapter, GfxApp, Tau7Chapter
 
         chapter = Tau7Chapter(generate, diary_dir=diary_dir, save_dir=SAVE_DIR, legacy_dir=legacy_dir)
+        campaign = None
+        if args.campaign:
+            from .cyberpunk.__main__ import make_brain as make_city_brain
+            from .cyberpunk.worldgen import generate as city_generate
+
+            campaign = Campaign(chapter, brain, make_city_brain(args),
+                                lambda legacy: CityChapter(lambda s: city_generate(s, legacy), diary_dir=diary_dir))
         GfxApp(chapter, brain, seed, speed=args.speed, sprites_dir=args.sprites, size=window_size(args),
-               zoom=args.zoom, loaded=loaded, fullscreen=args.fullscreen, view=args.view).run()
+               zoom=args.zoom, loaded=loaded, fullscreen=args.fullscreen, view=args.view, campaign=campaign).run()
         return
     from .ui import WildsApp
 
-    WildsApp(generate, brain, seed, speed=args.speed, diary_dir=diary_dir, legacy_dir=legacy_dir,
-             loaded=loaded).run()
+    app = WildsApp(generate, brain, seed, speed=args.speed, diary_dir=diary_dir, legacy_dir=legacy_dir,
+                   loaded=loaded, campaign=args.campaign)
+    result = app.run()
+    if args.campaign and result == "campaign":
+        from .cyberpunk.__main__ import make_brain as make_city_brain
+        from .cyberpunk.legacy import import_legacy
+        from .cyberpunk import worldgen as city_worldgen
+        from .cyberpunk.ui import CyberApp
+
+        legacy = import_legacy(app.sim.legacy_path)
+        if app.eventlog:
+            app.eventlog.meta(f"кампанія: глава 2 «{CHAPTER2_TITLE}», спадок {app.sim.legacy_path}")
+        CyberApp(lambda s: city_worldgen.generate(s, legacy), make_city_brain(args), app.sim.world.seed,
+                 speed=args.speed, diary_dir=diary_dir, eventlog=app.eventlog).run()
+    if app.eventlog:
+        app.eventlog.close()
 
 
 if __name__ == "__main__":

@@ -14,6 +14,8 @@ from textual.screen import ModalScreen
 from textual.widgets import Footer, RichLog, Static
 
 from ..actions import visible_creatures
+from ..campaign import CHAPTER2_TITLE, ready_for_chapter2
+from ..eventlog import EventLog
 from ..hero import NEED_NAMES, NEEDS
 from ..save import SAVE_DIR, save_game, save_path
 from ..sim import Brain, Simulation
@@ -206,7 +208,8 @@ class WildsApp(App):
 
     def __init__(self, make_world: Callable[[int], World], brain: Brain, seed: int, speed: int = 1,
                  diary_dir: Path | None = None, save_dir: Path | None = SAVE_DIR,
-                 legacy_dir: Path | None = None, loaded: Simulation | None = None) -> None:
+                 legacy_dir: Path | None = None, loaded: Simulation | None = None,
+                 campaign: bool = False) -> None:
         super().__init__()
         self.make_world = make_world
         self.brain = brain
@@ -221,6 +224,8 @@ class WildsApp(App):
         self.generation = 0
         self.save_dir = save_dir
         self.legacy_dir = legacy_dir
+        self.campaign = campaign
+        self.eventlog: EventLog | None = None
         if loaded is not None:
             self.sim = loaded
             self.seed = loaded.world.seed
@@ -229,6 +234,7 @@ class WildsApp(App):
                 loaded.legacy_dir = self.legacy_dir
             loaded.world.listeners.append(self._on_event)
             self.generation += 1
+            self._open_log(loaded, resumed=True)
         else:
             self.sim = self._new_sim(seed)
 
@@ -249,7 +255,17 @@ class WildsApp(App):
             sim.diary_path = self.diary_dir / f"diary-{self.brain.name}-{seed}.md"
         if self.legacy_dir:
             sim.legacy_dir = self.legacy_dir
+        self._open_log(sim)
         return sim
+
+    def _open_log(self, sim: Simulation, resumed: bool = False) -> None:
+        """One journal per world - or one for the whole run of a campaign."""
+        if self.eventlog is None or not self.campaign:
+            if self.eventlog:
+                self.eventlog.close()
+            self.eventlog = EventLog.for_game(self.diary_dir, self.brain.name, sim.world.seed)
+        if self.eventlog:
+            self.eventlog.attach(sim, "Тау-7", self.brain.label, resumed)
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="main"):
@@ -297,9 +313,14 @@ class WildsApp(App):
         sim = self.sim
         hero = sim.world.hero
         if sim.over:
+            if self.eventlog:
+                self.eventlog.check_end()
             if self.ended_at is None:
                 self.ended_at = time.monotonic()
             elif time.monotonic() - self.ended_at > RESTART_AFTER and not self.paused:
+                if self.campaign and ready_for_chapter2(sim):
+                    self.exit("campaign")  # the caller continues into chapter 2
+                    return
                 self.action_new_world()
                 return
         elif not self.paused and self.thinking_since is None:
@@ -414,7 +435,8 @@ class WildsApp(App):
                 t.append(f"† {hero.name} загинув ({hero.cause_of_death}).\n", style="bold red")
             t.append(f"Прожито до: {sim.world.clock()}. Артефактів: {hero.inventory['artifact']}. "
                      f"Записів у щоденнику: {len(hero.diary)}.\n")
-            t.append(f"Нова капсула через {max(0, left):.0f} с (N — зараз, d — щоденник)", style="grey70")
+            nxt = f"Глава 2 «{CHAPTER2_TITLE}»" if self.campaign and ready_for_chapter2(sim) else "Нова капсула"
+            t.append(f"{nxt} через {max(0, left):.0f} с (N — нова планета, d — щоденник)", style="grey70")
             return t
         if hero.goal:
             t.append(f"Мета: {hero.goal}\n", style="bold")
@@ -449,6 +471,8 @@ class WildsApp(App):
             return
         path = save_path(self.sim, self.brain.name, self.save_dir)
         save_game(self.sim, path, {"wrecks_done": sorted(getattr(self.brain, "wrecks_done", set()))})
+        if self.eventlog:
+            self.eventlog.meta(f"збережено: {path}")
         if not quiet:
             self.notify(f"Гру збережено: {path}", title="Збереження")
 

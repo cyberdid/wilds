@@ -13,6 +13,7 @@ from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.screen import ModalScreen
 from textual.widgets import Footer, RichLog, Static
 
+from ..eventlog import EventLog
 from ..world import Event
 from .items import ITEMS
 from .sim import Brain, CitySim
@@ -158,7 +159,7 @@ class CyberApp(App):
     ]
 
     def __init__(self, make_world: Callable[[int], CityWorld], brain: Brain, seed: int, speed: int = 1,
-                 diary_dir=None) -> None:
+                 diary_dir=None, eventlog: EventLog | None = None) -> None:
         super().__init__()
         self.make_world = make_world
         self.brain = brain
@@ -171,6 +172,8 @@ class CyberApp(App):
         self.thinking_kind = "decide"
         self.ended_at: float | None = None
         self.generation = 0
+        self.eventlog = eventlog  # a campaign hands over its Tau-7 journal
+        self._own_log = eventlog is None
         self.sim = self._new_sim(seed)
 
     def _new_sim(self, seed: int) -> CitySim:
@@ -181,6 +184,12 @@ class CyberApp(App):
         if self.diary_dir:
             self.diary_dir.mkdir(parents=True, exist_ok=True)
             sim.diary_path = self.diary_dir / f"diary-cyberpunk-{self.brain.name}-{seed}.md"
+        if self._own_log:
+            if self.eventlog:
+                self.eventlog.close()
+            self.eventlog = EventLog.for_game(self.diary_dir, self.brain.name, seed, "cyberpunk")
+        if self.eventlog:
+            self.eventlog.attach(sim, "Тінемісто", self.brain.label)
         return sim
 
     def compose(self) -> ComposeResult:
@@ -225,6 +234,8 @@ class CyberApp(App):
     def _frame(self) -> None:
         sim = self.sim
         if sim.over:
+            if self.eventlog:
+                self.eventlog.check_end()
             if self.ended_at is None:
                 self.ended_at = time.monotonic()
             elif time.monotonic() - self.ended_at > RESTART_AFTER and not self.paused:

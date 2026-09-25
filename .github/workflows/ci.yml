@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      SDL_VIDEODRIVER: dummy
+      SDL_AUDIODRIVER: dummy
+      PYGAME_HIDE_SUPPORT_PROMPT: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Tests (game + sprite graphics, headless)
+        run: uv run pytest -q
+
+      - name: Pyflakes
+        run: uv run --with pyflakes python -m pyflakes src tests
+
+      - name: Whole game, scripted brain (Tau-7 -> rescue -> city)
+        run: |
+          mkdir -p ci-out
+          uv run wilds --campaign --brain scripted --seed 42 --headless 40000 \
+            --log-dir ci-out/logs --legacy-dir ci-out/legacy | tee ci-out/campaign.txt | tail -n 20
+          grep -q "Глава 2" ci-out/campaign.txt
+
+      - name: Screenshots of both chapters (2D and isometric)
+        run: |
+          shot() { uv run wilds "$@" --brain scripted --no-legacy --log-dir "" ; }
+          shot --seed 42 --headless 300 --shot ci-out/shots/tau7-day-2d.png
+          shot --seed 42 --headless 300 --view iso --shot ci-out/shots/tau7-day-iso.png
+          shot --seed 42 --headless 800 --shot ci-out/shots/tau7-night-2d.png
+          shot --chapter cyberpunk --seed 11 --headless 300 --shot ci-out/shots/city-day-2d.png
+          shot --chapter cyberpunk --seed 11 --headless 800 --view iso --shot ci-out/shots/city-night-iso.png
+
+      - name: Sprite sheets
+        run: uv run wilds-sprites --out ci-out/sprites --scale 3
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wilds-preview
+          path: ci-out/
+          retention-days: 14

@@ -176,7 +176,7 @@ def _ending(app, screen, view, t) -> None:
         x += 50
     screen.blit(txt.render(title, "bold", 24, color, shadow=(0, 0, 0)), (x, box.y + 18))
     lines = [f"{app.sim.world.clock()} · нуєни {hero.nuyen}¥ · контрактів {hero.contracts_done}",
-             f"Нове місто через {left:.0f} с  (N - зараз, D - щоденник)"]
+             f"{app.next_hint() or 'Нове місто'} через {left:.0f} с  (N - нове місто, D - щоденник)"]
     for i, ln in enumerate(lines):
         screen.blit(txt.render(ln, "text", 16, TEXT), (box.x + 20, box.y + 66 + i * 22))
 

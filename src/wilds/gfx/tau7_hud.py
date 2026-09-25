@@ -190,7 +190,7 @@ def _ending(app, screen, view, t) -> None:
         title, color, icon = f"{hero.name} загинув ({hero.cause_of_death})", (255, 110, 110), "ui.skull"
     lines = [f"Прожито до: {sim.world.clock()}",
              f"Артефактів: {hero.inventory['artifact']} · записів у щоденнику: {len(hero.diary)}",
-             f"Нова капсула через {left:.0f} с  (N - зараз, D - щоденник)"]
+             f"{app.next_hint() or 'Нова капсула'} через {left:.0f} с  (N - нова планета, D - щоденник)"]
     box = pygame.Rect(view.centerx - 300, view.centery - 80, 600, 150)
     hud.frame_rect(screen, box, bg=(14, 12, 22), edge=color)
     x = box.x + 20

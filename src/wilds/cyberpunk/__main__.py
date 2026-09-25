@@ -9,6 +9,7 @@ import shutil
 import sys
 from pathlib import Path
 
+from ..eventlog import EventLog
 from .brain import CyberClaudeBrain, CyberCodexBrain
 from .legacy import import_legacy
 from .scripted import CyberScriptedBrain
@@ -65,8 +66,10 @@ def _find_legacy(args: argparse.Namespace):
     return legacy
 
 
-def headless(args: argparse.Namespace, brain, seed: int) -> None:
-    legacy = _find_legacy(args)
+def headless(args: argparse.Namespace, brain, seed: int, legacy=None, eventlog: EventLog | None = None) -> CitySim:
+    """Run the city without a UI. A campaign passes the Tau-7 legacy and its journal."""
+    if legacy is None:
+        legacy = _find_legacy(args)
     world = generate(seed, legacy)
     for ev in world.events:
         print(f"[{ev.tick // 60 % 24:02d}:{ev.tick % 60:02d}] {ev.text}")
@@ -75,6 +78,9 @@ def headless(args: argparse.Namespace, brain, seed: int) -> None:
     if args.log_dir:
         Path(args.log_dir).mkdir(parents=True, exist_ok=True)
         sim.diary_path = Path(args.log_dir) / f"diary-cyberpunk-{brain.name}-{seed}.md"
+    log = eventlog or EventLog.for_game(args.log_dir, brain.name, seed, "cyberpunk")
+    if log:
+        log.attach(sim, "Тінемісто", brain.label)
     sim.run(brain, args.headless)
     hero = world.hero
     ending = "вільний (борг погашено)" if hero.free else ("живий" if hero.alive else f"вибув: {hero.cause_of_death}")
@@ -82,6 +88,12 @@ def headless(args: argparse.Namespace, brain, seed: int) -> None:
           f"борг: {hero.debt}¥ | раса: {hero.race.label} | мозок: {brain.label}")
     if sim.diary_path and hero.diary:
         print(f"щоденник: {sim.diary_path}")
+    if log:
+        log.check_end()
+        if eventlog is None:
+            log.close()
+            print(f"журнал: {log.path}")
+    return sim
 
 
 def shot(args: argparse.Namespace, brain, seed: int) -> None:
@@ -123,7 +135,10 @@ def main(argv: list[str] | None = None) -> None:
         return
     from .ui import CyberApp
 
-    CyberApp(lambda s: generate(s, legacy), brain, seed, speed=args.speed, diary_dir=diary_dir).run()
+    app = CyberApp(lambda s: generate(s, legacy), brain, seed, speed=args.speed, diary_dir=diary_dir)
+    app.run()
+    if app.eventlog:
+        app.eventlog.close()
 
 
 if __name__ == "__main__":
