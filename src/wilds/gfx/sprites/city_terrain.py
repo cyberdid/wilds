@@ -49,7 +49,7 @@ _FIXED = {"ink": "k", "ink2": "K", "white": "w"}
 
 
 def _art(*frames: Canvas, fps: float = 0.0, anchor: tuple[int, int] | None = None,
-         loop: bool = True, note: str = "") -> Art:
+         loop: bool = True, note: str = "", outline: str | None = None) -> Art:
     """Name-canvases -> Art: every palette name gets a legend character."""
     names = sorted({n for f in frames for row in f.px for n in row} - {_})
     lut = {_: _}
@@ -60,7 +60,7 @@ def _art(*frames: Canvas, fps: float = 0.0, anchor: tuple[int, int] | None = Non
         lut[n] = ch
         legend[ch] = n
     grids = [tuple("".join(lut[n] for n in row) for row in f.px) for f in frames]
-    return art(*grids, legend=legend, fps=fps, anchor=anchor, loop=loop, note=note)
+    return art(*grids, legend=legend, fps=fps, anchor=anchor, loop=loop, note=note, outline=outline)
 
 
 def _reg(name: str, *frames: Canvas, **kw) -> None:
@@ -1604,3 +1604,316 @@ _FPS = {0: 2, 1: 1, 2: 1.5, 4: 3, 5: 2, 6: 3}
 for _i, _fr in enumerate(_station_faces()):
     _reg(f"cp.station.wall.face@{_i}", *_fr, fps=_FPS.get(_i, 0) if len(_fr) > 1 else 0,
          note="station bulkhead, portholes onto the stars")
+
+
+# --- outpost «Вертиго» ----------------------------------------------------------------------
+# Frontier outpost beyond the city: packed sand, tyre ruts for a road, sun-baked adobe
+# blocks patched with prefab metal, orange lamps and antennas.
+
+
+def _outpost_sidewalk(i: int) -> Canvas:
+    rng = random.Random(11100 + i)
+    c = Canvas(T, T)
+    body = ("sand1", "sand2", "sand2", "sand2", "sand2", "sand3")
+    _fill(c, _locked(11110 + i, 11100, cells=3, margin=2.5), body, dither=1.0)
+    _speck(c, "sand3", 3, rng, only=("sand2",))
+    _speck(c, "sand1", 2, rng, only=("sand2",))
+    if i in (4, 5):  # boot prints heading somewhere
+        for k, (x, y) in enumerate(((4, 11), (7, 8), (10, 5)) if i == 4 else ((5, 4), (8, 7), (11, 10))):
+            c.set(x, y, "sand1")
+            c.set(x + 1, y, "sand1")
+            c.set(x, y + 1, "sand3")
+            _ = k
+    elif i == 6:  # pebbles
+        for x, y in ((5, 6), (10, 10), (11, 9)):
+            c.set(x, y, "bone2")
+            c.set(x, y + 1, "sand0")
+        c.set(6, 6, "bone3")
+    elif i == 7:  # dry scrub
+        _stamp(c, """
+            o.O.o
+            .oOo.
+            ..1..
+            """, {"o": "olive2", "O": "olive3", "1": "sand0"}, 5, 6)
+    elif i == 8:  # a bent bolt and a scrap of wire in the dust
+        for x, y in ((4, 10), (5, 10), (6, 9), (7, 9), (8, 10)):
+            c.set(x, y, "steel3")
+        c.set(10, 5, "rust2")
+        c.set(11, 5, "rust3")
+    return c
+
+
+def _outpost_road(i: int) -> Canvas:
+    rng = random.Random(11200 + i)
+    c = Canvas(T, T)
+    body = ("sand0", "sand1", "sand1", "sand2", "sand2", "sand2")
+    _fill(c, _locked(11210 + i, 11200, cells=3, margin=2.5), body, dither=1.0)
+    for y in (4, 10):  # two tyre ruts: shadowed north wall, dark bed with tread, lit south lip
+        for x in range(T):
+            c.set(x, y, "sand0")
+            c.set(x, y + 1, "sand0" if x % 3 == 0 else "sand1")
+            c.set(x, y + 2, "sand3" if bayer(x, y + 2) < 0.7 else "sand2")
+    _speck(c, "sand3", 2, rng, only=("sand2",))
+    if i == 3:  # a rock kicked into the track
+        c.set(7, 8, "rock3")
+        c.set(8, 8, "rock2")
+        c.set(7, 9, "sand0")
+        c.set(8, 9, "sand0")
+    elif i == 4:  # oil drip from a crawler
+        c.ellipse(11.0, 8.0, 2.0, 1.0, "sand0")
+        c.set(11, 8, "ink2")
+    elif i == 5:  # footprints crossing the road
+        for x, y in ((5, 1), (7, 3), (6, 7), (8, 13)):
+            c.set(x, y, "sand1")
+            c.set(x, y + 1, "sand3")
+    return c
+
+
+def _outpost_roof_base(i: int) -> Canvas:
+    rng = random.Random(11300 + i)
+    c = Canvas(T, T)
+    body = ("sand2", "sand3", "sand3", "sand3", "sand3", "sand4")
+    _fill(c, _locked(11310 + i, 11300, cells=3, margin=2.5), body, dither=0.8)
+    _speck(c, "sand2", 3, rng, only=("sand3",))
+    return c
+
+
+def _outpost_roofs() -> list[list[Canvas]]:
+    out = [[_outpost_roof_base(i)] for i in range(3)]
+    c = _outpost_roof_base(3)  # sun-cracked mud
+    _crack(c, random.Random(5), 4, 5, 8, "sand1", "sand4", box=(3, 3, 12, 12), dx_choices=(0, 1, 1))
+    out.append([c])
+    # 4: solar panel on a frame
+    c = _outpost_roof_base(4)
+    c.rect(3, 4, 10, 6, "ink2")
+    c.rect(4, 5, 8, 4, "glass2")
+    for x in (6, 9):
+        c.vline(x, 5, 8, "glass1")
+    c.hline(4, 11, 5, "glass3")
+    c.hline(4, 12, 10, "sand1")
+    out.append([c])
+    # 5: water barrel and sandbags
+    c = _outpost_roof_base(5)
+    _stamp(c, """
+        .kkk.
+        k343k
+        k232k
+        k232k
+        .kkk.
+        """, {"2": "rust2", "3": "rust3", "4": "rust4"}, 3, 3)
+    for x0, y0 in ((7, 10), (10, 10), (8, 8)):
+        _stamp(c, """
+            .oo.
+            oOOo
+            """, {"o": "tent2", "O": "tent3"}, x0, y0)
+    c.hline(4, 8, 8, "sand1")
+    out.append([c])
+    # 6: antenna mast, beacon blinking orange
+    c = _outpost_roof_base(6)
+    c.vline(8, 2, 11, "steel3")
+    c.vline(9, 3, 11, "steel1")
+    for x, y in ((6, 5), (10, 5), (5, 8), (11, 8)):
+        c.set(x, y, "steel2")
+    c.hline(6, 11, 12, "sand1")
+    on = c.copy()
+    on.set(8, 1, "neon_orange")
+    off = c.copy()
+    off.set(8, 1, "rust2")
+    out.append([on, on, off])
+    # 7: dish and a roof hatch
+    c = _outpost_roof_base(7)
+    _stamp(c, """
+        .kkk.
+        k443k
+        k432k
+        .k2k.
+        """, {"2": "bone2", "3": "bone3", "4": "bone4"}, 9, 3)
+    c.rect(3, 9, 5, 4, "rust1")
+    c.rect(3, 9, 5, 4, "ink2", fill=False)
+    c.hline(4, 6, 10, "rust2")
+    out.append([c])
+    return out
+
+
+def _outpost_face_base(i: int) -> Canvas:
+    rng = random.Random(11400 + i)
+    c = Canvas(T, T)
+    _fill(c, _locked(11410 + i, 11400, cells=4, margin=2.0), ("sand1", "sand2", "sand2", "sand2", "sand2", "sand3"),
+          dither=0.8)
+    _parapet(c, "sand3", "sand4", "sand3", "sand1")
+    for x in (2, 13):  # viga beam ends poking out of the adobe, same rhythm everywhere
+        c.set(x, 4, "leather2")
+        c.set(x, 5, "sand1")
+    _ = rng
+    return c
+
+
+def _outpost_faces() -> list[list[Canvas]]:
+    F: list[list[Canvas]] = []
+    # 0: deep window glowing, rug drying under it
+    c = _outpost_face_base(0)
+    _stamp(c, """
+        kkkk
+        kyyk
+        kyTk
+        3333
+        """, {"y": "win_warm", "T": "tent1", "3": "sand3"}, 6, 6)
+    for y in range(10, 14):
+        c.hline(5, 10, y, ("spore1", "tent2", "spore1", "tent2")[y - 10])
+    F.append([c])
+    # 1: wooden door under an orange lamp (buzzes)
+    c = _outpost_face_base(1)
+    _stamp(c, """
+        kkkkk
+        k121k
+        k121k
+        k1y1k
+        k121k
+        k121k
+        """, {"1": "rust1", "2": "rust2", "y": "gold1"}, 5, 9)
+    on = c.copy()
+    _stamp(on, """
+        kkk
+        .o.
+        """, {"o": "neon_orange"}, 6, 6)
+    on.set(5, 8, "sand3")
+    on.set(9, 8, "sand3")
+    off = c.copy()
+    _stamp(off, """
+        kkk
+        .o.
+        """, {"o": "rust3"}, 6, 6)
+    F.append([on, on, on, off, on, off])
+    # 2: prefab module grafted into the wall: riveted panels, round hatch window
+    c = _outpost_face_base(2)
+    c.rect(2, 6, 12, 9, "bone2")
+    c.rect(2, 6, 12, 9, "bone1", fill=False)
+    c.hline(2, 13, 6, "bone3")
+    for x in (5, 10):
+        c.vline(x, 7, 13, "bone1")
+    c.ellipse(8.0, 9.5, 1.6, 1.6, "ink2")
+    c.set(7, 9, "win_cold")
+    c.set(8, 9, "win_cold")
+    c.hline(3, 12, 14, "hazard_dark")
+    F.append([c])
+    # 3: plain wall, cracks, a hanging tarp
+    c = _outpost_face_base(3)
+    _crack(c, random.Random(8), 10, 6, 6, "sand0", "sand3", box=(8, 5, 13, 13), dx_choices=(0, 1), dy_choices=(1,))
+    for x in range(2, 7):
+        c.vline(x, 7, 7 + (x % 3) + 4, "tent1" if x % 2 else "tent2")
+    c.hline(2, 6, 6, "ink2")
+    F.append([c])
+    # 4: two small windows and a wheezing AC box
+    c = _outpost_face_base(4)
+    for x0, lit in ((3, True), (10, False)):
+        _stamp(c, """
+            kkk
+            kyk
+            333
+            """, {"y": "win_warm" if lit else "win_dark", "3": "sand3"}, x0, 7)
+    _stamp(c, """
+        kkkk
+        k32k
+        k21k
+        kkkk
+        """, {"1": "conc1", "2": "conc2", "3": "conc3"}, 6, 11)
+    F.append([c])
+    # 5: trade hatch with a painted sign
+    c = _outpost_face_base(5)
+    c.rect(3, 9, 10, 5, "ink2")
+    c.rect(4, 10, 8, 3, "tent1")
+    c.set(5, 10, "win_warm")
+    c.set(9, 10, "win_warm")
+    c.hline(3, 12, 13, "rust2")
+    for x in range(4, 12, 2):
+        c.set(x, 7, "red2")
+    c.hline(4, 11, 8, "sand1")
+    F.append([c])
+    for f in F:
+        for fr in f:
+            _base(fr, "sand1", "sand0")
+    return F
+
+
+for _i in range(9):
+    _reg(f"cp.outpost.sidewalk@{_i}", _outpost_sidewalk(_i), note="outpost: packed sand")
+for _i in range(6):
+    _reg(f"cp.outpost.road@{_i}", _outpost_road(_i), note="outpost: sand track with tyre ruts")
+for _i, _fr in enumerate(_outpost_roofs()):
+    _reg(f"cp.outpost.wall.top@{_i}", *_fr, fps=1.5 if len(_fr) > 1 else 0, note="outpost: adobe roof")
+for _i, _fr in enumerate(_outpost_faces()):
+    _reg(f"cp.outpost.wall.face@{_i}", *_fr, fps=4 if len(_fr) > 1 else 0, note="outpost: adobe and prefab wall")
+
+
+# --- neon-lit pavement and alleys (shared + per theme) -------------------------------------
+# Each theme gets its own version built on its own paving, so the tile never looks
+# pasted in; ``cp.any.*`` is the generic concrete fallback.
+
+
+def _neon_glyph(c: Canvas, lit: bool, tube: str, dim: str, rim: str, spill: str) -> None:
+    """A neon arrow set flush into the pavement, its light pooling around it."""
+    for x, y in c.where(lambda x, y, n: 3 <= x <= 12 and 4 <= y <= 11 and ((x - 7.5) ** 2 / 30 + (y - 7.5) ** 2 / 14) < 1):
+        if bayer(x, y) < 0.55:
+            c.set(x, y, spill)
+    shape = """
+        ...aa...
+        ..a..a..
+        .a.aa.a.
+        a.a..a.a
+        ..a..a..
+        ..aaaa..
+        """
+    _stamp(c, shape, {"a": tube if lit else dim}, 4, 5)
+    if lit:
+        c.set(7, 5, rim)
+        c.set(8, 5, rim)
+
+
+def _alley_grime(c: Canvas, rng: random.Random, dark: str, darker: str, tags: tuple[str, ...], v: int) -> None:
+    """Grime pooled in the middle of a tile: dark wet ground, a puddle, spray marks."""
+    for x, y in c.where(lambda x, y, n: 2 <= x <= 13 and 2 <= y <= 13):
+        d = abs(x - 7.5) + abs(y - 7.5)
+        if bayer(x, y) < 0.9 - d / 9:
+            c.set(x, y, dark)
+    _puddle(c, 8.0 if v else 6.5, 9.0 if v else 7.5, 3.4, 1.4, darker, "glass0", dark, [])
+    col, hi = tags[v % len(tags)], tags[(v + 1) % len(tags)]
+    shape = TAG_SHAPES[v % len(TAG_SHAPES)]
+    _tag(c, 4 if v else 7, 12 if v else 3, shape, col, hi)
+    for _i in range(3):  # butts and broken glass
+        c.set(rng.randint(3, 12), rng.randint(3, 12), rng.choice(("bone3", "glass3", "chrome2")))
+
+
+NEON_STYLE = {  # tube, off-state, hot rim, light spill on the paving
+    "sprawl": ("neon_pink", "neon_pink_dim", "neon_cyan", "spore0"),
+    "docks": ("neon_orange", "rust2", "win_warm", "rust1"),
+    "corp": ("neon_cyan", "neon_cyan_dim", "white", "glass3"),
+    "station": ("neon_cyan", "neon_cyan_dim", "win_cold", "steel4"),
+    "outpost": ("neon_orange", "rust2", "neon_yellow", "sand3"),
+}
+ALLEY_STYLE = {  # dark ground, puddle, spray colours
+    "sprawl": ("asph2", "asph0", TAGS),
+    "docks": ("asph2", "asph0", ("cryst1", "jacket2", "spore3")),
+    "corp": ("stat1", "asph1", ("water4", "white", "spore3")),
+    "station": ("steel1", "steel0", ("hazard", "cryst1", "red3")),
+    "outpost": ("sand1", "sand0", ("red3", "white", "jacket2")),
+}
+PAVING = {"sprawl": _sprawl_sidewalk, "docks": _docks_sidewalk, "corp": _corp_sidewalk,
+          "station": _station_sidewalk, "outpost": _outpost_sidewalk}
+
+
+def _neon_tiles() -> None:
+    for theme, paving in (("any", _sprawl_sidewalk),) + tuple(PAVING.items()):
+        style = NEON_STYLE.get(theme, ("neon_pink", "neon_pink_dim", "neon_cyan", "spore0"))
+        tube, dim, rim, spill = style
+        on, off = paving(0), paving(0)
+        _neon_glyph(on, True, tube, dim, rim, spill)
+        _neon_glyph(off, False, tube, dim, rim, spill)
+        _reg(f"cp.{theme}.neon", on, on, on, off, on, off, fps=5, note="neon-lit pavement: a floor sign flickering")
+        dark, darker, tags = ALLEY_STYLE.get(theme, ALLEY_STYLE["sprawl"])
+        for v in range(2):
+            c = paving(1 + v)
+            _alley_grime(c, random.Random(12000 + v + len(theme)), dark, darker, tags, v)
+            _reg(f"cp.{theme}.alley@{v}", c, note="grimy alley ground where the gangers hang out")
+
+
+_neon_tiles()

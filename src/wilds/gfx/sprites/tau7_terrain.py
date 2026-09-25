@@ -1370,6 +1370,253 @@ def _wrecks() -> None:
                                   note="entrance: the precursor hive, glowing nodes pulse"))
 
 
+# --- wreck interiors -----------------------------------------------------------------------
+# Every theme: floor@0-3 (deck), wall.top@0-1 (bulkhead mass from above, edge-neutral),
+# wall.face@0-2 (the south face: lit rim on top, contact shadow at the foot), hatch (2f).
+
+INTERIOR = {
+    "helios": {**_ramp_legend("steel", 6), "y": "hazard", "Y": "hazard_dark", "c": "glowcyan",
+               "C": "cryst0", "r": "rust1", "R": "rust2", "l": "bone3:110", "L": "bone4:70"},
+    "kepler": {**_ramp_legend("stat", 5), "a": "statacc", "A": "rust2", "c": "glowcyan", "C": "glass1",
+               "g": "glass2", "o": "neon_orange", "O": "rust1", "d": "dust1", "l": "bone3:110",
+               "L": "bone4:70", "m": "steel3", "M": "steel4"},
+    "hive": {**_ramp_legend("hive", 5), "g": "hivegl", "G": "hivegl:120", "h": "hivegl:60",
+             "b": "bone2", "l": "hivegl:40"},
+}
+
+
+def _plate(c: Canvas, light: str, dark: str) -> None:
+    """A deck plate: lit top/left bevel, dark seam right/bottom (chains into a clean grid)."""
+    for i in range(T):
+        c.set(i, 0, light)
+        c.set(0, i, light)
+        c.set(i, T - 1, dark)
+        c.set(T - 1, i, dark)
+
+
+def _helios_interior() -> None:
+    lg = INTERIOR["helios"]
+    for i in range(4):
+        c = Canvas(T, T, "2")
+        for y in range(1, T - 1):
+            for x in range(1, T - 1):
+                if (x + 2 * y) % 5 == 0 and y % 2 == 0:
+                    c.set(x, y, "3")  # tread studs
+        _plate(c, "3", "1")
+        if i == 1:  # a vent grate
+            _stamp(c, 4, 5, ["11111111", "03030303", "11111111", "03030303", "11111111"], wrap=False)
+        elif i == 2:  # oil stain and scuffs
+            _stamp(c, 5, 7, [".rr.", "rRRr", ".rr."], wrap=False)
+            c.set(10, 4, "4")
+            c.set(11, 4, "4")
+        elif i == 3:  # rivets
+            for x, y in ((2, 2), (13, 2), (2, 13), (13, 13)):
+                c.set(x, y, "4")
+                c.set(x + 1, y + 1, "1")
+        register(f"t7.helios.floor@{i}", art(c.grid(), legend=lg, note="Helios deck plating"))
+    for i in range(2):
+        c = Canvas(T, T)
+        f = _mix((0.6, fbm(T, T, 900 + i, 2, 4)), (0.4, _emboss(_cushions(T, T, 910 + i, 5, 4, 6))))
+        _quantize(c, f, "012", [20, 62, 18], dither=0.1)
+        for x in range(0, T, 4):
+            c.set(x, (x * 3 + i * 5) % T, "3")  # bolt heads
+        register(f"t7.helios.wall.top@{i}", art(c.grid(), legend=lg, note="Helios bulkhead from above"))
+    for i in range(3):
+        c = Canvas(T, T, "3")
+        for y in range(T):
+            for x in range(T):
+                if x in (0, 8):
+                    c.set(x, y, "1")
+                elif x in (1, 9):
+                    c.set(x, y, "4")
+                elif x in (7, 15):
+                    c.set(x, y, "2")
+        for x in range(T):
+            c.set(x, 0, "5")
+            c.set(x, 1, "4")
+            c.set(x, 2, "1")
+            c.set(x, T - 1, "0")
+            c.set(x, T - 2, "1")
+            c.set(x, T - 3, "2" if bayer(x, 0) < 0.5 else "1")
+        if i == 0:  # a pipe running along the wall
+            for x in range(T):
+                c.set(x, 6, "4")
+                c.set(x, 7, "2")
+                c.set(x, 8, "1")
+        elif i == 1:  # hazard kick plate
+            for x in range(T):
+                for y in (10, 11):
+                    c.set(x, y, "y" if ((x + y) // 2) % 2 == 0 else "Y")
+        else:  # an emergency light strip
+            for x in range(2, 14):
+                c.set(x, 6, "c" if x % 3 else "C")
+            _stamp(c, 2, 7, ["111111111111"], wrap=False)
+        register(f"t7.helios.wall.face@{i}", art(c.grid(), legend=lg, note="Helios bulkhead face"))
+
+
+def _kepler_interior() -> None:
+    lg = INTERIOR["kepler"]
+    for i in range(4):
+        c = Canvas(T, T, "2")
+        for y in range(T):
+            for x in range(T):
+                if x % 8 == 7 or y % 8 == 7:
+                    c.set(x, y, "1")
+                elif x % 8 == 0 or y % 8 == 0:
+                    c.set(x, y, "3" if bayer(x, y) < 0.6 else "2")
+        if i == 1:  # an orange guide stripe
+            for x in range(T):
+                c.set(x, 11, "a")
+                c.set(x, 12, "A")
+        elif i == 2:  # tracked-in dust
+            c.speckle("d", 0.05, 931, only="23")
+        elif i == 3:  # a drain
+            _stamp(c, 5, 5, ["1111", "1001", "1001", "1111"], wrap=False)
+        register(f"t7.kepler.floor@{i}", art(c.grid(), legend=lg, note="Kepler-9 lab floor tiles"))
+    for i in range(2):
+        c = Canvas(T, T, "1")
+        for y in range(T):
+            for x in range(T):
+                if (x + i * 4) % 8 == 0 or y % 8 == 0:
+                    c.set(x, y, "0")
+                elif bayer(x, y) < 0.12:
+                    c.set(x, y, "2")
+        register(f"t7.kepler.wall.top@{i}", art(c.grid(), legend=lg, note="Kepler-9 bulkhead from above"))
+    for i in range(3):
+        c = Canvas(T, T, "3")
+        for y in range(T):
+            for x in range(T):
+                if x in (0, 8):
+                    c.set(x, y, "2")
+                elif x in (7, 15):
+                    c.set(x, y, "2" if y % 2 else "3")
+        for x in range(T):
+            c.set(x, 0, "4")
+            c.set(x, 1, "4" if bayer(x, 1) < 0.6 else "3")
+            c.set(x, 2, "2")
+            c.set(x, 9, "a")
+            c.set(x, 10, "A")
+            c.set(x, T - 1, "0")
+            c.set(x, T - 2, "1")
+            c.set(x, T - 3, "2")
+        if i == 1:  # a dim wall screen
+            _stamp(c, 3, 4, ["111111", "1CgCc1", "1gCCC1", "111111"], wrap=False)
+        elif i == 2:  # a vent
+            _stamp(c, 10, 4, ["1111", "2121", "1111"], wrap=False)
+        register(f"t7.kepler.wall.face@{i}", art(c.grid(), legend=lg, note="Kepler-9 bulkhead face"))
+
+
+def _hive_interior() -> None:
+    lg = INTERIOR["hive"]
+    for i in range(4):
+        c = Canvas(T, T)
+        blis = _cushions(T, T, 950 + i, 8, 2.0, 4.0)
+        f = _mix((0.5, _emboss(blis)), (0.3, blis), (0.2, fbm(T, T, 955 + i, 2, 4)))
+        _quantize(c, f, "1234", [22, 50, 24, 4], dither=0.08)
+        rng = random.Random(960 + i)
+        x, y = rng.randrange(T), rng.randrange(T)
+        for _ in range(8):  # a vein
+            c.set(x % T, y % T, "0")
+            x += rng.choice((1, 1, 0))
+            y += rng.choice((-1, 0, 1))
+        if i == 3:
+            c.set(rng.randrange(3, 13), rng.randrange(3, 13), "g")  # a glowing speck
+        register(f"t7.hive.floor@{i}", art(c.grid(), legend=lg, note="precursor hive floor, organic"))
+    for i in range(2):
+        c = Canvas(T, T)
+        f = _mix((0.6, _emboss(_cushions(T, T, 970 + i, 7, 3, 5))), (0.4, fbm(T, T, 975 + i, 2, 4)))
+        _quantize(c, f, "012", [30, 55, 15], dither=0.08)
+        register(f"t7.hive.wall.top@{i}", art(c.grid(), legend=lg, note="precursor hive mass from above"))
+    for i in range(3):
+        c = Canvas(T, T, "1")
+        for rib in (1, 6, 11):  # vertical ribs, lit on the left
+            for y in range(T):
+                x = rib + (1 if (y // 5 + i) % 3 == 0 else 0)
+                c.set(x, y, "4")
+                c.set(x + 1, y, "3")
+                c.set(x + 2, y, "2")
+                c.set(x + 3, y, "0")
+        for x in range(T):
+            c.set(x, 0, "4" if bayer(x, 0) < 0.6 else "3")
+            c.set(x, 1, "3")
+            c.set(x, T - 1, "0")
+            c.set(x, T - 2, "0" if bayer(x, 2) < 0.6 else "1")
+        if i == 1:  # a glowing node in the membrane
+            _stamp(c, 5, 7, [".G.", "GgG", ".G."], wrap=False)
+        elif i == 2:  # luminous ooze dripping down a rib
+            for y in range(4, 11):
+                c.set(9, y, "G" if y < 9 else "g")
+        register(f"t7.hive.wall.face@{i}", art(c.grid(), legend=lg, note="precursor hive rib wall"))
+
+
+def _hatches() -> None:
+    """Exit hatches: an opening in the deck with a ladder up into daylight."""
+    ladder = ["....l....l....", "....MMMMMM....", "....l....l....", "....MMMMMM....",
+              "....l....l....", "....MMMMMM...."]
+    # helios: hazard-striped square frame, cyan lights at the corners
+    frames = []
+    for fr in range(2):
+        c = Canvas(T, T, "2")
+        _plate(c, "3", "1")
+        for y in range(2, 14):
+            for x in range(2, 14):
+                edge = x in (2, 13) or y in (2, 13)
+                c.set(x, y, ("y" if ((x + y) // 2) % 2 == 0 else "Y") if edge else "0")
+        for y in range(3, 13):
+            for x in range(3, 13):
+                c.set(x, y, "L" if y < 6 else ("l" if y < 9 else "0"))
+        for j, row in enumerate(ladder):
+            for i, ch in enumerate(row):
+                if ch != ".":
+                    c.set(i + 1, j + 5, {"l": "4", "M": "5"}[ch])
+        for x, y in ((1, 1), (14, 14)) if fr == 0 else ((14, 1), (1, 14)):
+            c.set(x, y, "c")
+        frames.append(c.grid())
+    register("t7.helios.hatch", art(*frames, legend=INTERIOR["helios"], fps=2,
+                                    note="Helios exit hatch: ladder up to daylight"))
+    # kepler: round white hatch ring with orange chevrons, orange blink
+    frames = []
+    for fr in range(2):
+        c = Canvas(T, T, "2")
+        for y in range(T):
+            for x in range(T):
+                if x % 8 == 7 or y % 8 == 7:
+                    c.set(x, y, "1")
+        for y in range(T):
+            for x in range(T):
+                d = math.hypot(x + 0.5 - 8, (y + 0.5 - 8) * 1.1)
+                if d < 7.2:
+                    c.set(x, y, "a" if d > 6.0 and (x + y) % 3 else ("4" if d > 5.0 else
+                          ("L" if y < 6 else ("l" if y < 9 else "0"))))
+        for j, row in enumerate(ladder[:4]):
+            for i, ch in enumerate(row):
+                if ch != "." and c.get(i + 1, j + 7) in "Ll0":
+                    c.set(i + 1, j + 7, {"l": "m", "M": "M"}[ch])
+        c.set(8, 1, "o" if fr == 0 else "O")
+        frames.append(c.grid())
+    register("t7.kepler.hatch", art(*frames, legend=INTERIOR["kepler"], fps=2,
+                                    note="Kepler-9 exit hatch: round airlock up to the surface"))
+    # hive: an organic sphincter, its glowing rim pulsing
+    frames = []
+    for fr in range(2):
+        c = Canvas(T, T)
+        f = _mix((0.5, _emboss(_cushions(T, T, 990, 8, 2.0, 4.0))), (0.5, fbm(T, T, 991, 2, 4)))
+        _quantize(c, f, "1234", [22, 50, 24, 4], dither=0.08)
+        for y in range(T):
+            for x in range(T):
+                d = math.hypot(x + 0.5 - 8, (y + 0.5 - 8) * 1.15)
+                if d < 6.8:
+                    if d > 5.6:
+                        c.set(x, y, "4" if (x < 8 and y < 8) else "2")
+                    elif d > 4.6:
+                        c.set(x, y, "g" if (fr == 0) == ((x + y) % 2 == 0) else "G")
+                    else:
+                        c.set(x, y, "l" if y < 7 else "0")
+        frames.append(c.grid())
+    register("t7.hive.hatch", art(*frames, legend=INTERIOR["hive"], fps=2,
+                                  note="hive exit: a sphincter tunnel up to the surface, pulsing"))
+
+
 _ground_moss()
 _ground_forest()
 _ground_dust()
@@ -1385,3 +1632,7 @@ _grave()
 _pod()
 _crash()
 _wrecks()
+_helios_interior()
+_kepler_interior()
+_hive_interior()
+_hatches()
