@@ -489,7 +489,7 @@ class Tau7Scene:
                 if "glow" in name and lit and night:
                     f.light(gx, gy, 10, (120, 255, 230), 0.6, glow=True, phase=ph, z=4)
         elif tile is Tile.FLOOR and hash2(tx, ty, 17) % 100 < 6:
-            options = self._bases(f"t7.{wreck_theme(level.id)}.decor.") or self._bases("t7.decor.cables")
+            options = self._bases(f"t7.{wreck_theme(level.id)}.decor.")
             if options:
                 f.sprite(pick(reg, options[hash2(tx, ty, 19) % len(options)], tx, ty), gx, gy, now + ph,
                          layer=-1, tint=memory, solid=False)

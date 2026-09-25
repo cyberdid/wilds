@@ -47,8 +47,11 @@ def init_headless() -> None:
 
 
 def family(name: str) -> str:
-    """Grouping key for sheets: the first two dotted parts (t7.hero, cp.sprawl, ui.log)."""
+    """Grouping key for sheets: the first two dotted parts (t7.hero, cp.sprawl); all HUD
+    icons share one sheet and the event-log markers another."""
     parts = name.split("@")[0].split(".")
+    if parts[0] == "ui":
+        return "ui.log" if parts[1] == "log" else "ui"
     return ".".join(parts[:2])
 
 

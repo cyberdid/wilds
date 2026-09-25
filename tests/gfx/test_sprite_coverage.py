@@ -107,6 +107,8 @@ def test_every_sprite_name_written_in_the_gfx_code_exists(sprites):
     """Catches typos like 'ui.hydraton' in HUD/scene code (prefix lookups excluded)."""
     missing = []
     for path in GFX.glob("*.py"):
+        if path.name == "export.py":  # its dotted strings are sheet-grouping keys, not sprites
+            continue
         for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
             if isinstance(node, ast.Constant) and isinstance(node.value, str) and LITERAL.match(node.value):
                 name = node.value
