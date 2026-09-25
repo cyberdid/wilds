@@ -25,6 +25,7 @@ SIGN_LIGHT = {CTile.SHOP: (90, 255, 140), CTile.BAR: (255, 226, 90), CTile.FIXER
               CTile.CHECKPOINT: (255, 70, 90), CTile.NEON: (255, 60, 220)}
 GOLD, BAD, GOOD = (255, 222, 90), (255, 96, 96), (140, 255, 150)
 RAINY = ("sprawl", "docks", "corp")
+HEAD_Z = {"TROLL": 25, "DWARF": 13}  # bubble anchor above the feet; dwarves are short
 # isometric building heights per theme: (base, extra per block) - the skyline
 SKYLINE = {"sprawl": (18, 14), "docks": (12, 8), "corp": (28, 20), "station": (16, 4), "outpost": (10, 6)}
 
@@ -234,7 +235,7 @@ class CityScene:
             gx, gy = ground_point(*npc.pos)
             f.sprite(name, gx, gy, now - v.anim_since + _phase(*npc.pos), flip=v.facing < 0, layer=2,
                      shadow=12 if npc.race.name == "TROLL" else 9)
-            f.anchors[("npc", npc.id)] = (gx, gy, 24 if npc.race.name == "TROLL" else 17)
+            f.anchors[("npc", npc.id)] = (gx, gy, HEAD_Z.get(npc.race.name, 17))
             if npc.role == "collector" and night:
                 f.light(gx, gy, 18, (255, 60, 70), 0.8, glow=True, z=12)
 
@@ -252,7 +253,7 @@ class CityScene:
                               shadow=12 if race == "troll" else 9)
             if name in self.bank:
                 placed.xray = self.bank.frame(name, now - v.anim_since, 1, v.facing < 0, "silhouette")
-            f.anchors["hero"] = (gx, gy, 25 if race == "troll" else 17)
+            f.anchors["hero"] = (gx, gy, HEAD_Z.get(hero.race.name, 17))
             f.light(gx, gy, 40, (170, 180, 230), 0.8, z=8)
             if level.heat > 65:
                 for i in range(2):
