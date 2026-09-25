@@ -29,7 +29,7 @@ import math
 import random
 
 from ..pixelart import art, grid, outline_grid, overlay, pad, shift, swap
-from ..procgen import Canvas, bayer
+from ..procgen import Canvas, bayer, fbm
 from ..registry import register
 
 
@@ -809,3 +809,166 @@ THINK = {"w": "stat4", "b": "water5", "d": "steel1"}
 register("fx.thinking", art(*_thinking_frames(), legend=THINK, fps=2.5, anchor=(0, 11),
                             note="AI hero thinking: bubble with filling dots; anchor = the tail's "
                                  "last dot, put it on top of the head (bubble floats up-right)"))
+
+
+# --- Tau-7 world events ------------------------------------------------------------------
+
+def _noise(seed: int, w: int, h: int, cells: int = 4) -> list:
+    return fbm(w, h, seed, octaves=2, cells=cells)
+
+
+# One puff of smoke (crash site, pod fault, burning debris): born small and
+# dense at the centre, it swells, drifts a little downwind and thins out. The
+# renderer spawns one every 0.8-1.6 s and floats it up (vy ~ -10 px/s).
+def _smoke_frames(n: int = 10) -> list:
+    out = []
+    for f in range(n):
+        t = f / (n - 1)
+        grow = 1.8 + 2.6 * t ** 0.7
+        cx, cy = 8.0 + 1.4 * t, 11.0 - 4.0 * t
+        lobes = [(cx, cy, grow), (cx - grow * 0.62, cy + grow * 0.35, grow * 0.68),
+                 (cx + grow * 0.6, cy + grow * 0.3, grow * 0.62)]
+        if f >= 2:
+            lobes.append((cx + 0.3, cy - grow * 0.62, grow * 0.6))
+        chars = "1234" if t < 0.45 else "5678" if t < 0.75 else "abcd"
+        c = Canvas(16, 16)
+        _cloud(c, lobes, chars, erode=max(0.0, (t - 0.3) * 1.7))
+        out.append(c.grid())
+    return out
+
+
+SMOKE = {"1": "grey1", "2": "grey2", "3": "grey3", "4": "grey4",
+         "5": "grey1:180", "6": "grey2:180", "7": "grey3:180", "8": "grey4:180",
+         "a": "grey1:110", "b": "grey2:110", "c": "grey3:110", "d": "grey4:110"}
+register("fx.smoke", art(*_smoke_frames(), legend=SMOKE, fps=10, loop=False,
+                         note="one smoke puff: swells, drifts, thins (one-shot, 1 s; spawn at the "
+                              "source and float it up)"))
+
+
+def _fireball(c: Canvas, cx: float, cy: float, r: float, ramp: str, seed: int,
+              rough: float = 1.3) -> None:
+    """A turbulent ball of fire: ``ramp`` runs core -> rim, the rim is broken up
+    by seamless noise so it never reads as a clean circle."""
+    field = _noise(seed, c.w, c.h, 6)
+    for y in range(c.h):
+        for x in range(c.w):
+            d = math.hypot(x + 0.5 - cx, (y + 0.5 - cy) * 1.05)
+            edge = r + (field[y][x] - 0.5) * 2 * rough
+            if d > edge:
+                continue
+            k = min(len(ramp) - 1, int(d / max(edge, 0.01) * len(ramp)))
+            c.set(x, y, ramp[k])
+
+
+def _ellipse_ring(c: Canvas, cx: float, cy: float, rx: float, ry: float, ch: str,
+                  width: float = 1.0, noise=None, gap: float = 0.0) -> None:
+    for y in range(c.h):
+        for x in range(c.w):
+            nx, ny = (x + 0.5 - cx) / rx, (y + 0.5 - cy) / ry
+            d = math.hypot(nx, ny)
+            if abs(d - 1.0) * min(rx, ry) <= width / 2 and (noise is None or noise[y][x] > gap):
+                c.set(x, y, ch)
+
+
+# Orbital debris hits the 3x3 zone: white flash, a fireball that rolls up into
+# a mushroom of dark smoke lit from below, a ground shockwave and flying
+# chunks, then a smouldering crater. 48x48; centred by the renderer 3 px above
+# the impact tile's centre (anchor = that tile's ground point).
+def _explosion_frames() -> list:
+    gz = (24.0, 27.5)  # ground zero: the impact tile's centre
+    chunks = _spray(707, 9, (24.0, 25.0), 4.6, -90, 80, 0.55, 10, drag=0.93)
+    embers = _spray(708, 10, (24.0, 20.0), 2.2, -90, 70, 0.12, 10, drag=0.9)
+    dust_noise = _noise(709, 48, 48, 8)
+    out = []
+    for f in range(10):
+        c = Canvas(48, 48)
+        if f == 0:  # the flash: debris punches in
+            c.ellipse(24, 24, 12, 11, "F")
+            c.rect(23, 0, 2, 24, "f")
+            _fireball(c, 24, 24.5, 6.0, "wwyy", 3, rough=0.6)
+            for k in range(8):
+                a = k * math.tau / 8
+                for d in range(7, 11):
+                    c.set(round(24 + math.cos(a) * d - 0.5), round(24.5 + math.sin(a) * d - 0.5), "y")
+        elif f <= 3:  # the fireball swells and rises; a shockwave races out on the ground
+            rx = (0, 12, 17, 21)[f]
+            _ellipse_ring(c, gz[0], gz[1] + 1, rx, rx * 0.5, "q" if f < 3 else "Q", 1.3 if f < 3 else 1.0)
+            if f >= 2:
+                _cloud_dust(c, gz, 12 + f * 3, dust_noise, f)
+            r = (0, 9.5, 12.0, 13.0)[f]
+            cy = (0, 23.0, 21.0, 19.5)[f]
+            ramp = ("wwyyooeer", "wyyooeerr1", "yooeerr11s")[f - 1]
+            _fireball(c, 24, cy, r, ramp, 10 + f)
+        else:  # the mushroom: dark smoke cap lit from below, a thin stem, then it all thins out
+            k = f - 4
+            cap_r = 11.0 + k * 0.9
+            cap_y = 15.0 - k * 1.3
+            erode = (0.0, 0.1, 0.35, 0.6, 0.9, 1.2)[k]
+            chars = ("abcg", "abcg", "ABCG", "ABCG", "nijm", "nijm")[k]
+            if k < 5:
+                _cloud_dust(c, gz, 20 + k, dust_noise, f)
+            lobes = [(24 + math.cos(math.radians(a)) * cap_r * 0.55,
+                      cap_y + math.sin(math.radians(a)) * cap_r * 0.35, cap_r * 0.55)
+                     for a in (200, 250, 290, 340, 20, 90, 150)]
+            lobes.append((24, cap_y, cap_r * 0.62))
+            if k < 4:  # the stem of rising smoke
+                for y in range(int(cap_y + 3), int(gz[1])):
+                    half = 2.2 + (y - cap_y) * 0.08
+                    lobes.append((24 + math.sin(y * 0.7 + k) * 0.6, y + 0.5, half))
+            _cloud(c, lobes, chars, erode)
+            if k < 3:  # the fire still burning inside, glowing through the smoke
+                _fireball(c, 24, cap_y + 3 + k, 6.5 - k * 1.8, ("eerr1", "err11", "r111")[k], 40 + k,
+                          rough=1.0)
+                _underglow(c, 24, cap_y + 5, cap_r + 1, "abcgABCG")
+            # the crater smoulders
+            cr = (7, 6, 5, 4, 3, 2)[k]
+            _fireball(c, gz[0], gz[1] + 0.5, cr * 0.9, ("er11", "r11", "r11", "11", "11", "1")[k], 60 + k,
+                      rough=0.8)
+        if 1 <= f <= 8:  # chunks of hull fly out and fall
+            for p in chunks:
+                (x0, y0), (x1, y1) = p[f - 1], p[f]
+                if y1 < 44:
+                    c.line(int(x0), int(y0), int(x1), int(y1), "t" if f < 4 else "d")
+                    c.set(int(x1), int(y1), "D")
+        if 3 <= f <= 9:  # embers rise out of the smoke
+            for i, p in enumerate(embers):
+                if (i + f) % 3:
+                    x, y = p[f]
+                    c.set(int(x), int(y), "e" if f < 7 else "r")
+        out.append(c.grid())
+    return out
+
+
+def _cloud_dust(c: Canvas, gz, rx: float, noise, f: int) -> None:
+    """Dust kicked up around ground zero, a low ragged skirt."""
+    for y in range(c.h):
+        for x in range(c.w):
+            nx, ny = (x + 0.5 - gz[0]) / rx, (y + 0.5 - gz[1] - 2) / (rx * 0.32)
+            d = nx * nx + ny * ny
+            if d <= 1.0 and noise[y][x] > 0.35 + d * 0.3 + f * 0.02 and c.get(x, y) == ".":
+                c.set(x, y, "u" if noise[y][x] > 0.62 else "v")
+
+
+def _underglow(c: Canvas, cx: float, cy: float, r: float, smoke: str) -> None:
+    """Warm the underside of the smoke that hangs over the fire."""
+    for y in range(c.h):
+        for x in range(c.w):
+            ch = c.get(x, y)
+            if ch not in smoke:
+                continue
+            dy = y + 0.5 - cy
+            d = math.hypot(x + 0.5 - cx, dy)
+            if dy > -2 and d < r * 0.75:
+                c.set(x, y, "1" if d < r * 0.5 else "0")
+
+
+EXPLOSION = {
+    "w": "white", "y": "fire5", "o": "fire4", "e": "fire3", "r": "fire2", "1": "fire1", "0": "fire0",
+    "s": "grey1", "F": "fire5:80", "f": "fire5:120", "q": "fire5:190", "Q": "fire4:110",
+    "a": "ink2", "b": "grey0", "c": "grey1", "g": "grey2",
+    "A": "ink2:180", "B": "grey0:180", "C": "grey1:180", "G": "grey2:180",
+    "n": "ink2:100", "i": "grey0:100", "j": "grey1:100", "m": "grey2:100",
+    "u": "dust3:170", "v": "dust2:130", "d": "rock1", "D": "steel2", "t": "fire3",
+}
+register("fx.explosion", art(*_explosion_frames(), legend=EXPLOSION, fps=12, loop=False, anchor=(24, 34),
+                             note="orbital debris impact over the 3x3 zone (one-shot)"))

@@ -1120,6 +1120,256 @@ def _crash() -> None:
                              note="the second pod's crash site: half buried, hatch blown off, smoking"))
 
 
+# --- wreck entrances ------------------------------------------------------------------------
+
+WRECK = {
+    **_ramp_legend("steel", 6),
+    "y": "hazard", "Y": "hazard_dark", "c": "glowcyan", "C": "cryst0", "x": "glowcyan:90",
+    "e": "dust0", "E": "dust1", "d": "dust2", "D": "dust3", "r": "rust2", "R": "rust3",
+    "z": "ink:96", "Z": "ink:150",
+}
+
+
+def _poly(c: Canvas, pts: list[tuple[float, float]], ch: str) -> None:
+    """Fill a polygon (even-odd scanline)."""
+    n = len(pts)
+    for y in range(c.h):
+        yc = y + 0.5
+        xs = []
+        for i in range(n):
+            (x0, y0), (x1, y1) = pts[i], pts[(i + 1) % n]
+            if (y0 <= yc < y1) or (y1 <= yc < y0):
+                xs.append(x0 + (yc - y0) * (x1 - x0) / (y1 - y0))
+        xs.sort()
+        for i in range(0, len(xs) - 1, 2):
+            for x in range(int(math.ceil(xs[i] - 0.5)), int(math.floor(xs[i + 1] - 0.5)) + 1):
+                c.set(x, y, ch)
+
+
+def _mound(c: Canvas, cx: float, cy: float, rx: float, ry: float, seed: int, over: bool = False) -> None:
+    """Drifted dust piled against a structure: lit crest, shaded foot, a few pebbles."""
+    rng = random.Random(seed)
+    wob = fbm(64, 1, seed, 2, 4)[0]
+    for y in range(c.h):
+        for x in range(c.w):
+            nx, ny = (x + 0.5 - cx) / rx, (y + 0.5 - cy) / ry
+            if ny < 0:
+                ny *= 0.8 + 0.5 * wob[min(63, int((nx + 1) * 32))]
+            if nx * nx + ny * ny > 1 or (not over and c.px[y][x] != "."):
+                continue
+            ch = "D" if ny < -0.55 else ("d" if ny < 0.1 else ("E" if ny < 0.6 else "e"))
+            if ch == "d" and bayer(x, y) < 0.2:
+                ch = "D"
+            c.px[y][x] = ch
+    for _ in range(4):
+        x, y = int(cx + rng.uniform(-0.8, 0.8) * rx), int(cy + rng.uniform(-0.1, 0.5) * ry)
+        if c.get(x, y) in "dE":
+            c.set(x, y, "e")
+
+
+def _wreck_helios(fr: int) -> Canvas:
+    c = Canvas(40, 32)
+    # a hull section of the colony ship, rammed into the ground at an angle
+    top_a, top_b = (1.0, 22.0), (33.0, 5.0)
+    face = [(1.0, 25.0), top_a, top_b, (35.0, 7.0), (37.5, 16.0), (36.0, 22.0), (38.0, 28.0), (1.0, 28.0)]
+    _poly(c, face, "3")
+    # the lit upper side of the hull: a band above the top edge
+    _poly(c, [(1.0, 22.0), (0.0, 19.0), (31.0, 2.0), (33.0, 5.0)], "5")
+    for x in range(c.w):  # darker toward the ground, lighter near the upper edge
+        for y in range(c.h):
+            if c.px[y][x] != "3":
+                continue
+            ty = top_a[1] + (x - top_a[0]) * (top_b[1] - top_a[1]) / (top_b[0] - top_a[0])
+            depth = y - ty
+            if depth < 2:
+                c.px[y][x] = "4"
+            elif depth > 14 or (depth > 11 and bayer(x, y) < 0.5):
+                c.px[y][x] = "2"
+    for x in range(c.w):  # the upper band: lit plating with a darker far edge
+        for y in range(c.h):
+            if c.px[y][x] == "5" and (c.get(x, y - 1) == "." or c.get(x - 1, y - 1) == "."):
+                c.px[y][x] = "4"
+    # plating seams parallel to the hull, frames across it, rivets
+    slope = (top_b[1] - top_a[1]) / (top_b[0] - top_a[0])
+    for k in (5, 10, 15):
+        for x in range(c.w):
+            y = int(round(top_a[1] + (x - top_a[0]) * slope + k))
+            if c.get(x, y) in "234":
+                c.set(x, y, "1")
+                if c.get(x, y + 1) in "234":
+                    c.set(x, y + 1, "4" if c.get(x, y + 1) != "2" else "3")
+    for x0 in (7, 15, 26):
+        for y in range(c.h):
+            if c.get(x0, y) in "234":
+                c.set(x0, y, "1")
+                if c.get(x0 + 1, y) in "234" and bayer(x0, y) < 0.5:
+                    c.set(x0 + 1, y, "4")
+    # the torn end: ribs sticking out of a dark breach
+    _poly(c, [(33.0, 6.0), (36.0, 8.0), (37.0, 15.0), (35.0, 21.0), (36.5, 27.0), (31.5, 27.0),
+              (32.5, 20.0), (30.5, 13.0)], "0")
+    for x, y0, y1 in ((32, 9, 25), (35, 10, 24)):
+        for y in range(y0, y1):
+            if c.get(x, y) == "0":
+                c.set(x, y, "3" if y % 4 else "4")
+    # a hazard-striped band along the hull, and the airlock
+    for x in range(1, 31):
+        y = int(round(top_a[1] + (x - top_a[0]) * slope + 2))
+        ch = "y" if ((x + y) // 2) % 2 == 0 else "Y"
+        if c.get(x, y) in "1234":
+            c.set(x, y, ch)
+    door = [
+        "yYYyyYYyyYYy",
+        "Y1111111111Y",
+        "Y1000000001y",
+        "y10xxxxxx01y",
+        "y10000000011",
+        "Y10000000041",
+        "Y10000000041",
+        "y10000000041",
+        "y10000000041",
+        "Y10000000041",
+        "Y1000000001y",
+    ]
+    _stamp(c, 14, 17, door, wrap=False)
+    # emergency lamps: cyan, blinking alternately
+    for i, (x, y) in enumerate(((12, 17), (27, 17))):
+        on = (i + fr) % 2 == 0
+        _stamp(c, x, y, ["1c1" if on else "1C1", "c" + ("c" if on else "C") + "c" if on else "1C1"],
+               wrap=False)
+    for i, x in enumerate(range(5, 30, 6)):  # a string of marker lights along the upper edge
+        y = int(round(top_a[1] + (x - top_a[0]) * slope - 1))
+        c.set(x, y, "c" if (i + fr) % 2 == 0 else "C")
+    _outline_canvas(c, skip=".zZeEdDx")
+    _mound(c, 20.0, 29.5, 21.0, 3.2, 41, over=False)
+    # debris half sunk in the drift
+    _stamp(c, 2, 27, ["k3k", "k1k"], wrap=False)
+    _stamp(c, 34, 28, ["kk4k", "k21k"], wrap=False)
+    _shadow_canvas(c, 20.0, 31.0, 20.0, 1.2)
+    return c
+
+
+KEPLER = {**_ramp_legend("stat", 5), "a": "statacc", "A": "rust2", "g": "glass1", "G": "glass2",
+          "c": "glowcyan", "o": "neon_orange", "O": "rust1", "m": "steel3", "M": "steel4",
+          "e": "dust0", "E": "dust1", "d": "dust2", "D": "dust3", "z": "ink:96", "Z": "ink:150"}
+
+
+def _wreck_kepler(fr: int) -> Canvas:
+    """Kepler-9: a white station module lying half buried, orange trim, a round airlock,
+    a row of dark portholes, a bent dish on its back."""
+    c = Canvas(40, 32)
+    cx, cy, rx, ry = 20.0, 17.0, 17.5, 9.5
+    for y in range(c.h):
+        for x in range(c.w):
+            ex = (abs(x + 0.5 - cx) - (rx - 3.0)) / 3.0  # rounded end caps
+            ny = (y + 0.5 - cy) / ry
+            if abs(x + 0.5 - cx) > rx or abs(ny) > 1:
+                continue
+            if ex > 0 and ex * ex + ny * ny > 1:
+                continue
+            v = -ny * 0.9 + 0.25 - (0.35 if x > cx + 8 else 0) + (bayer(x, y) - 0.5) * 0.15
+            ch = "4" if v > 0.75 else ("3" if v > 0.15 else ("2" if v > -0.45 else "1"))
+            if ex > 0.55:
+                ch = str(max(0, int(ch) - 1))
+            c.set(x, y, ch)
+    for x0 in (8, 15, 26, 33):  # ring seams between the hull segments
+        for y in range(c.h):
+            if c.get(x0, y) in "1234":
+                c.set(x0, y, "1")
+                if c.get(x0 + 1, y) in "234":
+                    c.set(x0 + 1, y, "4")
+    for x in range(c.w):  # the orange accent stripe
+        for y in (19, 20):
+            if c.get(x, y) in "1234":
+                c.set(x, y, "a" if y == 19 else "A")
+    for x0 in (4, 10, 28, 34):  # portholes
+        _stamp(c, x0, 11, ["kk", "Gg"], wrap=False)
+    # the round airlock with orange trim; the door slid half open, dark inside
+    door = [
+        "..kkkkkk..",
+        ".kaaaaaak.",
+        "kaa2222aak",
+        "ka2Zkkk2ak",
+        "ka2ZZZk2ak",
+        "ka2ZZZk2ak",
+        "ka2ZZZk2ak",
+        "ka2ZZZk2ak",
+        "ka1ZZZk1ak",
+    ]
+    _stamp(c, 15, 16, door, wrap=False)
+    c.set(20, 14, "o" if fr == 0 else "O")  # status light over the door
+    # a bent dish and an antenna on its back
+    _stamp(c, 5, 3, [".kkk..", "kM44k.", "k433mk", ".k22mk", "..kkmk", "....m."], wrap=False)
+    _stamp(c, 29, 3, ["M.", "M.", "m."], wrap=False)
+    c.set(29, 2, "c" if fr == 1 else "M")
+    _outline_canvas(c, skip=".zZeEdD")
+    _mound(c, 20.0, 29.0, 21.0, 3.6, 43)
+    _shadow_canvas(c, 20.0, 31.0, 20.0, 1.2)
+    return c
+
+
+HIVE = {**_ramp_legend("hive", 5), "g": "hivegl", "G": "hivegl:120", "h": "hivegl:60",
+        "b": "bone3", "B": "bone2", "e": "dust0", "E": "dust1", "d": "dust2", "D": "dust3",
+        "z": "ink:96", "Z": "ink:150"}
+
+
+def _wreck_hive(fr: int) -> Canvas:
+    """The precursor hive: ribbed biomech carapace arching over a dark maw, horn spires,
+    green bioluminescent nodes that pulse."""
+    c = Canvas(40, 32)
+    body = _Sketch(40, 32)
+    body.blob(20.0, 22.0, 18.5, 13.0, "01233")
+    c.px = body.c.px
+    # ribs: arcs over the mound, lit on their upper-left edge
+    for k, r in enumerate((6.0, 10.0, 14.0, 17.5)):
+        for i in range(90):
+            a = math.pi * (0.05 + 0.9 * i / 89)
+            x = int(20.0 - math.cos(a) * r * 1.05)
+            y = int(27.5 - math.sin(a) * r * 0.95)
+            if c.get(x, y) != ".":
+                c.set(x, y, "4")
+                if c.get(x + 1, y + 1) not in ".4":
+                    c.set(x + 1, y + 1, "1")
+    # horn spires on the crown
+    for x0, h in ((9, 8), (20, 12), (30, 9)):
+        for j in range(h):
+            y = 13 - j if x0 != 20 else 10 - j
+            w = max(0, 2 - j // 4)
+            for dx in range(-w, w + 1):
+                c.set(x0 + dx + (j // 5), y, "3" if dx < 0 else ("2" if dx == 0 else "1"))
+    # the maw: a dark tunnel with bone teeth around the rim
+    for y in range(c.h):
+        for x in range(c.w):
+            nx, ny = (x + 0.5 - 20.0) / 5.5, (y + 0.5 - 26.0) / 6.5
+            if nx * nx + ny * ny <= 1 and y < 29:
+                c.set(x, y, "Z" if nx * nx + ny * ny < 0.6 else "0")
+    for x, y in ((15, 22), (24, 22), (16, 20), (23, 20), (18, 19), (21, 19)):
+        c.set(x, y, "b")
+        c.set(x, y + 1, "B")
+    # bioluminescent nodes along the ribs, pulsing
+    nodes = [(8, 18), (13, 13), (27, 13), (32, 18), (20, 12), (5, 24), (35, 24), (11, 21), (29, 21)]
+    for i, (x, y) in enumerate(nodes):
+        bright = (i + fr) % 2 == 0
+        c.set(x, y, "g" if bright else "G")
+        if bright and c.get(x + 1, y) not in ".":
+            c.set(x + 1, y, "G")
+    _outline_canvas(c, skip=".zZeEdDhG")
+    # a glow breathing out of the maw
+    for x, y in ((19, 25), (20, 25), (20, 24), (19, 27), (21, 26)):
+        c.set(x, y, "h" if fr == 0 else "G")
+    _mound(c, 20.0, 29.8, 20.5, 2.6, 47)
+    _shadow_canvas(c, 20.0, 31.0, 20.0, 1.2)
+    return c
+
+
+def _wrecks() -> None:
+    register("t7.wreck.helios", art(*[_wreck_helios(f).grid() for f in range(2)], legend=WRECK, fps=2,
+                                    note="entrance: a hull section of the colony ship Helios"))
+    register("t7.wreck.kepler", art(*[_wreck_kepler(f).grid() for f in range(2)], legend=KEPLER, fps=1.5,
+                                    note="entrance: Kepler-9 station module, half buried"))
+    register("t7.wreck.hive", art(*[_wreck_hive(f).grid() for f in range(2)], legend=HIVE, fps=1.5,
+                                  note="entrance: the precursor hive, glowing nodes pulse"))
+
+
 _ground_moss()
 _ground_forest()
 _ground_dust()
@@ -1134,3 +1384,4 @@ _dome()
 _grave()
 _pod()
 _crash()
+_wrecks()

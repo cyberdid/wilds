@@ -94,7 +94,8 @@ def shot(args: argparse.Namespace, brain, seed: int) -> None:
     if args.headless:
         sim.run(brain, args.headless)
     app = GfxApp(CityChapter(lambda s: generate(s, legacy)), brain, seed, speed=args.speed,
-                 sprites_dir=args.sprites, size=window_size(args), zoom=args.zoom, loaded=sim, headless=True)
+                 sprites_dir=args.sprites, size=window_size(args), zoom=args.zoom, loaded=sim, headless=True,
+                 view=args.view)
     app.god_view = args.god
     app.paused = True
     print(f"скріншот: {app.shot(args.shot)}")
@@ -118,7 +119,7 @@ def main(argv: list[str] | None = None) -> None:
 
         GfxApp(CityChapter(lambda s: generate(s, legacy), diary_dir=diary_dir), brain, seed, speed=args.speed,
                sprites_dir=args.sprites, size=window_size(args), zoom=args.zoom,
-               fullscreen=args.fullscreen).run()
+               fullscreen=args.fullscreen, view=args.view).run()
         return
     from .ui import CyberApp
 

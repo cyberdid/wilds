@@ -1285,3 +1285,322 @@ _FPS = {2: 2, 3: 1.5, 5: 2}
 for _i, _fr in enumerate(_corp_faces()):
     _reg(f"cp.corp.wall.face@{_i}", *_fr, fps=_FPS.get(_i, 0) if len(_fr) > 1 else 0,
          note="corp glass curtain wall")
+
+
+# --- station «Кассандра» --------------------------------------------------------------------
+# Orbital station: bolted deck plates instead of paving, a main corridor with a cyan
+# guide-light strip, machinery on top of the bulkheads and bulkhead faces with
+# portholes onto the stars. White and cyan light everywhere.
+
+
+def _deck(c: Canvas, base: str, seam: str, bevel: str, bolt: str, period: int = 8, off: int = 3) -> None:
+    """Bolted deck plates: seams on a period dividing 16, lit bevels, corner bolts."""
+    c.rect(0, 0, T, T, base)
+    for y in range(T):
+        for x in range(T):
+            px, py = (x - off) % period, (y - off) % period
+            if px == 0 or py == 0:
+                c.set(x, y, seam)
+            elif (px == 1 or py == 1) and bayer(x, y) < 0.6:
+                c.set(x, y, bevel)
+            if px == 2 and py == 2 or px == period - 2 and py == period - 2:
+                c.set(x, y, bolt)
+
+
+def _station_sidewalk(i: int) -> Canvas:
+    rng = random.Random(10100 + i)
+    c = Canvas(T, T)
+    _deck(c, "steel3", "steel1", "steel4", "steel5")
+    for _k in range(2):  # boot scuffs
+        x, y = rng.randint(4, 9), rng.randint(4, 12)
+        c.set(x, y, "steel2")
+        c.set(x + 1, y, "steel2")
+    if i == 4:  # vent grille panel
+        for y in range(5, 10):
+            c.hline(5, 9, y, "steel1" if y % 2 else "steel2")
+        c.rect(4, 4, 7, 7, "steel2", fill=False)
+    elif i == 5:  # floor light panel
+        c.rect(5, 6, 5, 3, "steel1")
+        c.hline(6, 8, 7, "win_cold")
+        c.set(5, 6, "steel0")
+    elif i == 6:  # hazard-striped maintenance plate
+        for y in range(4, 11):
+            for x in range(4, 11):
+                c.set(x, y, "hazard" if (x + y) % 4 < 2 else "ink2")
+        c.rect(4, 4, 7, 7, "steel1", fill=False)
+    elif i == 7:  # access hatch with a recessed handle
+        c.rect(4, 4, 7, 7, "steel2")
+        c.rect(4, 4, 7, 7, "steel1", fill=False)
+        c.hline(6, 8, 7, "steel0")
+        c.hline(6, 8, 8, "steel4")
+    elif i == 8:  # cable cover strip
+        c.hline(2, 13, 7, "steel1")
+        c.hline(2, 13, 8, "stat1")
+        c.hline(2, 13, 9, "steel1")
+        for x in range(3, 13, 3):
+            c.set(x, 8, "stat2")
+    return c
+
+
+def _station_road(i: int) -> Canvas:
+    rng = random.Random(10200 + i)
+    c = Canvas(T, T)
+    _deck(c, "steel2", "steel1", "steel3", "steel4")
+    # the guide-light strip down the corridor, same in every tile
+    c.hline(0, T - 1, 7, "steel0")
+    for x in range(T):
+        c.set(x, 8, "neon_cyan" if 2 <= x <= 5 or 10 <= x <= 13 else "neon_cyan_dim")
+    c.hline(0, T - 1, 9, "steel0")
+    if i == 3:  # floor grate over the service void: dim lights far below
+        for y in range(11, 15):
+            for x in range(3, 13):
+                c.set(x, y, "steel1" if x % 2 else "ink2")
+        c.set(6, 13, "neon_cyan_dim")
+        c.set(10, 12, "glass1")
+    elif i == 4:  # hazard chevrons at a blast-door line
+        for x in range(2, 14):
+            c.set(x, 2, "hazard" if (x // 2) % 2 else "ink2")
+            c.set(x, 3, "hazard" if ((x + 1) // 2) % 2 else "ink2")
+    elif i == 5:  # tread plate section
+        for y in range(11, 15):
+            for x in range(2, 14):
+                if (x + 2 * y) % 4 == 0:
+                    c.set(x, y, "steel3")
+                    c.set(x, y + 1 if y < 14 else y, "steel1")
+    elif i == 6:  # maintenance hatch, a warning light beside it
+        c.rect(3, 1, 7, 5, "steel1")
+        c.rect(4, 2, 5, 3, "steel2")
+        c.hline(5, 7, 3, "steel0")
+        c.set(11, 3, "neon_red_dim")
+    _ = rng
+    return c
+
+
+def _station_roof_base(i: int) -> Canvas:
+    c = Canvas(T, T)
+    _deck(c, "steel2", "steel1", "steel3", "steel4", period=16, off=3)
+    rng = random.Random(10300 + i)
+    for _k in range(3):  # rivet rows
+        x, y = rng.randint(4, 12), rng.randint(4, 12)
+        c.set(x, y, "steel3")
+    return c
+
+
+def _pipe_h(c: Canvas, x0: int, x1: int, y: int, lit: str, body: str, dark: str) -> None:
+    c.hline(x0, x1, y, lit)
+    c.hline(x0, x1, y + 1, body)
+    c.hline(x0, x1, y + 2, dark)
+
+
+def _station_roofs() -> list[list[Canvas]]:
+    out = [[_station_roof_base(i)] for i in range(3)]
+    # 3: pipe run ending in two elbows
+    c = _station_roof_base(3)
+    _pipe_h(c, 3, 12, 5, "chrome2", "chrome1", "chrome0")
+    for x in (3, 12):
+        c.rect(x - 1, 4, 3, 5, "steel1")
+        c.set(x, 5, "chrome2")
+    c.hline(4, 12, 8, "steel1")
+    out.append([c])
+    # 4: heat-sink fins
+    c = _station_roof_base(4)
+    for x in range(3, 13, 2):
+        c.vline(x, 4, 11, "stat2")
+        c.vline(x + 1, 4, 11, "steel1")
+    c.hline(3, 12, 3, "stat3")
+    c.hline(3, 12, 12, "steel0")
+    out.append([c])
+    # 5: vent fan turning
+    c = _station_roof_base(5)
+    c.rect(3, 3, 10, 9, "steel1")
+    c.ellipse(8.0, 7.5, 4.0, 3.5, "steel0")
+    frames = []
+    for f in range(2):
+        fr = c.copy()
+        blades = [(6, 6), (7, 7), (9, 8), (10, 9), (9, 5), (8, 6), (6, 9), (7, 8)] if f == 0 else \
+                 [(8, 5), (8, 6), (8, 9), (8, 10), (5, 7), (6, 7), (10, 8), (11, 8)]
+        for x, y in blades:
+            fr.set(x, y, "steel3")
+        fr.set(8, 7, "chrome2")
+        frames.append(fr)
+    out.append(frames)
+    # 6: junction box with a status light
+    c = _station_roof_base(6)
+    _kit_box(c, 4, 5, 6, 2, 3, "stat2", "stat1", "stat3", "steel0", "steel1")
+    for x in (5, 7):
+        c.vline(x, 8, 12, "ink2")
+    on = c.copy()
+    on.set(8, 8, "neon_green")
+    off = c.copy()
+    off.set(8, 8, "neon_green_dim")
+    out.append([on, on, on, off])
+    # 7: cable tray
+    c = _station_roof_base(7)
+    c.rect(2, 9, 12, 3, "steel1")
+    for x in range(2, 14):
+        c.set(x, 10, ("neon_red_dim", "steel4", "hazard_dark", "glass2")[x % 4])
+    c.hline(2, 13, 9, "steel3")
+    out.append([c])
+    # 8: coolant tank
+    c = _station_roof_base(8)
+    c.ellipse(9.0, 11.5, 4.0, 1.6, "steel1")
+    _stamp(c, """
+        .kkkkk.
+        k43332k
+        k32221k
+        k32221k
+        k21110k
+        .kkkkk.
+        """, {"0": "glass0", "1": "glass1", "2": "glass2", "3": "glass3", "4": "white"}, 5, 4)
+    out.append([c])
+    return out
+
+
+def _porthole(c: Canvas, x: int, y: int, size: int, stars: list[tuple[int, int, str]]) -> None:
+    """A round window onto space: lit rim top-left, shadowed bottom-right, void and stars."""
+    r = size / 2
+    cx, cy = x + r, y + r
+    c.ellipse(cx, cy, r, r, "steel1")
+    c.ellipse(cx, cy, r - 1, r - 1, "void")
+    for xx in range(x, x + size):
+        for yy in range(y, y + size):
+            if c.get(xx, yy) == "steel1" and (xx - cx) + (yy - cy) < -0.5:
+                c.set(xx, yy, "steel5")
+    for sx, sy, n in stars:
+        if c.get(x + sx, y + sy) == "void":
+            c.set(x + sx, y + sy, n)
+
+
+def _station_face_base(i: int) -> Canvas:
+    rng = random.Random(10400 + i)
+    c = Canvas(T, T, "stat1")
+    _parapet(c, "stat3", "stat4", "stat2", "steel1")
+    c.hline(0, T - 1, 3, "steel1")  # light-strip housing, lamps on the inner part of the tile
+    for x in range(2, 14):
+        c.set(x, 3, "win_cold")
+    c.hline(0, T - 1, 4, "stat2")
+    for y in range(5, 15):  # panel seams and rivets
+        c.set(0, y, "steel2")
+        c.set(15, y, "stat2")
+    for y in (9,):
+        for x in range(T):
+            if bayer(x, y) < 0.5:
+                c.set(x, y, "stat2")
+    for x, y in ((2, 6), (13, 6), (2, 12), (13, 12)):
+        c.set(x, y, "stat3")
+    _ = rng
+    return c
+
+
+def _station_faces() -> list[list[Canvas]]:
+    F: list[list[Canvas]] = []
+    tw = [("white", "win_cold"), ("win_cold", "white"), ("steel3", "white")]
+    # 0: twin portholes, stars twinkling
+    frames = []
+    for f in range(3):
+        c = _station_face_base(0)
+        _porthole(c, 2, 6, 5, [(2, 1, tw[f][0]), (3, 3, "steel3"), (1, 3, tw[(f + 1) % 3][1])])
+        _porthole(c, 9, 6, 5, [(1, 2, tw[(f + 2) % 3][0]), (3, 1, "steel3"), (2, 3, tw[f][1])])
+        frames.append(c)
+    F.append(frames)
+    # 1: sliding door, status LED
+    c = _station_face_base(1)
+    _stamp(c, """
+        kkkkkkkk
+        k232232k
+        k232232k
+        k232232k
+        k232232k
+        khhhhhhk
+        khKhKhKk
+        k232232k
+        """, {"2": "stat2", "3": "stat3", "h": "hazard"}, 4, 6)
+    c.vline(7, 7, 13, "steel1")
+    on = c.copy()
+    on.set(13, 8, "neon_green")
+    off = c.copy()
+    off.set(13, 8, "neon_green_dim")
+    F.append([on, on, off, on])
+    # 2: one big porthole with the planet's limb
+    frames = []
+    for f in range(3):
+        c = _station_face_base(2)
+        _porthole(c, 4, 5, 8, [])
+        for xx in range(5, 12):
+            for yy in range(6, 13):
+                if c.get(xx, yy) == "void" and (xx - 12) ** 2 + (yy - 14) ** 2 < 22:
+                    c.set(xx, yy, "water2" if (xx - 12) ** 2 + (yy - 14) ** 2 > 14 else "water1")
+        c.set(6, 7, tw[f][0])
+        c.set(9, 6, tw[(f + 1) % 3][1])
+        c.set(7, 9, "steel3")
+        frames.append(c)
+    F.append(frames)
+    # 3: vent grille, pipes, warning label
+    c = _station_face_base(3)
+    for y in range(6, 12):
+        c.hline(3, 8, y, "steel1" if y % 2 else "stat2")
+    c.rect(2, 5, 8, 8, "steel2", fill=False)
+    c.vline(12, 4, 14, "chrome1")
+    c.vline(13, 4, 14, "chrome0")
+    c.set(12, 9, "steel0")
+    c.hline(10, 11, 12, "hazard")
+    F.append([c])
+    # 4: terminal screen, text scrolling
+    frames = []
+    for f in range(3):
+        c = _station_face_base(4)
+        c.rect(3, 6, 9, 6, "steel0")
+        c.rect(4, 7, 7, 4, "glass0")
+        for k in range(3):
+            y = 7 + (k + f) % 4
+            ln = (5, 3, 6)[k]
+            c.hline(4, 3 + ln, y, "win_cold")
+        c.set(12, 7, "neon_green")
+        frames.append(c)
+    F.append(frames)
+    # 5: porthole and an emergency locker
+    frames = []
+    for f in range(3):
+        c = _station_face_base(5)
+        _porthole(c, 2, 6, 5, [(2, 2, tw[f][0]), (1, 1, tw[(f + 2) % 3][1])])
+        c.rect(9, 6, 5, 7, "red1")
+        c.rect(10, 7, 3, 5, "red2")
+        c.set(10, 7, "red3")
+        c.set(11, 9, "white")
+        frames.append(c)
+    F.append(frames)
+    # 6: airlock door, red light turning
+    c = _station_face_base(6)
+    _stamp(c, """
+        kkkkkkkkkkkk
+        khKhKhKhKhKk
+        k2222222222k
+        k2333333332k
+        k2322222232k
+        k2322222232k
+        k2333333332k
+        k2222222222k
+        """, {"2": "stat2", "3": "stat1", "h": "hazard"}, 2, 6)
+    on = c.copy()
+    on.set(7, 5, "neon_red")
+    on.set(8, 5, "neon_red_dim")
+    off = c.copy()
+    off.set(7, 5, "neon_red_dim")
+    off.set(8, 5, "neon_red")
+    F.append([on, off])
+    for f in F:
+        for fr in f:
+            _base(fr, "steel1", "steel0")
+    return F
+
+
+for _i in range(9):
+    _reg(f"cp.station.sidewalk@{_i}", _station_sidewalk(_i), note="station: bolted deck plates")
+for _i in range(7):
+    _reg(f"cp.station.road@{_i}", _station_road(_i), note="station: main corridor, cyan guide strip")
+for _i, _fr in enumerate(_station_roofs()):
+    _reg(f"cp.station.wall.top@{_i}", *_fr, fps=4 if len(_fr) > 1 else 0, note="station: machinery on bulkheads")
+_FPS = {0: 2, 1: 1, 2: 1.5, 4: 3, 5: 2, 6: 3}
+for _i, _fr in enumerate(_station_faces()):
+    _reg(f"cp.station.wall.face@{_i}", *_fr, fps=_FPS.get(_i, 0) if len(_fr) > 1 else 0,
+         note="station bulkhead, portholes onto the stars")

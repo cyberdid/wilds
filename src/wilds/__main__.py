@@ -55,6 +55,8 @@ def add_gfx_args(p: argparse.ArgumentParser) -> None:
     g = p.add_argument_group("графіка (спрайти, pygame)")
     g.add_argument("--gfx", action="store_true", help="графічний клієнт зі спрайтами замість терміналу")
     g.add_argument("--zoom", type=int, default=3, help="масштаб пікселів 1-6 (типово 3)")
+    g.add_argument("--view", choices=["2d", "iso"], default="2d",
+                   help="вид: 2d (3/4 зверху) або iso (ізометрія 2.5D); у грі перемикає клавіша i")
     g.add_argument("--window", default="1360x820", help="розмір вікна, напр. 1600x900")
     g.add_argument("--fullscreen", action="store_true", help="на весь екран")
     g.add_argument("--sprites", metavar="DIR", default=None,
@@ -123,7 +125,7 @@ def shot(args: argparse.Namespace, brain, seed: int, loaded: Simulation | None =
     if args.headless:
         sim.run(brain, args.headless)
     app = GfxApp(Tau7Chapter(generate), brain, seed, speed=args.speed, sprites_dir=args.sprites,
-                 size=window_size(args), zoom=args.zoom, loaded=sim, headless=True)
+                 size=window_size(args), zoom=args.zoom, loaded=sim, headless=True, view=args.view)
     app.god_view = args.god
     app.paused = True  # only animations advance while the frame settles
     print(f"скріншот: {app.shot(args.shot)}")
@@ -160,7 +162,7 @@ def main(argv: list[str] | None = None) -> None:
 
         chapter = Tau7Chapter(generate, diary_dir=diary_dir, save_dir=SAVE_DIR, legacy_dir=legacy_dir)
         GfxApp(chapter, brain, seed, speed=args.speed, sprites_dir=args.sprites, size=window_size(args),
-               zoom=args.zoom, loaded=loaded, fullscreen=args.fullscreen).run()
+               zoom=args.zoom, loaded=loaded, fullscreen=args.fullscreen, view=args.view).run()
         return
     from .ui import WildsApp
 
