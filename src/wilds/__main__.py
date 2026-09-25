@@ -11,7 +11,7 @@ from pathlib import Path
 from .brain import ClaudeBrain, CodexBrain, ScriptedBrain
 from .brain.codex import DEFAULT_MODEL as CODEX_DEFAULT_MODEL
 from .actions import ACTION_HELP
-from .save import latest_save, load_game, save_game, save_path
+from .save import SAVE_DIR, latest_save, load_game, save_game, save_path
 from .sim import Simulation
 from .worldgen import generate
 
@@ -46,7 +46,30 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                    help="tau7 (типово) - виживання; cyberpunk - друга глава після порятунку")
     p.add_argument("--legacy-dir", default="legacy", help="куди/звідки писати/читати спадок персонажа")
     p.add_argument("--no-legacy", action="store_true", help="не писати спадок при порятунку")
+    add_gfx_args(p)
     return p.parse_args(argv)
+
+
+def add_gfx_args(p: argparse.ArgumentParser) -> None:
+    """Sprite front-end flags, shared by both chapters."""
+    g = p.add_argument_group("графіка (спрайти, pygame)")
+    g.add_argument("--gfx", action="store_true", help="графічний клієнт зі спрайтами замість терміналу")
+    g.add_argument("--zoom", type=int, default=3, help="масштаб пікселів 1-6 (типово 3)")
+    g.add_argument("--window", default="1360x820", help="розмір вікна, напр. 1600x900")
+    g.add_argument("--fullscreen", action="store_true", help="на весь екран")
+    g.add_argument("--sprites", metavar="DIR", default=None,
+                   help="тека з PNG, що підміняють вбудовані спрайти (формат: wilds-sprites --strips)")
+    g.add_argument("--shot", metavar="FILE", default=None,
+                   help="зберегти кадр гри в PNG без вікна (після --headless N тіків) і вийти")
+    g.add_argument("--god", action="store_true", help="для --shot: показати всю мапу («око бога»)")
+
+
+def window_size(args: argparse.Namespace) -> tuple[int, int]:
+    try:
+        w, h = (int(v) for v in args.window.lower().split("x"))
+        return max(640, w), max(480, h)
+    except ValueError:
+        sys.exit(f"--window: очікую ШИРИНАxВИСОТА, отримав {args.window!r}")
 
 
 def make_brain(args: argparse.Namespace):
@@ -91,6 +114,21 @@ def headless(args: argparse.Namespace, brain, seed: int, loaded: Simulation | No
         print(f"щоденник: {sim.diary_path}")
 
 
+def shot(args: argparse.Namespace, brain, seed: int, loaded: Simulation | None = None) -> None:
+    """Render one frame of the sprite front-end to a PNG, no window needed."""
+    from .gfx.app import GfxApp, Tau7Chapter
+
+    sim = loaded or Simulation(generate(seed))
+    sim.brain_name = brain.name
+    if args.headless:
+        sim.run(brain, args.headless)
+    app = GfxApp(Tau7Chapter(generate), brain, seed, speed=args.speed, sprites_dir=args.sprites,
+                 size=window_size(args), zoom=args.zoom, loaded=sim, headless=True)
+    app.god_view = args.god
+    app.paused = True  # only animations advance while the frame settles
+    print(f"скріншот: {app.shot(args.shot)}")
+
+
 def main(argv: list[str] | None = None) -> None:
     if _chapter(argv) == "cyberpunk":
         from .cyberpunk.__main__ import main as cyberpunk_main
@@ -109,13 +147,23 @@ def main(argv: list[str] | None = None) -> None:
         if hasattr(brain, "wrecks_done"):
             brain.wrecks_done = set(state.get("wrecks_done", []))
         print(f"Завантажено {path}: {loaded.world.clock()}")
+    if args.shot:
+        shot(args, brain, seed, loaded)
+        return
     if args.headless:
         headless(args, brain, seed, loaded)
         return
-    from .ui import WildsApp
-
     diary_dir = Path(args.log_dir) if args.log_dir else None
     legacy_dir = None if args.no_legacy else Path(args.legacy_dir)
+    if args.gfx:
+        from .gfx.app import GfxApp, Tau7Chapter
+
+        chapter = Tau7Chapter(generate, diary_dir=diary_dir, save_dir=SAVE_DIR, legacy_dir=legacy_dir)
+        GfxApp(chapter, brain, seed, speed=args.speed, sprites_dir=args.sprites, size=window_size(args),
+               zoom=args.zoom, loaded=loaded, fullscreen=args.fullscreen).run()
+        return
+    from .ui import WildsApp
+
     WildsApp(generate, brain, seed, speed=args.speed, diary_dir=diary_dir, legacy_dir=legacy_dir,
              loaded=loaded).run()
 

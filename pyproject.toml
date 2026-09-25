@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
+    "pygame-ce>=2.5.8",
     "textual>=8.2.8",
 ]
 
@@ -17,11 +18,13 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "pillow>=11",
     "pytest>=9.1.1",
 ]
 
 [project.scripts]
 wilds = "wilds.__main__:main"
+wilds-sprites = "wilds.gfx.export:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

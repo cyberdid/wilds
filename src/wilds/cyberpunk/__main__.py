@@ -31,6 +31,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                    help="конкретний файл спадку; типово - найновіший у --legacy-dir")
     p.add_argument("--no-legacy", action="store_true", help="почати без спадку (випадкова раса, 200¥)")
     p.add_argument("--headless", type=int, metavar="TICKS", default=0)
+    from ..__main__ import add_gfx_args
+
+    add_gfx_args(p)
     return p.parse_args(argv)
 
 
@@ -81,17 +84,44 @@ def headless(args: argparse.Namespace, brain, seed: int) -> None:
         print(f"щоденник: {sim.diary_path}")
 
 
+def shot(args: argparse.Namespace, brain, seed: int) -> None:
+    """Render one frame of the sprite front-end to a PNG, no window needed."""
+    from ..__main__ import window_size
+    from ..gfx.app import CityChapter, GfxApp
+
+    legacy = _find_legacy(args)
+    sim = CitySim(generate(seed, legacy))
+    if args.headless:
+        sim.run(brain, args.headless)
+    app = GfxApp(CityChapter(lambda s: generate(s, legacy)), brain, seed, speed=args.speed,
+                 sprites_dir=args.sprites, size=window_size(args), zoom=args.zoom, loaded=sim, headless=True)
+    app.god_view = args.god
+    app.paused = True
+    print(f"скріншот: {app.shot(args.shot)}")
+
+
 def main(argv: list[str] | None = None) -> None:
     args = parse_args(argv)
     seed = args.seed if args.seed is not None else random.randrange(1_000_000)
     brain = make_brain(args)
+    if args.shot:
+        shot(args, brain, seed)
+        return
     if args.headless:
         headless(args, brain, seed)
         return
-    from .ui import CyberApp
-
     legacy = _find_legacy(args)
     diary_dir = Path(args.log_dir) if args.log_dir else None
+    if args.gfx:
+        from ..__main__ import window_size
+        from ..gfx.app import CityChapter, GfxApp
+
+        GfxApp(CityChapter(lambda s: generate(s, legacy), diary_dir=diary_dir), brain, seed, speed=args.speed,
+               sprites_dir=args.sprites, size=window_size(args), zoom=args.zoom,
+               fullscreen=args.fullscreen).run()
+        return
+    from .ui import CyberApp
+
     CyberApp(lambda s: generate(s, legacy), brain, seed, speed=args.speed, diary_dir=diary_dir).run()
 
 
