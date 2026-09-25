@@ -1992,11 +1992,11 @@ def _shop() -> list[Canvas]:
 
 
 BAR_LETTERS = """
-gg..g..gg.
-g.g.g.gg.g
-gg.g.g.gg.
-g.g.ggg.g.
-gg..g.g.g.
+gg...g..gg.
+g.g.g.g.g.g
+gg..ggg.gg.
+g.g.g.g.g.g
+gg..g.g.g.g
 """
 
 
@@ -2034,7 +2034,7 @@ def _bar() -> list[Canvas]:
     _stamp(lit, BAR_LETTERS, {"g": "neon_yellow"}, 7, 2)
     dim = c.copy()
     _stamp(dim, BAR_LETTERS, {"g": "neon_yellow"}, 7, 2)
-    for x in range(10, 14):  # the A stutters
+    for x in range(11, 14):  # the A stutters
         for y in range(2, 7):
             if dim.get(x, y) == "neon_yellow":
                 dim.set(x, y, "neon_yellow_dim")

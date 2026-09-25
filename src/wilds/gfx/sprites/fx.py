@@ -28,7 +28,7 @@ from __future__ import annotations
 import math
 import random
 
-from ..pixelart import art, grid, outline_grid, overlay, pad, shift, swap
+from ..pixelart import art, grid, outline_grid, pad, shift, swap
 from ..procgen import Canvas, bayer, fbm
 from ..registry import register
 
@@ -1036,7 +1036,7 @@ def _impact_frames() -> list:
             for y in (1, 46):
                 c.set(x, y, "Y")
                 c.set(y, x, "Y")
-        _ring(c, 24.0, 24.0, 13.0, "r", dashes=4, phase=0.125, duty=0.78)
+        _ring(c, 24.0, 24.0, 13.0, "r", dashes=4, phase=0.2225, duty=0.78)
         _ring(c, 24.0, 24.0, pr, "p" if f < 2 else "q" if f < 4 else "P")
         for d in (9, 10, 11):  # crosshair ticks inside the ring
             for x, y in ((24 - 1, 24 - d), (24, 24 - d), (24 - 1, 23 + d), (24, 23 + d),
@@ -1286,8 +1286,8 @@ register("fx.drop_marker", art(*_drop_frames(), legend=DROP, fps=4,
 # A police drone over a hot district: chrome body, blue band, scanner eye,
 # spinning rotors and a light bar that strobes red, red, blue, blue.
 _POLICE = """
-    ......kkkk......
-    ......k12k......
+    .....kkkkkk.....
+    .....k1122k.....
     mmm..kkkkkk..mmm
     .mmkkCCCCCCkkmm.
     ..kCCCCCCCCCCk..
@@ -1304,23 +1304,18 @@ def _police_frames() -> list:
     lamps = [("RR", "bb", "red"), ("RR", "bb", ""), ("rr", "BB", "blue"), ("rr", "BB", "")]
     out = []
     for f, (red, blue, halo) in enumerate(lamps):
-        body = grid(_POLICE)
-        body = swap(body, {"1": ".", "2": "."})
-        c = Canvas.of(pad(body, bottom=5))
-        c.set(6, 1, red[0])
-        c.set(7, 1, red[1])
-        c.set(8, 1, blue[0])
-        c.set(9, 1, blue[1])
+        body = swap(grid(_POLICE), {"1": red[0], "2": blue[0]})
+        c = Canvas.of(pad(body, top=1, bottom=4))
         if f % 2:  # rotor blur swings
-            for x, y in ((0, 2), (15, 2), (1, 3), (14, 3)):
+            for x, y in ((0, 3), (15, 3), (1, 4), (14, 4)):
                 c.set(x, y, "M")
         if halo == "red":
-            for x, y in ((5, 0), (6, 0), (7, 0), (4, 1), (5, 1)):
+            for x, y in ((5, 0), (6, 0), (7, 0), (4, 1), (4, 2)):
                 c.set(x, y, "H")
         elif halo == "blue":
-            for x, y in ((8, 0), (9, 0), (10, 0), (10, 1), (11, 1)):
+            for x, y in ((8, 0), (9, 0), (10, 0), (11, 1), (11, 2)):
                 c.set(x, y, "h")
-        for y, (x0, x1) in enumerate(((7, 8), (6, 9), (5, 10), (5, 10)), start=11):  # scanner cone
+        for y, (x0, x1) in enumerate(((7, 8), (6, 9), (5, 10), (5, 10)), start=12):  # scanner cone
             for x in range(x0, x1 + 1):
                 c.set(x, y, "v" if y < 14 else "V")
         g = c.grid()
@@ -1333,3 +1328,230 @@ POLICE = {"C": "chrome2", "c": "chrome1", "s": "chrome0", "d": "denim3", "e": "w
           "H": "neon_red:110", "h": "hair_blue:150", "v": "win_cold:45", "V": "win_cold:25"}
 register("fx.police", art(*_police_frames(), legend=POLICE, fps=8,
                           note="police drone over a hot district: red/blue strobe, scanner cone"))
+
+
+# --- vehicles ----------------------------------------------------------------------------------
+# Drawn as normal lit objects (outlined, lit from the top-left); their flames,
+# windows and lights use emissive colours so they glow after the night pass.
+
+def _shade_runs(c: Canvas, body: str, ramp: str, bands=(0.2, 0.6, 0.86)) -> None:
+    """Shade every vertical run of ``body`` pixels: lit top, mid side, dark
+    belly (``ramp`` = darkest, dark, mid, light)."""
+    for x in range(c.w):
+        y = 0
+        while y < c.h:
+            if c.px[y][x] != body:
+                y += 1
+                continue
+            y0 = y
+            while y < c.h and c.px[y][x] == body:
+                y += 1
+            y1 = y - 1
+            for yy in range(y0, y1 + 1):
+                t = (yy - y0) / max(1, y1 - y0)
+                c.px[yy][x] = ramp[3 if t < bands[0] else 2 if t < bands[1] else 1 if t < bands[2] else 0]
+
+
+def _flame(c: Canvas, cx: int, y0: int, length: int, half0: float) -> None:
+    """A downward thruster flame from the nozzle at (cx, y0): white-yellow core,
+    cooling to orange and a translucent red tip."""
+    for i in range(length):
+        u = i / max(1, length)
+        half = half0 * (1 - u) ** 0.6 + 0.35
+        for j in range(-4, 5):
+            d = abs(j)
+            if d > half:
+                continue
+            core = d <= half * 0.45
+            ch = (("W" if u < 0.35 else "E" if u < 0.7 else "e") if core else
+                  ("E" if u < 0.4 else "e" if u < 0.75 else "f"))
+            c.set(cx + j, y0 + i, ch)
+
+
+def _shuttle_hull(beacon: bool, door_open: bool = False) -> tuple:
+    c = Canvas(48, 40)
+    _poly(c, [(6, 10), (9.5, 1.5), (13.5, 1.5), (18, 9.5)], "F")
+    _poly(c, [(3, 11.5), (6, 9), (30, 8), (35, 6.5), (40, 7), (44, 10), (46.5, 14), (46, 17.5),
+              (43, 20.5), (38, 22.5), (8, 22.5), (4, 20.5), (3, 17)], "H")
+    c.rect(9, 21, 11, 6, "N")
+    c.rect(28, 21, 11, 6, "N")
+    _shade_runs(c, "F", "1234")
+    _shade_runs(c, "H", "1234")
+    _shade_runs(c, "N", "5678")
+    c.rect(11, 27, 7, 2, "n")
+    c.rect(30, 27, 7, 2, "n")
+    for x in (7, 40):
+        c.vline(x, 23, 29, "S")
+    c.hline(4, 10, 30, "S")
+    c.hline(37, 43, 30, "S")
+    for x in range(3, 46):  # the company stripe along the hull
+        if c.get(x, 16) in "1234":
+            c.set(x, 16, "o")
+        if c.get(x, 17) in "1234":
+            c.set(x, 17, "O")
+    for x in range(9, 39):  # hazard bands on the thruster pods
+        if c.get(x, 22) in "5678":
+            c.set(x, 22, "h" if (x // 2) % 2 else "K")
+    _poly(c, [(33.5, 8.5), (39.5, 8.3), (44.2, 11.8), (35, 12.3)], "g")
+    c.line(36, 9, 39, 9, "c")
+    c.set(40, 10, "c")
+    for x in (12, 16, 20):
+        c.rect(x, 12, 2, 2, "y")
+    c.rect(26, 10, 6, 11, "1", fill=False)  # the hatch
+    if door_open:
+        c.rect(27, 11, 4, 9, "y")
+        c.rect(27, 11, 4, 1, "Y")
+    else:
+        c.rect(28, 12, 2, 2, "y")
+    c.set(11, 5, "o")
+    c.set(12, 5, "o")
+    c.set(11, 6, "O")
+    c.set(24, 7, "B" if beacon else "b")
+    g = outline_grid(c.grid(), "k")
+    c = Canvas.of(g)
+    c.set(11, 2, "R")  # tail light and nose light sit on the rim
+    c.set(46, 15, "G")
+    return c
+
+
+def _shuttle_frames() -> list:
+    rear = (9, 7, 10, 8)
+    front = (8, 10, 7, 9)
+    out = []
+    for f in range(4):
+        c = _shuttle_hull(beacon=f < 2)
+        _flame(c, 14, 29, rear[f], 3.2)
+        _flame(c, 33, 29, front[f], 3.2)
+        out.append(c.grid())
+    return out
+
+
+SHUTTLE = {"1": "stat1", "2": "stat2", "3": "stat3", "4": "stat4", "5": "steel1", "6": "steel2",
+           "7": "steel3", "8": "steel4", "n": "steel0", "S": "steel2", "o": "statacc", "O": "suit1",
+           "h": "hazard", "K": "ink2", "g": "glass2", "c": "win_cold", "y": "win_warm", "Y": "fire5",
+           "B": "win_warm", "b": "hazard_dark", "R": "neon_red", "G": "neon_green",
+           "W": "fire5", "E": "fire4", "e": "fire3", "f": "fire2:150"}
+register("fx.shuttle", art(*_shuttle_frames(), legend=SHUTTLE, fps=12, anchor=(24, 30),
+                           note="corporate rescue shuttle descending, thrusters on; anchor = the "
+                                "landing skids (flames reach 10 px below)"))
+
+
+# The runner's ship: a scrappy courier with the runner's yellow stripe, rust
+# around the engine, a lit canopy and a cyan drive plume that flickers.
+def _ship_hull(tail_light: bool) -> Canvas:
+    c = Canvas(48, 24)
+    _poly(c, [(16, 7.5), (18.5, 2), (22.5, 2), (27, 7)], "F")
+    _poly(c, [(19, 16.5), (21, 21.5), (24, 21.5), (29, 16.5)], "F")
+    _poly(c, [(14, 9), (18, 7), (28, 6), (33, 5), (39, 6), (47.5, 11.5), (46.5, 13.5), (39, 16.5),
+              (18, 17.5), (14, 15.5)], "H")
+    c.rect(11, 7, 7, 10, "N")
+    _shade_runs(c, "F", "2345")
+    _shade_runs(c, "H", "2345")
+    _shade_runs(c, "N", "1234")
+    c.rect(9, 8, 2, 8, "n")
+    for x in range(18, 46):  # the runner's yellow stripe
+        if c.get(x, 11) in "2345":
+            c.set(x, 11, "j")
+        if c.get(x, 12) in "2345":
+            c.set(x, 12, "J")
+    rng = random.Random(1212)
+    for _ in range(9):  # rust and scorch around the drive
+        x, y = rng.randint(12, 24), rng.randint(12, 16)
+        if c.get(x, y) in "12345":
+            c.set(x, y, rng.choice("rRr"))
+    for y in range(7, 17):
+        if c.get(30, y) in "2345":
+            c.set(30, y, "1")
+    _poly(c, [(31, 6), (35, 3.5), (40, 4.5), (43.5, 8.8), (35, 8.5)], "g")
+    c.line(35, 5, 38, 5, "c")
+    c.set(39, 6, "c")
+    g = outline_grid(c.grid(), "k")
+    c = Canvas.of(g)
+    c.set(19, 1, "L" if tail_light else "l")
+    c.set(47, 12, "y")
+    for y in range(9, 15):  # the glowing drive mouth
+        c.set(8, y, "A")
+    return c
+
+
+def _ship_frames() -> list:
+    lengths = (8, 6, 9, 7)
+    out = []
+    for f in range(4):
+        c = _ship_hull(tail_light=f < 2)
+        n = lengths[f]
+        for i in range(n):
+            u = i / n
+            x = 7 - i
+            for y in range(9, 15):
+                d = abs(y + 0.5 - 12.0)
+                half = 3.0 * (1 - u) ** 0.5
+                if d > half:
+                    continue
+                c.set(x, y, "Q" if d < half * 0.4 and u < 0.45 else "A" if d < half * 0.7 and u < 0.7
+                      else "a" if u < 0.85 else "t")
+        out.append(c.grid())
+    return out
+
+
+SHIP = {"1": "steel1", "2": "steel2", "3": "steel3", "4": "steel4", "5": "steel5", "n": "steel0",
+        "j": "jacket2", "J": "jacket1", "r": "rust2", "R": "rust3", "g": "glass2", "c": "win_cold",
+        "L": "neon_red", "l": "red1", "y": "win_warm", "Q": "cryst2", "A": "neon_cyan",
+        "a": "glowcyan:150", "t": "neon_cyan:70"}
+register("cp.ship", art(*_ship_frames(), legend=SHIP, fps=12,
+                        note="the runner's ship, side view facing right, drive plume flickers"))
+
+
+# A maglev car: sleek chrome body, a band of lit windows with passengers, a
+# neon stripe, and the levitation glow under the skirt; reflections of passing
+# lights slide back along the glass.
+def _maglev_frames() -> list:
+    out = []
+    for f in range(4):
+        c = Canvas(64, 24)
+        _poly(c, [(1, 7), (3, 4.5), (50, 4.5), (56, 5.5), (61, 9), (63.5, 14.5), (62.5, 17.5),
+                  (1, 17.5)], "H")
+        c.rect(2, 17, 59, 3, "S")
+        _shade_runs(c, "H", "0123")
+        _shade_runs(c, "S", "5566")
+        c.rect(4, 7, 47, 4, "G")
+        lit = "yyydyycyyydyyycy"
+        for i, wx in enumerate(range(5, 50, 6)):
+            ch = lit[(i + (1 if f == 3 and i == 4 else 0)) % len(lit)]
+            c.rect(wx, 8, 5, 2, ch)
+            if ch == "y" and i % 3 != 1:  # passengers' heads against the light
+                c.set(wx + 1 + i % 3, 9, "p")
+        c.rect(27, 6, 6, 11, "0", fill=False)
+        c.set(30, 12, "E")
+        for x in range(2, 60):
+            if c.get(x, 13) in "0123":
+                c.set(x, 13, "N")
+            if c.get(x, 14) in "0123":
+                c.set(x, 14, "n")
+        _poly(c, [(51.5, 5.5), (56, 6), (60.5, 10.2), (53, 10.5)], "g")
+        c.line(54, 6, 57, 7, "c")
+        g = outline_grid(c.grid(), "k")
+        c = Canvas.of(g)
+        c.set(62, 14, "Y")
+        c.set(63, 14, "y" if f % 2 == 0 else "Y")
+        rx = 44 - f * 12  # a reflection sliding back along the windows
+        for k in range(3):
+            for y in range(7, 11):
+                x = rx + k - (y - 7)
+                if c.get(x, y) in "yGcd":
+                    c.set(x, y, "r")
+        glow = "L" if f % 2 == 0 else "l"
+        for x in range(4, 59):
+            c.set(x, 20, glow)
+            if x % 2 == f % 2:
+                c.set(x, 21, "t")
+        out.append(c.grid())
+    return out
+
+
+MAGLEV = {"0": "chrome0", "1": "chrome1", "2": "chrome2", "3": "chrome3", "5": "steel1", "6": "steel2",
+          "G": "glass0", "y": "win_warm", "c": "win_cold", "d": "win_dark", "p": "ink2", "E": "neon_green",
+          "N": "neon_pink", "n": "neon_pink_dim", "g": "glass2", "Y": "fire5", "r": "white:110",
+          "L": "neon_cyan", "l": "glowcyan:200", "t": "neon_cyan:70"}
+register("cp.maglev", art(*_maglev_frames(), legend=MAGLEV, fps=8,
+                          note="maglev car, side view facing right: lit windows, levitation glow"))
