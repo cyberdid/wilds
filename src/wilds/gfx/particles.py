@@ -91,11 +91,14 @@ class Particles:
                       vz=rng.uniform(3, 8), life=4 + rng.random() * 4, sprite="fx.spore", glow=True,
                       phase=rng.random() * 6.28, wobble=9)
 
-    def embers(self, x: float, y: float, dt: float, rate: float = 3.0, key: str = "ember", z: float = 8) -> None:
+    def embers(self, x: float, y: float, dt: float, rate: float = 3.0, key: str = "ember", z: float = 8,
+               down: bool = False) -> None:
+        """Rising sparks from a fire; ``down=True`` blasts them downward (thrusters)."""
         rng = self.rng
         for _ in range(self.spawn_rate(key, rate, dt)):
-            self.emit(x=x + rng.uniform(-3, 3), y=y, z=z, vx=rng.uniform(-4, 4), vy=0,
-                      vz=rng.uniform(12, 22), life=0.6 + rng.random() * 0.6,
+            vz = -rng.uniform(60, 110) if down else rng.uniform(12, 22)
+            self.emit(x=x + rng.uniform(-2 if down else -3, 2 if down else 3), y=y, z=z,
+                      vx=rng.uniform(-4, 4), vy=0, vz=vz, life=(0.25 if down else 0.6) + rng.random() * 0.4,
                       color=rng.choice([(255, 190, 90), (255, 120, 60)]), glow=True)
 
     def puff(self, x: float, y: float, n: int = 6, color=(200, 190, 210), speed: float = 20, z: float = 6) -> None:

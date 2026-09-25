@@ -444,8 +444,9 @@ class Tau7Scene:
             drop = max(0.0, 150 - (now - self.rescued_at) * 55)
             f.sprite("fx.shuttle", px + 26, py, now, layer=2, shadow=22 if drop < 40 else 0, z=drop)
             f.light(px + 26, py, 50, (255, 210, 150), 0.9, glow=True, z=drop)
-            if drop > 0:
-                self.r.particles.embers(px + 26, py, 1 / 60, 20, key="thrust", z=drop + 2)
+            if drop > 0:  # two nozzles, flames blasting down
+                for dx in (-10, 9):
+                    self.r.particles.embers(px + 26 + dx, py, 1 / 60, 18, key=f"thrust{dx}", z=drop, down=True)
 
         # effects
         for e in self.r.effects.fx:
