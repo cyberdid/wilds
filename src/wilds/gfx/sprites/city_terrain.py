@@ -31,7 +31,7 @@ from __future__ import annotations
 
 import random
 
-from ..pixelart import Art, art, grid, mirror
+from ..pixelart import Art, art, grid
 from ..procgen import Canvas, bayer, fbm
 from ..registry import register
 
@@ -1917,3 +1917,299 @@ def _neon_tiles() -> None:
 
 
 _neon_tiles()
+
+
+# --- shared street structures (cp.any.*) -----------------------------------------------------
+# Free-standing landmarks an NPC stands at (the NPC is drawn in front of them), anchored
+# bottom-centre, 1px ink outline, their own contact shadow.
+
+SHADOW, SHADOW_SOFT = "ink:110", "ink:60"
+
+
+def _contact(c: Canvas, x0: int, x1: int) -> None:
+    c.hline(x0, x1, c.h - 2, SHADOW)
+    c.hline(x0 + 2, x1 - 2, c.h - 1, SHADOW_SOFT)
+
+
+DOLLAR = """
+..g..
+.ggg.
+g.g..
+.ggg.
+..g.g
+.ggg.
+..g..
+"""
+
+
+def _shop() -> list[Canvas]:
+    c = Canvas(24, 30)
+    _contact(c, 2, 21)
+    c.rect(7, 1, 10, 9, "steel2")  # the $ sign box on a stub pole
+    c.rect(8, 2, 8, 7, "city1")
+    c.vline(11, 10, 11, "steel1")
+    c.vline(12, 10, 11, "steel2")
+    for x in range(1, 23):  # striped awning, lit on top, scalloped hem
+        red = (x - 1) // 3 % 2 == 0
+        for y in range(11, 16):
+            if y == 15 and x % 3 == 1:
+                continue
+            if red:
+                n = "red3" if y == 11 else "red2" if y < 14 else "red1"
+            else:
+                n = "bone4" if y == 11 else "bone3" if y < 14 else "bone2"
+            c.set(x, y, n)
+    c.rect(3, 16, 18, 6, "city1")  # the booth's dark inside
+    c.hline(3, 20, 18, "rust2")    # shelves
+    c.hline(3, 20, 21, "rust2")
+    for x, n in ((4, "spore3"), (5, "spore3"), (7, "cryst1"), (9, "jacket2"), (10, "jacket2"), (14, "hound3"),
+                 (16, "water4"), (17, "water4"), (19, "spore3")):
+        c.set(x, 17, n)
+    for x, n in ((5, "bone3"), (6, "bone3"), (8, "chrome2"), (15, "chrome1"), (16, "red2"), (18, "bone3")):
+        c.set(x, 20, n)
+    c.set(11, 16, "win_warm")  # a bare bulb over the counter
+    c.set(12, 16, "win_warm")
+    c.set(11, 17, "tent3")
+    for x in (2, 21):  # posts
+        c.vline(x, 16, 26, "steel2" if x == 2 else "steel1")
+    c.hline(2, 21, 22, "conc3")    # counter top
+    c.rect(2, 23, 20, 4, "conc2")  # counter front
+    c.hline(2, 21, 26, "conc1")
+    c.vline(11, 23, 26, "conc1")
+    c.rect(4, 23, 3, 2, "jacket2")  # a sticker
+    c.rect(15, 23, 4, 3, "bone3")   # price board
+    c.hline(16, 17, 24, "ink2")
+    c.set(16, 25, "ink2")
+    for x in (5, 8, 14):  # bowls steaming on the counter
+        c.set(x, 21, "white")
+    lit = c.copy()
+    _stamp(lit, DOLLAR, {"g": "neon_green"}, 10, 2)
+    dim = c.copy()
+    _stamp(dim, DOLLAR, {"g": "neon_green_dim"}, 10, 2)
+    dim.set(12, 2, "neon_green")
+    dim.set(12, 8, "neon_green")
+    return [lit, lit, lit, dim, lit, dim]
+
+
+BAR_LETTERS = """
+gg..g..gg.
+g.g.g.gg.g
+gg.g.g.gg.
+g.g.ggg.g.
+gg..g.g.g.
+"""
+
+
+def _bar() -> list[Canvas]:
+    c = Canvas(24, 30)
+    _contact(c, 2, 21)
+    c.rect(5, 1, 14, 7, "city1")  # sign backing on two legs
+    c.rect(5, 1, 14, 7, "leather1", fill=False)
+    c.vline(7, 8, 8, "ink2")
+    c.vline(16, 8, 8, "ink2")
+    c.hline(1, 22, 9, "steel3")   # roof slab
+    c.hline(1, 22, 10, "steel1")
+    c.rect(2, 11, 20, 17, "rust1")  # kiosk body: dark planks
+    for x in range(4, 21, 4):
+        c.vline(x, 11, 27, "rust0")
+    c.vline(2, 11, 27, "rust2")
+    c.rect(4, 12, 16, 8, "tent1")  # serving hatch, warm inside
+    for x in range(4, 20):
+        c.set(x, 12, "win_warm" if x % 4 == 1 else "tent2")
+    c.hline(4, 19, 16, "tent0")    # back shelf
+    for k, x in enumerate(range(5, 19, 2)):
+        n = ("moss3", "glass3", "rust3", "cryst1", "spore2", "glass3", "moss3")[k]
+        c.set(x, 14, n)
+        c.set(x, 15, n)
+        c.set(x, 13, "white" if k % 3 == 0 else "tent2")
+    c.set(9, 18, "leather0")  # the bartender's shape, back to us
+    c.set(10, 18, "leather0")
+    c.set(9, 17, "leather0")
+    c.hline(3, 20, 20, "tent3")    # counter ledge
+    c.hline(3, 20, 21, "tent0")
+    c.rect(5, 23, 3, 3, "spore2")  # a poster
+    c.set(6, 24, "bone3")
+    c.hline(2, 21, 27, "rust0")
+    lit = c.copy()
+    _stamp(lit, BAR_LETTERS, {"g": "neon_yellow"}, 7, 2)
+    dim = c.copy()
+    _stamp(dim, BAR_LETTERS, {"g": "neon_yellow"}, 7, 2)
+    for x in range(10, 14):  # the A stutters
+        for y in range(2, 7):
+            if dim.get(x, y) == "neon_yellow":
+                dim.set(x, y, "neon_yellow_dim")
+    return [lit, lit, dim, lit, lit, dim, dim, lit]
+
+
+HOLO_EYE = """
+...cccccc...
+.cc......cc.
+c...cCCc...c
+c...cCCc...c
+.cc......cc.
+...cccccc...
+"""
+
+
+def _fixer() -> list[Canvas]:
+    c = Canvas(24, 31)
+    _contact(c, 2, 21)
+    c.hline(2, 21, 10, "steel4")   # armoured roof
+    c.hline(2, 21, 11, "steel2")
+    c.rect(10, 8, 4, 2, "steel1")  # holo projector
+    c.rect(3, 12, 18, 16, "steel2")  # plated body
+    c.vline(3, 12, 27, "steel3")
+    c.vline(20, 12, 27, "steel1")
+    for y in (16, 22):
+        c.hline(3, 20, y, "steel1")
+        for x in range(4, 20, 3):
+            c.set(x, y - 1, "steel4")  # rivets
+    c.hline(5, 18, 13, "ink2")      # armoured slit, a screen glowing behind it
+    for x in range(6, 18):
+        c.set(x, 14, "win_cold" if x in (8, 9, 14) else "neon_cyan_dim")
+    c.hline(5, 18, 15, "steel1")
+    c.rect(9, 18, 6, 10, "steel1")  # the door
+    c.rect(9, 18, 6, 10, "steel0", fill=False)
+    c.set(11, 22, "steel3")
+    c.rect(15, 20, 2, 2, "ink2")    # keypad
+    c.set(15, 20, "neon_green")
+    c.vline(5, 3, 9, "steel3")      # antenna
+    c.set(19, 12, "ink2")           # camera
+    c.set(20, 12, "ink2")
+    c.hline(2, 21, 27, "steel0")
+    frames = []
+    for f in range(4):
+        fr = c.copy()
+        _stamp(fr, HOLO_EYE, {"c": "neon_cyan:210", "C": "win_cold"}, 6, 1)
+        for y in range(1, 7):  # scanlines crawl through the hologram
+            if (y + f) % 3 == 0:
+                for x in range(6, 18):
+                    if fr.get(x, y).startswith("neon_cyan"):
+                        fr.set(x, y, "neon_cyan:110")
+        for y in (7, 8):  # the projector beam
+            fr.set(11, y, "neon_cyan:80")
+            fr.set(12, y, "neon_cyan:80")
+        fr.set(5, 2, "neon_red" if f % 2 == 0 else "neon_red_dim")
+        fr.set(21, 12, "neon_red" if f < 2 else "neon_red_dim")
+        frames.append(fr)
+    return frames
+
+
+def _checkpoint() -> list[Canvas]:
+    c = Canvas(24, 30)
+    _contact(c, 1, 22)
+    c.rect(1, 7, 7, 21, "stat2")    # control pillar
+    c.vline(1, 7, 27, "stat3")
+    c.vline(7, 7, 27, "stat1")
+    c.rect(1, 7, 7, 4, "ink2")      # scanner head
+    c.rect(2, 13, 5, 3, "glass0")   # status screen
+    c.hline(3, 5, 14, "win_cold")
+    c.rect(3, 19, 2, 2, "gold1")    # corp emblem
+    c.set(3, 19, "gold2")
+    for y in range(24, 28):         # hazard base
+        for x in range(1, 8):
+            c.set(x, y, "hazard" if (x + y) % 4 < 2 else "ink2")
+    c.rect(6, 14, 3, 3, "ink2")     # pivot and the striped boom
+    for x in range(9, 23):
+        red = (x - 9) // 3 % 2 == 0
+        c.set(x, 15, "red3" if red else "white")
+        c.set(x, 16, "red1" if red else "stat3")
+    c.vline(20, 17, 27, "stat1")    # rest post with a fork
+    c.vline(21, 17, 27, "stat2")
+    c.set(19, 17, "ink2")
+    c.set(22, 17, "ink2")
+    frames = []
+    for f in range(4):
+        fr = c.copy()
+        eye = "neon_red" if f != 3 else "neon_red_dim"
+        for x in range(2, 7):
+            fr.set(x, 9, eye if x in (3, 4, 5) else "red1")
+        fr.set(4, 8, eye)
+        y = 20 + f * 2  # the scan line sweeping across the lane
+        for x in range(9, 20):
+            if fr.get(x, y) == _:
+                fr.set(x, y, "neon_red:150")
+        frames.append(fr)
+    return frames
+
+
+def _fence() -> Canvas:
+    c = Canvas(16, 24)
+    c.hline(0, 15, 23, SHADOW_SOFT)
+    for y in range(5, 21):          # chain-link diamonds
+        for x in range(2, 14):
+            if (x + y) % 4 == 0 or (x - y) % 4 == 0:
+                c.set(x, y, "grey3" if (x + y) % 8 else "grey4")
+    c.hline(0, 15, 4, "steel4")     # rails
+    c.hline(0, 15, 21, "steel2")
+    for x0 in (0, 14):              # posts, lit on the left
+        c.vline(x0, 0, 22, "steel3")
+        c.vline(x0 + 1, 0, 22, "steel1")
+    for x in range(T):              # razor wire coiled along the top
+        for y, on in ((0, x % 4 in (1, 2)), (1, x % 4 in (0, 3)), (2, x % 4 in (1, 2))):
+            if on and 2 <= x <= 13:
+                c.set(x, y, "chrome2" if y == 0 else "chrome1")
+    return c
+
+
+def _trash() -> list[Canvas]:
+    a = Canvas(16, 14)
+    a.hline(1, 14, 12, SHADOW)
+    a.hline(3, 12, 13, SHADOW_SOFT)
+    for cx, cy, rx, ry in ((5.5, 8.5, 4.2, 3.6), (10.5, 9.5, 3.6, 2.8), (8.0, 5.5, 3.0, 2.6)):
+        a.ellipse(cx, cy, rx, ry, "asph1")
+        a.ellipse(cx - 0.8, cy - 0.8, rx - 1.6, ry - 1.4, "asph2")
+        a.set(int(cx - rx / 2), int(cy - ry / 2), "asph3")
+    a.set(8, 2, "asph2")            # tied necks
+    a.set(8, 3, "asph1")
+    a.set(4, 5, "asph3")
+    a.rect(13, 9, 2, 3, "red2")     # a crushed can
+    a.set(13, 9, "chrome2")
+    a.set(2, 11, "bone3")           # a paper cup
+    b = Canvas(16, 14)
+    b.hline(1, 14, 12, SHADOW)
+    b.hline(3, 12, 13, SHADOW_SOFT)
+    b.rect(1, 4, 7, 2, "sand3")     # a soggy cardboard box
+    b.rect(1, 6, 7, 6, "sand2")
+    b.vline(7, 4, 11, "sand1")
+    b.hline(2, 6, 7, "sand1")
+    b.rect(8, 5, 7, 7, "grey2")     # a dead monitor, screen smashed
+    b.rect(9, 6, 5, 4, "glass0")
+    b.set(10, 7, "glass2")
+    b.set(11, 8, "glass2")
+    b.set(12, 7, "white")
+    b.hline(8, 14, 11, "grey1")
+    b.set(4, 3, "bone3")
+    b.set(5, 3, "bone2")
+    return [a, b]
+
+
+def _door() -> Canvas:
+    c = Canvas(16, 24)
+    c.hline(1, 14, 22, SHADOW)
+    c.hline(3, 12, 23, SHADOW_SOFT)
+    c.rect(1, 3, 14, 18, "conc2")   # frame
+    c.vline(1, 3, 20, "conc3")
+    c.vline(14, 3, 20, "conc1")
+    c.hline(1, 14, 3, "conc3")
+    c.rect(3, 6, 10, 14, "ink2")    # the dark doorway, a lit stair inside
+    for k, y in enumerate(range(12, 20)):
+        c.hline(8 - k // 2, 12, y, "tent1" if y % 2 else "tent0")
+    c.rect(4, 7, 3, 4, "tent1")
+    c.set(5, 7, "win_warm")
+    c.rect(6, 1, 4, 2, "ink2")      # caged lamp over the lintel
+    c.hline(7, 8, 2, "win_warm")
+    c.hline(1, 14, 20, "conc3")     # threshold step
+    c.hline(1, 14, 21, "conc1")
+    c.rect(11, 4, 2, 1, "bone3")    # address plate
+    return c
+
+
+_reg("cp.any.shop", *_shop(), fps=4, outline="ink", note="street vendor stall, neon $ sign flickering")
+_reg("cp.any.bar", *_bar(), fps=5, outline="ink", note="bar / safehouse kiosk, yellow neon BAR")
+_reg("cp.any.fixer", *_fixer(), fps=3, outline="ink", note="armoured fixer booth, cyan holo eye")
+_reg("cp.any.checkpoint", *_checkpoint(), fps=4, outline="ink", note="corp checkpoint: striped boom, red scanner")
+_reg("cp.any.fence", _fence(), note="chain-link fence segment with razor wire (posts join when tiled)")
+for _i, _c in enumerate(_trash()):
+    _reg(f"cp.any.trash@{_i}", _c, outline="ink", note="trash bags / junk")
+_reg("cp.any.door", _door(), outline="ink", note="doorway: frame, lit stair, threshold, caged lamp")

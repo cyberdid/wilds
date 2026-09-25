@@ -972,3 +972,364 @@ EXPLOSION = {
 }
 register("fx.explosion", art(*_explosion_frames(), legend=EXPLOSION, fps=12, loop=False, anchor=(24, 34),
                              note="orbital debris impact over the 3x3 zone (one-shot)"))
+
+
+# Burning debris falling straight down (moved by the renderer, ~380 px/s): a
+# chunk of hull, white-hot on its leading face, a bow shock under it and a
+# flickering fire trail that cools to smoke above it.
+_METEOR_ROCK = """
+    ..kkk..
+    .kMmmk.
+    kMmmssk
+    kmmsssk
+    kseeesk
+    .keyyk.
+    ..kyk..
+    """
+
+
+def _meteor_frames() -> list:
+    out = []
+    for f in range(4):
+        rng = random.Random(900 + f)
+        c = Canvas(16, 32)
+        for y in range(0, 24):
+            t = (23 - y) / 23  # 0 at the rock .. 1 at the top
+            half = 3.7 * (1 - t) ** 0.8 + 0.5 + rng.uniform(-0.6, 0.6)
+            for x in range(16):
+                d = abs(x + 0.5 - 8.0)
+                if d > half:
+                    continue
+                heat = (1 - t) * (1 - 0.5 * d / max(half, 0.01))
+                ch = ("y" if heat > 0.72 else "o" if heat > 0.52 else "e" if heat > 0.36 else
+                      "r" if heat > 0.22 else "1" if heat > 0.12 else "s" if heat > 0.05 else "S")
+                c.set(x, y, ch)
+        for _ in range(3):  # sparks peeling off the trail
+            c.set(rng.randint(3, 12), rng.randint(6, 20), "e")
+        _put(c, _METEOR_ROCK, 5, 21)
+        for x, y, ch in ((4, 25, "o"), (12, 25, "o"), (4, 26, "e"), (12, 26, "e"), (5, 28, "q"),
+                         (6, 28, "y"), (7, 29, "y"), (8, 29, "q"), (9, 28, "y"), (10, 28, "q"), (8, 30, "Q")):
+            c.set(x, y, ch)
+        if f % 2:
+            c.set(7, 30, "Q")
+            c.set(8, 31, "Q")
+        out.append(c.grid())
+    return out
+
+
+METEOR = {"y": "fire5", "o": "fire4", "e": "fire3", "r": "fire2", "1": "fire1", "s": "grey2:150",
+          "S": "grey1:80", "M": "steel4", "m": "steel3", "q": "fire5:190", "Q": "fire4:120"}
+register("fx.meteor", art(*_meteor_frames(), legend=METEOR, fps=12,
+                          note="burning debris falling straight down (the renderer moves it)"))
+
+
+# The director's warning: a pulsing red reticle over the whole 3x3 impact zone
+# (48x48, centred on the target tile). Corner brackets mark the zone, a lock-on
+# ring closes in once a second, the fill breathes.
+def _impact_frames() -> list:
+    out = []
+    radii = (22.0, 18.5, 15.0, 11.5, 8.0, 4.5)
+    for f, pr in enumerate(radii):
+        c = Canvas(48, 48)
+        c.rect(0, 0, 48, 48, "z" if f < 3 else "Z")
+        for x in range(1, 47):  # a slightly stronger border band inside the zone edge
+            for y in (1, 46):
+                c.set(x, y, "Y")
+                c.set(y, x, "Y")
+        _ring(c, 24.0, 24.0, 13.0, "r", dashes=4, phase=0.125, duty=0.78)
+        _ring(c, 24.0, 24.0, pr, "p" if f < 2 else "q" if f < 4 else "P")
+        for d in (9, 10, 11):  # crosshair ticks inside the ring
+            for x, y in ((24 - 1, 24 - d), (24, 24 - d), (24 - 1, 23 + d), (24, 23 + d),
+                         (24 - d, 23), (24 - d, 24), (23 + d, 23), (23 + d, 24)):
+                c.set(x, y, "r")
+        for x, y in ((21, 23), (21, 24), (26, 23), (26, 24), (23, 21), (24, 21), (23, 26), (24, 26)):
+            c.set(x, y, "R")
+        if f == 5:
+            c.rect(22, 22, 4, 4, "P")
+            c.rect(23, 23, 2, 2, "w")
+        g = c.grid()
+        br = Canvas.of(g)
+        for sx, sy in ((0, 0), (1, 0), (0, 1), (1, 1)):  # corner brackets, outlined
+            x0 = 2 if sx == 0 else 45
+            y0 = 2 if sy == 0 else 45
+            dx = 1 if sx == 0 else -1
+            dy = 1 if sy == 0 else -1
+            for k in range(8):
+                for t in range(2):
+                    br.set(x0 + dx * k, y0 + dy * t, "R")
+                    br.set(x0 + dx * t, y0 + dy * k, "R")
+        g = br.grid()
+        # a dark rim under the brackets and ring so they read on the red dust too
+        mask = Canvas(48, 48)
+        for y in range(48):
+            for x in range(48):
+                if g[y][x] in "Rrw":
+                    mask.set(x, y, g[y][x])
+        rim = outline_grid(mask.grid(), "k")
+        final = Canvas.of(g)
+        for y in range(48):
+            for x in range(48):
+                if rim[y][x] == "k" and g[y][x] in "zZY":
+                    final.set(x, y, "k")
+        out.append(final.grid())
+    return out
+
+
+IMPACT = {"z": "red2:26", "Z": "red2:40", "Y": "red3:70", "r": "red3", "R": "neon_red",
+          "p": "neon_red:110", "q": "neon_red:170", "P": "neon_red", "k": "ink:170"}
+register("fx.impact_marker", art(*_impact_frames(), legend=IMPACT, fps=6, anchor=(24, 31),
+                                 note="debris warning: pulsing reticle over the 3x3 zone (centre it "
+                                      "on the target tile)"))
+
+
+# The repaired beacon transmits: one radio ring expands from the antenna tip and
+# fades (the renderer spawns one every 0.9 s while transmitting).
+def _beacon_frames() -> list:
+    radii = (1.5, 3.5, 5.5, 7.5, 9.5, 11.5, 13.5, 15.0)
+    main = "wggggGhi"
+    out = []
+    for f, r in enumerate(radii):
+        c = Canvas(32, 32)
+        if 1 <= f <= 5:
+            _ring(c, 16.0, 16.0, r + 1, "o")
+        if f >= 2:
+            _ring(c, 16.0, 16.0, r - 2.2, "e" if f < 6 else "E")
+        _ring(c, 16.0, 16.0, r, main[f])
+        if f < 2:
+            c.rect(15, 15, 2, 2, "w")
+        out.append(c.grid())
+    return out
+
+
+BEACON = {"w": "white", "g": "hivegl", "G": "hivegl:170", "h": "hivegl:110", "i": "hivegl:60",
+          "e": "neon_green:120", "E": "neon_green:60", "o": "hivegl:50"}
+register("fx.beacon_wave", art(*_beacon_frames(), legend=BEACON, fps=8, loop=False, anchor=(16, 16),
+                               note="distress call: a radio ring expands from the antenna (one-shot, "
+                                    "1 s; centre it on the antenna tip)"))
+
+
+# --- weather and city ambience ----------------------------------------------------------------
+
+# Dust-storm grains, blown right and slightly down by the renderer: bright
+# leading grain, a translucent tail behind it.
+DUST = {"D": "dust5", "d": "dust4", "u": "dust4:150", "t": "dust3:90", "s": "sand4:200"}
+register("fx.dust@0", art("tudD", legend=DUST, note="dust streak (moves right)"))
+register("fx.dust@1", art("tu..", ".udD", legend=DUST, note="dust clump streak (moves right/down)"))
+register("fx.dust@2", art("ds", "td", legend=DUST, note="dust grain"))
+register("fx.dust@3", art("t...", "uts.", legend=DUST, note="faint dust wisp"))
+
+# A bioluminescent mote drifting at night: a soft pink glow that breathes.
+register("fx.spore", art(
+    """
+    .a.
+    aPa
+    .a.
+    """,
+    """
+    .b.
+    bSb
+    .b.
+    """,
+    """
+    .a.
+    aPa
+    .a.
+    """,
+    """
+    ...
+    .P.
+    ...
+    """, legend={"S": "spore5", "P": "spore4", "a": "spore3:110", "b": "spore4:170"}, fps=4,
+    note="night spore mote: breathing pink glow"))
+
+# City rain streak, falling down and a little left like the renderer moves it.
+register("fx.rain", art(
+    """
+    .a
+    .a
+    .a
+    .b
+    .b
+    .b
+    b.
+    c.
+    c.
+    c.
+    d.
+    w.
+    """, legend={"a": "glass4:45", "b": "glass4:90", "c": "glass4:150", "d": "win_cold:200",
+                 "w": "white:230"}, note="rain streak (moves down-left)"))
+
+# A raindrop hits the pavement: a small crown, droplets hop out, a ring spreads.
+register("fx.splash", art(
+    """
+    ........
+    ........
+    ........
+    ........
+    ...ww...
+    ..a..a..
+    """,
+    """
+    ........
+    .w....w.
+    ..a..a..
+    ........
+    .a....a.
+    ..aaaa..
+    """,
+    """
+    w......w
+    ........
+    ........
+    ........
+    t......t
+    .tttttt.
+    """,
+    """
+    ........
+    ........
+    ........
+    ........
+    ........
+    t......t
+    """, legend={"w": "white:220", "a": "glass4:190", "t": "glass4:100"}, fps=14, loop=False,
+    note="raindrop hits the pavement (one-shot); anchor = bottom centre on the ground"))
+
+
+# Steam from a city vent: wisps rise from the vent (bottom centre), swell,
+# drift downwind and dissolve; three wisps in flight make a seamless loop.
+def _steam_frames(n: int = 6) -> list:
+    out = []
+    for f in range(n):
+        c = Canvas(16, 16)
+        blobs = sorted(((f / n + k / 3) % 1.0 for k in range(3)), reverse=True)
+        for ph in blobs:  # the highest (oldest) first, so newer puffs sit in front
+            y = 14.5 - ph * 13.0
+            r = 1.4 + ph * 3.0
+            x = 8.0 + math.sin(ph * math.pi * 1.3) * 1.2 + ph * 2.0
+            chars = "123" if ph < 0.35 else "456" if ph < 0.7 else "789"
+            _cloud(c, [(x, y, r), (x - r * 0.55, y + r * 0.3, r * 0.6)], chars,
+                   erode=max(0.0, ph - 0.45) * 1.8)
+        out.append(c.grid())
+    return out
+
+
+STEAM = {"1": "grey3", "2": "grey4", "3": "white",
+         "4": "grey3:160", "5": "grey4:160", "6": "white:160",
+         "7": "grey3:90", "8": "grey4:90", "9": "white:90"}
+register("fx.steam", art(*_steam_frames(), legend=STEAM, fps=6,
+                         note="steam rising from a city vent (loop); anchor = the vent"))
+
+
+def _poly(c: Canvas, pts, ch: str) -> None:
+    """Fill a polygon (even-odd, pixel centres) with ``ch``."""
+    n = len(pts)
+    for y in range(c.h):
+        yc = y + 0.5
+        xs = []
+        for i in range(n):
+            (x0, y0), (x1, y1) = pts[i], pts[(i + 1) % n]
+            if (y0 <= yc < y1) or (y1 <= yc < y0):
+                xs.append(x0 + (yc - y0) * (x1 - x0) / (y1 - y0))
+        xs.sort()
+        for a, b in zip(xs[::2], xs[1::2]):
+            for x in range(math.ceil(a - 0.5), math.floor(b - 0.5) + 1):
+                c.set(x, y, ch)
+
+
+# A contract dead-drop: a holographic package bobbing over a projector ring,
+# a chevron pointing at the drop point, a scanline rolling through it.
+def _drop_frames() -> list:
+    bob = (0, 1, 2, 1)
+    out = []
+    for f in range(4):
+        c = Canvas(16, 24)
+        # projector ring on the ground and a faint beam up to the package
+        _ellipse_ring(c, 8.0, 21.5, 5.0 + (f % 2) * 0.6, 1.6, "E" if f % 2 == 0 else "e", 1.2)
+        for y in range(15, 21):
+            c.set(7, y, "b")
+            c.set(8, y, "b")
+        # the chevron
+        cy = 16 + bob[f] // 2
+        for i, row in enumerate(("e....e", ".e..e.", "..ee..")):
+            for x, ch in enumerate(row):
+                if ch != ".":
+                    c.set(5 + x, cy + i, "E")
+        # the package: an isometric box, translucent faces, bright edges
+        oy = 1 + bob[f]
+        top = [(8, oy), (14.5, oy + 3.2), (8, oy + 6.4), (1.5, oy + 3.2)]
+        left = [(1.5, oy + 3.2), (8, oy + 6.4), (8, oy + 13), (1.5, oy + 9.8)]
+        right = [(8, oy + 6.4), (14.5, oy + 3.2), (14.5, oy + 9.8), (8, oy + 13)]
+        _poly(c, left, "L")
+        _poly(c, right, "R")
+        _poly(c, top, "T")
+        for a, b in ((top[0], top[1]), (top[1], top[2]), (top[2], top[3]), (top[3], top[0]),
+                     (left[0], left[3]), (left[3], left[2]), (right[1], right[2]), (right[2], right[3]),
+                     (top[2], left[2])):
+            c.line(round(a[0] - 0.5), round(a[1] - 0.5), round(b[0] - 0.5), round(b[1] - 0.5), "E")
+        c.line(4, oy + 1, 11, oy + 5, "e")  # tape across the lid
+        scan = oy + 4 + f * 2  # a scanline rolls down the hologram
+        for x in range(16):
+            if c.get(x, scan) in "LRT":
+                c.set(x, scan, "e")
+        out.append(c.grid())
+    return out
+
+
+DROP = {"E": "neon_cyan", "e": "glowcyan:190", "T": "glowcyan:120", "L": "neon_cyan:90",
+        "R": "neon_cyan:55", "b": "glowcyan:45"}
+register("fx.drop_marker", art(*_drop_frames(), legend=DROP, fps=4,
+                               note="contract dead-drop hologram (loop); anchor = the drop point"))
+
+
+# A police drone over a hot district: chrome body, blue band, scanner eye,
+# spinning rotors and a light bar that strobes red, red, blue, blue.
+_POLICE = """
+    ......kkkk......
+    ......k12k......
+    mmm..kkkkkk..mmm
+    .mmkkCCCCCCkkmm.
+    ..kCCCCCCCCCCk..
+    .kCccccccccccsk.
+    .kcddddddddeesk.
+    .kcddddddddewsk.
+    .kcccccccccccsk.
+    ..kssssssssssk..
+    ...kkkkkkkkkk...
+    """
+
+
+def _police_frames() -> list:
+    lamps = [("RR", "bb", "red"), ("RR", "bb", ""), ("rr", "BB", "blue"), ("rr", "BB", "")]
+    out = []
+    for f, (red, blue, halo) in enumerate(lamps):
+        body = grid(_POLICE)
+        body = swap(body, {"1": ".", "2": "."})
+        c = Canvas.of(pad(body, bottom=5))
+        c.set(6, 1, red[0])
+        c.set(7, 1, red[1])
+        c.set(8, 1, blue[0])
+        c.set(9, 1, blue[1])
+        if f % 2:  # rotor blur swings
+            for x, y in ((0, 2), (15, 2), (1, 3), (14, 3)):
+                c.set(x, y, "M")
+        if halo == "red":
+            for x, y in ((5, 0), (6, 0), (7, 0), (4, 1), (5, 1)):
+                c.set(x, y, "H")
+        elif halo == "blue":
+            for x, y in ((8, 0), (9, 0), (10, 0), (10, 1), (11, 1)):
+                c.set(x, y, "h")
+        for y, (x0, x1) in enumerate(((7, 8), (6, 9), (5, 10), (5, 10)), start=11):  # scanner cone
+            for x in range(x0, x1 + 1):
+                c.set(x, y, "v" if y < 14 else "V")
+        g = c.grid()
+        out.append(shift(g, 0, 1) if f in (1, 2) else g)
+    return out
+
+
+POLICE = {"C": "chrome2", "c": "chrome1", "s": "chrome0", "d": "denim3", "e": "win_cold", "m": "steel4:110",
+          "M": "steel5:150", "R": "neon_red", "r": "red1", "B": "win_cold", "b": "denim1",
+          "H": "neon_red:110", "h": "hair_blue:150", "v": "win_cold:45", "V": "win_cold:25"}
+register("fx.police", art(*_police_frames(), legend=POLICE, fps=8,
+                          note="police drone over a hot district: red/blue strobe, scanner cone"))

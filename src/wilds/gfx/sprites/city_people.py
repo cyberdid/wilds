@@ -84,8 +84,9 @@ class Rig:
     """One metatype's body parts plus where its eye and mouth are (stand pose)."""
 
     def __init__(self, race: str, size: tuple[int, int], eye: tuple[int, int],
-                 mouth: tuple[int, int], parts: dict[str, Part]) -> None:
+                 mouth: tuple[int, int], parts: dict[str, Part], over: tuple[str, ...] = ()) -> None:
         self.race, self.size, self.eye, self.mouth, self.parts = race, size, eye, mouth, parts
+        self.over = over  # drawn after hair and headgear: elf ears, troll horns
 
     def __getitem__(self, name: str) -> Part:
         try:
@@ -116,6 +117,7 @@ def figure(rig: Rig, look: Look, legs: str = "legs.stand", arm: str = "arm.down"
     body = [rig["torso"]] + [rig[n] for n in look.wear]
     heads = [rig["head"]] + ([rig[look.hair]] if look.hair else [])
     heads += [rig[n] for n in (look.gear if gear is None else gear)]
+    heads += [rig[n] for n in rig.over]
     if mouth:
         heads.append(dot(*rig.mouth, "m"))
     top = [rig[arm]] + [rig[n] for n in extra]

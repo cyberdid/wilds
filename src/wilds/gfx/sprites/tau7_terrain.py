@@ -1461,17 +1461,18 @@ def _kepler_interior() -> None:
         for y in range(T):
             for x in range(T):
                 if x % 8 == 7 or y % 8 == 7:
-                    c.set(x, y, "1")
-                elif x % 8 == 0 or y % 8 == 0:
-                    c.set(x, y, "3" if bayer(x, y) < 0.6 else "2")
-        if i == 1:  # an orange guide stripe
-            for x in range(T):
-                c.set(x, 11, "a")
-                c.set(x, 12, "A")
-        elif i == 2:  # tracked-in dust
-            c.speckle("d", 0.05, 931, only="23")
+                    c.set(x, y, "1")  # grout
+                elif (x % 8 == 0 or y % 8 == 0) and bayer(x, y) < 0.2:
+                    c.set(x, y, "3")  # a faint bevel on the tile edges
+        if i == 1:  # one tile darker: a scuffed, replaced panel
+            for y in range(8, 15):
+                for x in range(8, 15):
+                    if bayer(x, y) < 0.35:
+                        c.set(x, y, "1")
+        elif i == 2:  # a little tracked-in dust
+            c.speckle("d", 0.02, 931, only="2")
         elif i == 3:  # a drain
-            _stamp(c, 5, 5, ["1111", "1001", "1001", "1111"], wrap=False)
+            _stamp(c, 2, 2, ["1111", "1001", "1111"], wrap=False)
         register(f"t7.kepler.floor@{i}", art(c.grid(), legend=lg, note="Kepler-9 lab floor tiles"))
     for i in range(2):
         c = Canvas(T, T, "1")
@@ -1512,7 +1513,7 @@ def _hive_interior() -> None:
         c = Canvas(T, T)
         blis = _cushions(T, T, 950 + i, 8, 2.0, 4.0)
         f = _mix((0.5, _emboss(blis)), (0.3, blis), (0.2, fbm(T, T, 955 + i, 2, 4)))
-        _quantize(c, f, "1234", [22, 50, 24, 4], dither=0.08)
+        _quantize(c, f, "1234", [24, 56, 18, 2], dither=0.08)
         rng = random.Random(960 + i)
         x, y = rng.randrange(T), rng.randrange(T)
         for _ in range(8):  # a vein
