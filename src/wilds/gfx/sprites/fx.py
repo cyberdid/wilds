@@ -824,7 +824,7 @@ def _smoke_frames(n: int = 10) -> list:
     out = []
     for f in range(n):
         t = f / (n - 1)
-        grow = 1.8 + 2.6 * t ** 0.7
+        grow = 2.3 + 3.3 * t ** 0.7
         cx, cy = 8.0 + 1.4 * t, 11.0 - 4.0 * t
         lobes = [(cx, cy, grow), (cx - grow * 0.62, cy + grow * 0.35, grow * 0.68),
                  (cx + grow * 0.6, cy + grow * 0.3, grow * 0.62)]
@@ -905,7 +905,7 @@ def _explosion_frames() -> list:
             cap_y = 15.0 - k * 1.3
             erode = (0.0, 0.1, 0.35, 0.6, 0.9, 1.2)[k]
             chars = ("abcg", "abcg", "ABCG", "ABCG", "nijm", "nijm")[k]
-            if k < 5:
+            if k < 2:
                 _cloud_dust(c, gz, 20 + k, dust_noise, f)
             lobes = [(24 + math.cos(math.radians(a)) * cap_r * 0.55,
                       cap_y + math.sin(math.radians(a)) * cap_r * 0.35, cap_r * 0.55)
