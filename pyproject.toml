@@ -1,0 +1,28 @@
+[project]
+name = "wilds"
+version = "0.1.0"
+description = "Sci-fi ASCII survival on planet Tau-7, lived by an AI (Claude or Codex CLI)"
+readme = "README.md"
+authors = [
+    { name = "Cyberdid", email = "cyberdid@example.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "textual>=8.2.8",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.1,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[project.scripts]
+wilds = "wilds.__main__:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tests", "tests/cyberpunk"]
