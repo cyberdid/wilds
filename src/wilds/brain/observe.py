@@ -169,7 +169,8 @@ def _character(hero) -> list[str]:
     if hero.traits:
         out.append("YOUR TRAITS: " + "; ".join(hero.traits))
     if hero.goal:
-        out.append(f"TODAY'S GOAL (you set it last night): {hero.goal}")
+        out.append(f"TODAY'S GOAL (you set it last night; it may already be done or out of date - "
+                   f"trust STATUS and POD below over it): {hero.goal}")
     if hero.diary:
         sol, text = hero.diary[-1]
         out.append(f"LAST DIARY ENTRY (sol {sol}): {text}")
@@ -255,9 +256,24 @@ def build_observation(sim: "Simulation") -> str:
         for h in sim.history[-6:]:
             target = f" {h.target}" if h.target else ""
             out.append(f"- {h.action}{target} -> {h.outcome or 'in progress'}")
+    out.extend(repeated_rejections(sim.history))
     out.append("")
     out.append("What do you do now?")
     return "\n".join(out)
+
+
+def repeated_rejections(history, window: int = 12, threshold: int = 2) -> list[str]:
+    """Warn about a choice the engine keeps refusing - a model otherwise tends to
+    retry it, since the refusal scrolls out of YOUR RECENT DECISIONS quickly."""
+    counts: dict[str, tuple[int, str]] = {}
+    for h in history[-window:]:
+        if h.outcome.startswith("rejected"):
+            key = f"{h.action} {h.target}".strip()
+            n, _ = counts.get(key, (0, ""))
+            counts[key] = (n + 1, h.outcome.removeprefix("rejected: "))
+    return [f"STOP REPEATING: `{key}` was rejected {n} times recently ({reason}) - it will fail "
+            "again; choose something different."
+            for key, (n, reason) in counts.items() if n >= threshold]
 
 
 def build_reflection_prompt(sim: "Simulation") -> str:

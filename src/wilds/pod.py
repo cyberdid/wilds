@@ -48,6 +48,11 @@ class Pod:
         parts = [f"power {self.power:.0f}/100", f"heater {'ON' if self.heater_on else 'off'}"]
         if self.fault:
             parts.append("FAULT (heater and solar dead until `pod repair`)")
+        else:
+            # said out loud: a low battery alone reads to a model as "still broken"
+            # (a live Codex run retried `pod repair` 44 times on a healthy pod)
+            parts.append(f"no fault, nothing to repair (solar adds ~10 power per sol by day; "
+                         f"`pod charge` adds {CELL_POWER} per power_cell)")
         if self.rescue_at is not None:
             parts.append("beacon: distress call SENT")
         elif self.beacon_repaired:

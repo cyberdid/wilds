@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ..brain.observe import repeated_rejections
 from ..world import chebyshev, direction_name
 from .actions import ACTION_HELP
 from .hero import MAX_ESSENCE
@@ -180,7 +181,8 @@ def build_observation(sim: "CitySim") -> str:
     if hero.traits:
         out.append("YOUR TRAITS: " + "; ".join(hero.traits))
     if hero.goal:
-        out.append(f"TODAY'S GOAL: {hero.goal}")
+        out.append(f"TODAY'S GOAL (set last night; may already be done or out of date - trust "
+                   f"STATUS over it): {hero.goal}")
     out.append("")
     out.append(f"STATUS: race {hero.race.label} ({hero.race.note}); hp {hero.hp:.0f}/100; "
               f"essence {hero.essence:.1f}/{MAX_ESSENCE:.0f} ({hero.essence_state}); "
@@ -244,6 +246,7 @@ def build_observation(sim: "CitySim") -> str:
         for h in sim.history[-6:]:
             target = f" {h.target}" if h.target else ""
             out.append(f"- {h.action}{target} -> {h.outcome or 'in progress'}")
+    out.extend(repeated_rejections(sim.history))
     out.append("")
     out.append("What do you do now?")
     return "\n".join(out)
