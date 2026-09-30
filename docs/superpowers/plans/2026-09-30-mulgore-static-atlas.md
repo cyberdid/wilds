@@ -124,11 +124,11 @@ The catalog owns searchable entities; atlas.py only draws entries with a tile. W
 - Modify: src/wilds/azeroth/scale.py
 - Read: data/azeroth/mulgore/zone.json and data/azeroth/mulgore/macro.json
 
-- [ ] Extend Geometry with world_map_id, x_min, x_max, y_min, and y_max loaded from zone.json.
-- [ ] Implement Geometry.world_to_tile(map_id, x, y): return None for the wrong map ID or coordinates outside half-open source bounds x_min <= x < x_max and y_min < y <= y_max; otherwise map west-to-east to tile X and north-to-south to tile Y using x_min/x_max and y_max/y_min. Do not clamp.
+- [ ] Extend Geometry with world_map_id, x_min, x_max, y_min, and y_max loaded from zone.json. Follow the coordinate convention documented by tools/zone_scale.py: world X runs north-south and world Y runs west-east.
+- [ ] Implement Geometry.world_to_tile(map_id, x, y): return None for the wrong map ID or coordinates outside x_min < x <= x_max and y_min < y <= y_max. Compute tile_x = floor((y_max - y) / (y_max - y_min) * width) and tile_y = floor((x_max - x) / (x_max - x_min) * height). Do not swap these axes back or clamp.
 - [ ] Keep original world coordinates beside the converted tile; do not overwrite them with rounded tile values.
 - [ ] Add an importer helper that classifies the converted point against Macro.at(tile_x / geometry.width, tile_y / geometry.height): v is outside, a non-v cell touching a v neighbor or the outer macro border is edge_ambiguous, and other non-v cells are inside_mask.
-- [ ] Confirm the north-west source bound maps to tile (0, 0), the south-east half-open bound maps to the final tile, and a sample map-1 point falls within Mulgore's macro mask. After Task 4, visually compare a joined NPC known to be in Thunder Bluff or Camp Narache against the corresponding approximate feature marker.
+- [ ] Confirm source bound (x_max, y_max) maps to tile (0, 0), values just above x_min/y_min map to the final row/column, and a sample map-1 point falls within Mulgore's macro mask. After Task 4, visually compare a joined NPC known to be in Thunder Bluff or Camp Narache against the corresponding approximate feature marker.
 - [ ] Commit as feat: map Mulgore world coordinates to tiles.
 
 ## Task 3: Parse and Import Spawn Rows Into the Local JSON Snapshot
