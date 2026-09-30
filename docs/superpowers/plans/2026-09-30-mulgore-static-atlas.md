@@ -178,15 +178,15 @@ The catalog owns searchable entities; atlas.py only draws entries with a tile. W
 - Create: src/wilds/azeroth/atlas.py
 - Read: src/wilds/azeroth/terrain.py, src/wilds/azeroth/world.py, tools/preview_zone.py
 
-- [ ] Create MulgoreAtlasRenderer(world: ZoneWorld, catalog: AtlasCatalog) with render(surface, viewport, camera_x, camera_y, pixels_per_tile, filters: AtlasFilters, selected_key) -> None.
-- [ ] Construct ZoneWorld(pack_dir, seed=0, roads=False) so route-finding approximation is not mistaken for a surveyed Classic road. Keep terrain-noise detail labeled as a procedural preview.
-- [ ] Use world.chunk() and the existing terrain color palette to draw only chunks intersecting the camera viewport. Cache rendered chunk surfaces by chunk coordinates and zoom bucket in an LRU capped at 128 surfaces; draw full-resolution tiles when zoomed in.
-- [ ] At overview scale, sample the macro classification directly rather than looping all 64×64 tile cells for each output pixel. Use nearest-neighbor sampling, north at the top, and preserve zone aspect ratio.
-- [ ] Draw catalog markers only when filters accept the entry and CatalogEntry.tile exists. Give NPC, other creature, gameobject, landmark, source-map, and approximate markers distinct legend shapes/colors.
-- [ ] Cluster unselected markers into screen-space 24 px buckets at low zoom; a selected search result always draws its exact marker above its cluster.
-- [ ] Draw approximate feature roads only as a separate optional dashed layer labeled approximate route; never paint them into the terrain layer.
+- [x] Create MulgoreAtlasRenderer(world: ZoneWorld, catalog: AtlasCatalog) with render(surface, viewport, camera_x, camera_y, pixels_per_tile, filters: AtlasFilters, selected_key) -> None.
+- [x] Construct ZoneWorld(pack_dir, seed=0, roads=False) so route-finding approximation is not mistaken for a surveyed Classic road. Keep terrain-noise detail labeled as a procedural preview.
+- [x] Use world.chunk() and the existing terrain color palette to draw only chunks intersecting the camera viewport. Cache rendered chunk surfaces by chunk coordinates and zoom bucket in an LRU capped at 128 surfaces; draw full-resolution tiles when zoomed in.
+- [x] At overview scale, sample the macro classification directly rather than looping all 64×64 tile cells for each output pixel. Use nearest-neighbor sampling, north at the top, and preserve zone aspect ratio.
+- [x] Draw catalog markers only when filters accept the entry and CatalogEntry.tile exists. Give NPC, other creature, gameobject, landmark, source-map, and approximate markers distinct shapes/colors.
+- [x] Cluster unselected markers into screen-space 24 px buckets at low zoom; a selected search result always draws its exact marker above its cluster.
+- [x] Draw approximate feature roads only as a separate optional dashed layer labeled approximate route; never paint them into the terrain layer.
 - [ ] Manually compare the viewer with tools/preview_zone.py at matching scales; confirm north/orientation, boundary, water, and aspect ratio, allowing the expected route-layer difference because the viewer constructs ZoneWorld with roads=False.
-- [ ] Commit as feat: render Mulgore atlas layers.
+- [x] Commit as feat: render Mulgore atlas layers.
 
 ## Task 6: Add the Standalone Pygame Viewer
 
