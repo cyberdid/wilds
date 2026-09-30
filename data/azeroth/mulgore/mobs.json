@@ -1,0 +1,4209 @@
+[
+ {
+  "id": "pokey_thornmantle",
+  "title": "\"Pokey\" Thornmantle",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "\"Pokey\" Thornmantle",
+   "gender": "Male",
+   "race": "Quilboar",
+   "creature": "Humanoid",
+   "level": "Mulgore",
+   "type": "Rare",
+   "affiliation": "Bristleback tribe",
+   "faction": "Combat",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "\"Pokey\" Thornmantle is a rare quilboar found near the battleboar pens south of Camp Narache. He wields a fish as a weapon and it is possible that he is a relative of \"Squealer\" Thornmantle. He always drops a small pouch of a random color.",
+   "Abilities": "- -",
+   "Quotes": "Taunt"
+  },
+  "links": [
+   "rare mob",
+   "quilboar",
+   "Camp Narache",
+   "\"Squealer\" Thornmantle"
+  ],
+  "categories": [
+   "Kalimdor rare mobs",
+   "Mulgore mobs",
+   "Quilboar characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 423906,
+   "revid": 6382772,
+   "timestamp": "2025-06-15T00:38:02Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "adult_plainstrider",
+  "title": "Adult Plainstrider",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Adult Plainstrider",
+   "race": "Tallstrider",
+   "creature": "Beast",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "location": "Mulgore",
+   "pet": "Tallstrider"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Adult Plainstriders are level 5-6 tallstriders found in Mulgore. They have a grayish-brown, red and blue coloration, much like their inspiration, the .",
+   "Objective of": "- Drop Tender Strider Meat for the quest Kyle's Gone Missing!"
+  },
+  "links": [
+   "tallstrider",
+   "Mulgore",
+   "Tender Strider Meat",
+   "Kyle's Gone Missing!",
+   "es:Zancudo de llanura adulto"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Tallstriders"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 216150,
+   "revid": 5616272,
+   "timestamp": "2023-11-18T23:13:35Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "agitated_earth_spirit",
+  "title": "Agitated Earth Spirit",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Agitated Earth Spirit",
+   "race": "Earth elemental",
+   "creature": "Elemental",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "profession": "Mining",
+   "resource": "Mana",
+   "location": "Bael'dun Digsite, Mulgore"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nAgitated Earth Spirits are earth elementals located at Bael'dun Digsite in Mulgore.",
+   "Abilities": "-",
+   "Objective of": "- The Restless Earth"
+  },
+  "links": [
+   "earth elemental",
+   "Bael'dun Digsite",
+   "Mulgore",
+   "The Restless Earth"
+  ],
+  "categories": [
+   "Earth elementals",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 23893,
+   "revid": 6353913,
+   "timestamp": "2025-06-11T19:29:12Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "armored_battleboar",
+  "title": "Armored Battleboar",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Armored Battleboar",
+   "race": "Boar",
+   "creature": "Beast",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "affiliation": "Bristleback tribe",
+   "status": "Killable",
+   "location": "Battleboar Pen, Mulgore",
+   "pet": "Boar"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nArmored Battleboars are ferocious boars found in the Battleboar Pen on Red Cloud Mesa. They are wild boars that have been tamed by the Bristleback quilboar to be used against the tauren, and have been abused beyond hope of recovery. To give them a wild thirst for blood, the battleboars are force-fed raw flesh.\n\nAdana Thunderhorn asks adventurers to put down the boars and set fire to the troughs of meat they feed from.",
+   "Abilities": "-",
+   "Notes and trivia": "- Setting fire to the meat troughs during Feed of Evil will usually set several Battleboars on fire as well, killing them and reducing the amount of boars that have to be killed manually for The Battleboars (2).\n- With the right skill, it was once possible for hunters to tame a Battleboar after it has caught on fire during Feed of Evil, allowing them to keep a boar pet with the fire effect. However, this glitch has since been fixed on an unknown date."
+  },
+  "links": [
+   "boar",
+   "Battleboar Pen",
+   "Red Cloud Mesa",
+   "Bristleback tribe",
+   "quilboar",
+   "tauren",
+   "The Battleboars (2)",
+   "Feed of Evil",
+   "Adana Thunderhorn",
+   "adventurer",
+   "hunter",
+   "Tame Beast"
+  ],
+  "categories": [
+   "Boars",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 498436,
+   "revid": 6355012,
+   "timestamp": "2025-06-11T20:05:33Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "arrachea",
+  "title": "Arra'chea",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Arra'chea",
+   "race": "Kodo",
+   "creature": "Beast",
+   "level": "Mulgore",
+   "type": "Rare",
+   "faction": "Combat",
+   "location": "Mulgore",
+   "status": "Killable",
+   "pet": "Scalehide",
+   "profession": "Skinning"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nArra'chea is a named kodo found roaming the hills just east of Thunder Bluff. Its horn was once sought by Cairne Bloodhoof.",
+   "Abilities": "- - - -",
+   "Objective of": "- Rites of the Earthmother (3)",
+   "Notes": "- Arra'chea is sometimes hard to find. It spawns near the northeast corner of Thunder Bluff and follows a clockwise circular path around the plains of Mulgore."
+  },
+  "links": [
+   "named",
+   "kodo",
+   "Thunder Bluff",
+   "Cairne Bloodhoof",
+   "Rites of the Earthmother (3)",
+   "Mulgore"
+  ],
+  "categories": [
+   "Kalimdor rare mobs",
+   "Kodo",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 350926,
+   "revid": 6701489,
+   "timestamp": "2026-04-25T15:23:46Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "bristleback_battleboar",
+  "title": "Bristleback Battleboar",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Bristleback Battleboar",
+   "race": "Boar",
+   "creature": "Beast",
+   "level": "4 - 5",
+   "faction": "Combat",
+   "affiliation": "Bristleback tribe",
+   "location": "Brambleblade Ravine, Mulgore",
+   "status": "Killable",
+   "pet": "Boar"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nBristleback Battleboars were boars found in Mulgore. They are a slightly higher level variant of Battleboar found deeper in the Bristleback quilboar territory of Brambleblade Ravine. Killing them and collecting their meat and tusks is an objective of The Battleboars.",
+   "Abilities": "-",
+   "Drops": "- Battleboar Flank\n- Battleboar Snout"
+  },
+  "links": [
+   "boar",
+   "Mulgore",
+   "Battleboar",
+   "quilboar",
+   "Brambleblade Ravine",
+   "The Battleboars",
+   "Battleboar Flank",
+   "Battleboar Snout"
+  ],
+  "categories": [
+   "Boars",
+   "Removed Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 43475,
+   "revid": 6357199,
+   "timestamp": "2025-06-11T21:18:33Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "bristleback_gun_thief",
+  "title": "Bristleback Gun Thief",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Bristleback Gun Thief",
+   "race": "Quilboar",
+   "gender": "Female",
+   "creature": "Humanoid",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "occupation": "Thief",
+   "affiliation": "Bristleback tribe",
+   "location": "Mulgore",
+   "status": "Killable",
+   "profession": "Pickpocket"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Bristleback Gun Thieves are quilboar who have stolen guns from a tauren village while the tauren were occupied with the attack on Camp Narache. Adana Thunderhorn would like to get them back. The gun thieves are seen firing their stolen weapons in the air in southern Mulgore.",
+   "Abilities": "- - -",
+   "Drops": "- Dull Blade",
+   "Objective of": "- Drop Stolen Rifle for Rite of Courage."
+  },
+  "links": [
+   "quilboar",
+   "tauren",
+   "Camp Narache",
+   "Adana Thunderhorn",
+   "Mulgore",
+   "Dull Blade",
+   "Stolen Rifle",
+   "Rite of Courage"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Quilboar characters",
+   "Thieves"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 441745,
+   "revid": 6452519,
+   "timestamp": "2025-08-24T16:12:51Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "bristleback_interloper",
+  "title": "Bristleback Interloper",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Bristleback Interloper",
+   "race": "Quilboar",
+   "gender": "Female",
+   "creature": "Humanoid",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "affiliation": "Bristleback tribe",
+   "location": "Red Rocks, Mulgore",
+   "status": "Killable",
+   "profession": "Pickpocket"
+  },
+  "coords": [
+   {
+    "x": 58.6,
+    "y": 22.5,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "Bristleback Interlopers are quilboar found in Red Rocks in Mulgore.",
+   "Abilities": "- - -",
+   "Objective of": "- A Sacred Burial"
+  },
+  "links": [
+   "quilboar",
+   "Red Rocks",
+   "Mulgore",
+   "A Sacred Burial"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Quilboar characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 328530,
+   "revid": 6357208,
+   "timestamp": "2025-06-11T21:18:51Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "bristleback_invader",
+  "title": "Bristleback Invader",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Bristleback Invader",
+   "race": "Quilboar",
+   "gender": "Female",
+   "creature": "Humanoid",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "affiliation": "Bristleback tribe",
+   "location": "The Thornsnarl, Mulgore",
+   "status": "Killable",
+   "profession": "Pickpocket"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Bristleback Invaders are quilboar members of the Bristleback tribe. These barbarous quilboar have slaughtered many tauren and destroyed their homes. They fight the Fledgling Braves in the Thornsnarl, and are among the first enemies tauren braves must face.",
+   "Abilities": "- -",
+   "Objective of": "- Rite of Strength",
+   "Notes": "- There is also another version of this mob named 'Bristleback Invaders', which is neutral instead of hostile and not fighting Fledgling Braves."
+  },
+  "links": [
+   "quilboar",
+   "Bristleback tribe",
+   "tauren",
+   "Fledgling Brave",
+   "Thornsnarl",
+   "Rite of Strength",
+   "Bristleback Invaders"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Quilboar characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 165420,
+   "revid": 6357209,
+   "timestamp": "2025-06-11T21:18:52Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "bristleback_invaders",
+  "title": "Bristleback Invaders",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Bristleback Invaders",
+   "gender": "Female",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "race": "Quilboar",
+   "creature": "Humanoid",
+   "affiliation": "Bristleback tribe",
+   "location": "Thornsnarl, Mulgore",
+   "status": "Killable",
+   "profession": "Pickpocket"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Bristleback Invaders are quilboar located in the Thornsnarl in Mulgore.",
+   "Abilities": "-",
+   "Objective of": "- Rite of Strength"
+  },
+  "links": [
+   "quilboar",
+   "Thornsnarl",
+   "Mulgore",
+   "Rite of Strength",
+   "Bristleback Quilboar"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Quilboar characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 509151,
+   "revid": 6357210,
+   "timestamp": "2025-06-11T21:18:54Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "bristleback_quilboar",
+  "title": "Bristleback Quilboar",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Bristleback Quilboar",
+   "race": "Quilboar",
+   "gender": "Male",
+   "creature": "Humanoid",
+   "level": "3 - 4",
+   "faction": "Combat",
+   "affiliation": "Bristleback tribe",
+   "location": "Brambleblade Ravine,",
+   "status": "Killable",
+   "profession": "Pickpocket"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Bristleback Quilboar are found in Brambleblade Ravine in .",
+   "Drops": "- Dull Blade",
+   "Objective of": "- They drop Bristleback Belt for Rite of Strength (Classic)."
+  },
+  "links": [
+   "Brambleblade Ravine",
+   "Dull Blade",
+   "Bristleback Belt",
+   "Rite of Strength (Classic)",
+   "Bristleback Invaders"
+  ],
+  "categories": [
+   "Quilboar characters",
+   "Removed Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 463946,
+   "revid": 6841632,
+   "timestamp": "2026-08-24T09:10:17Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "bristleback_shaman",
+  "title": "Bristleback Shaman",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Bristleback Shaman",
+   "level": "3 - 4",
+   "resource": "Mana",
+   "faction": "Combat",
+   "class": "Shaman",
+   "affiliation": "Bristleback tribe",
+   "race": "Quilboar",
+   "gender": "Female",
+   "creature": "Humanoid",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [
+   {
+    "x": 59.1,
+    "y": 77.4,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "__NOTOC__\n\nBristleback Shaman are quilboar found in Mulgore.",
+   "Abilities": "-",
+   "Drops": "- Crooked Staff",
+   "Objective of": "- They drop Bristleback Belt for Rite of Strength (Classic).\n- They drop Ritual Salve for Call of Earth (Mulgore)."
+  },
+  "links": [
+   "quilboar",
+   "Mulgore (Classic)",
+   "Crooked Staff",
+   "Bristleback Belt",
+   "Rite of Strength (Classic)",
+   "Ritual Salve",
+   "Call of Earth (Mulgore)"
+  ],
+  "categories": [
+   "Quilboar characters",
+   "Removed Mulgore mobs",
+   "Shaman characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 91076,
+   "revid": 6357213,
+   "timestamp": "2025-06-11T21:19:00Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "bristleback_thorncaller",
+  "title": "Bristleback Thorncaller",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Bristleback Thorncaller",
+   "race": "Quilboar",
+   "gender": "Female",
+   "creature": "Humanoid",
+   "level": "Mulgore",
+   "resource": "Mana",
+   "faction": "Combat",
+   "class": "Shaman",
+   "occupation": "Thornweaver",
+   "affiliation": "Bristleback tribe",
+   "location": "Thornsnarl, Mulgore",
+   "status": "Killable",
+   "profession": "Pickpocket"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Bristleback Thorncallers are quilboar thornweavers of the Bristleback tribe found in the Thornsnarl on Red Cloud Mesa. They are responsible for seeding and growing new thorned roots for the quilboar to live in. These thorns mar the land and choke out other life, turning the earth around them barren. The great Cataclysm has driven the Bristlebacks from their dens, and the Thorncallers have begun planting their thorns on Red Cloud Mesa. Adana Thunderhorn asks adventurers to kill the Thorncallers.",
+   "Abilities": "- -",
+   "Objective of": "- 7 of them need to be slain for Stop the Thorncallers"
+  },
+  "links": [
+   "quilboar",
+   "quilboar thornweaver",
+   "Bristleback tribe",
+   "Thornsnarl",
+   "Red Cloud Mesa",
+   "Cataclysm (event)",
+   "Adana Thunderhorn",
+   "adventurer",
+   "Root",
+   "Stop the Thorncallers"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Quilboar characters",
+   "Shaman characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 504817,
+   "revid": 6357214,
+   "timestamp": "2025-06-11T21:19:02Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "chief_sharptusk_thornmantle",
+  "title": "Chief Sharptusk Thornmantle",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Chief Sharptusk Thornmantle",
+   "race": "Quilboar",
+   "creature": "Humanoid",
+   "level": "5",
+   "faction": "Combat",
+   "affiliation": "Bristleback tribe",
+   "occupation": "Chief",
+   "location": "Brambleblade Ravine, Mulgore",
+   "status": "Deceased"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Chief Sharptusk Thornmantle is a quilboar and the leader of the Bristleback tribe who lived in Brambleblade Ravine, near Red Cloud Mesa in Mulgore.\n\nThe Bristlebacks have started invading the lands guarded by the tauren at Camp Narache. Brave Windfeather wanted the chief's head.",
+   "Objective of": "- Dropped Chief Sharptusk Thornmantle's Head for the quest Break Sharptusk!",
+   "Relatives": "He may be related to \"Squealer\" Thornmantle."
+  },
+  "links": [
+   "quilboar",
+   "Bristleback tribe",
+   "Brambleblade Ravine",
+   "Red Cloud Mesa",
+   "Mulgore (Classic)",
+   "tauren",
+   "Camp Narache",
+   "Brave Windfeather",
+   "Chief Sharptusk Thornmantle's Head",
+   "Break Sharptusk!",
+   "\"Squealer\" Thornmantle"
+  ],
+  "categories": [
+   "Named mobs",
+   "Quilboar characters",
+   "Removed Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 80879,
+   "revid": 6294718,
+   "timestamp": "2025-04-16T14:31:01Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "chief_squealer_thornmantle",
+  "title": "Chief Squealer Thornmantle",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Chief Squealer Thornmantle",
+   "level": "Mulgore",
+   "race": "Quilboar",
+   "creature": "Humanoid",
+   "faction": "Combat",
+   "affiliation": "Bristleback tribe",
+   "occupation": "Chief of the Bristleback tribe",
+   "location": "Thornmantle's Hideout, Mulgore",
+   "status": "Killable",
+   "profession": "Pickpocket"
+  },
+  "coords": [
+   {
+    "x": 41.0,
+    "y": 81.4,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "__NOTOC__\n\nChief Squealer Thornmantle is a quilboar and the leader of the Bristleback tribe. He was originally known simply as \"Squealer\" Thornmantle and could be found in Brambleblade Ravine.\n\nAfter the death of Chief Sharptusk Thornmantle, Squealer took leadership of the tribe and became known as Chief Squealer Thornmantle. He led the Bristleback attack on Camp Narache, killing Greatmother Hawkwind. He fled and hid afterwards and now hides in Thornmantle's Hideout, fending off any braves the tauren send in after him. Adana Thunderhorn asks adventurers to kill Thornmantle and bring his mane back to Chief Hawkwind in honor of the Greatmother.",
+   "Abilities": "- -",
+   "Objective of": "- Drops Mane of Thornmantle for Rite of Honor.",
+   "Drops": "- Squealer's Belt"
+  },
+  "links": [
+   "quilboar",
+   "Bristleback tribe",
+   "Brambleblade Ravine",
+   "Chief Sharptusk Thornmantle",
+   "Camp Narache",
+   "Greatmother Hawkwind",
+   "Thornmantle's Hideout",
+   "brave",
+   "tauren",
+   "Adana Thunderhorn",
+   "adventurer",
+   "Mane of Thornmantle",
+   "Chief Hawkwind",
+   "Rite of Honor",
+   "Squealer's Belt"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Named mobs",
+   "Quilboar characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 16661,
+   "revid": 6381585,
+   "timestamp": "2025-06-14T18:34:00Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "darkmoon_carnie",
+  "title": "Darkmoon Carnie",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Darkmoon Carnie",
+   "level": "Elwynn Forest",
+   "faction": "Neutral",
+   "affiliation": "Darkmoon Faire",
+   "race": "Varies",
+   "gender": "Both",
+   "creature": "Humanoid",
+   "location": "Darkmoon Island; Goldshire, Elwynn Forest; Mulgore"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nDarkmoon Carnies are carnies found in Darkmoon Island. You can find them wandering around places, usually with a broom in hand and complaining about litterbugs. They also set up the area of the portal to the island at Goldshire and Mulgore.",
+   "Objective of": "They are a \"threat\" in the Chow Down War Campaign mission &mdash; actually an opponent in a corn dog-eating contest.",
+   "Quotes": "Gossip\n- Hello friend.\n\nVIP waiting area\nWhen they stop at the VIP waiting area of the zoo, the visitor will ask them where the tour guide is. They give any of the following responses.\n- - - - - - - Dialogue\n- - - - - - - - Gossip\n- That's right friend! The Darkmoon Faire is going to be right here. Just as soon as I unload those huge wagons, put up all the tents, erect the zoo and pour the drinks. Make sure you come back!\n- Won't be long now until the Darkmoon Faire opens. Come back later and check to see if we're done.\n- Can't you see I've got work to do here?\n- Faire's a coming!"
+  },
+  "links": [
+   "Darkmoon Island",
+   "Goldshire",
+   "Mulgore",
+   "Chow Down",
+   "War Campaign mission",
+   "Careless Carnie",
+   "Injured Carnie",
+   "Christopher Lesson"
+  ],
+  "categories": [
+   "Blood elf characters",
+   "Custodians",
+   "Darkmoon Faire",
+   "Darkmoon Island NPCs",
+   "Draenei characters",
+   "Dwarf characters",
+   "Elwynn Forest NPCs",
+   "High elf characters",
+   "Human characters",
+   "Jungle troll characters",
+   "Mission mobs",
+   "Mulgore NPCs",
+   "Night elf characters",
+   "Orc characters",
+   "Removed Terokkar Forest NPCs",
+   "Tauren characters",
+   "Undead characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 263978,
+   "revid": 6593140,
+   "timestamp": "2026-01-06T23:07:56Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "echo_of_corruption",
+  "title": "Echo of Corruption",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Echo of Corruption",
+   "level": "Bfa heritage",
+   "faction": "Combat",
+   "race": "Wraith",
+   "creature": "Undead",
+   "location": "Bloodhoof Village, Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Echoes of Corruption are wraiths located in Bloodhoof Village in Mulgore during the Heritage of the Shu'halo."
+  },
+  "links": [
+   "wraith",
+   "Bloodhoof Village",
+   "Mulgore",
+   "Heritage of the Shu'halo"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Wraiths"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 42945,
+   "revid": 5840502,
+   "timestamp": "2023-11-25T00:28:25Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "elder_plainstrider",
+  "title": "Elder Plainstrider",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Elder Plainstrider",
+   "level": "Mulgore",
+   "race": "Tallstrider",
+   "pet": "Tallstrider",
+   "creature": "Beast",
+   "faction": "neutral",
+   "location": "Mulgore"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Elder Plainstrider are level 8-9 tallstriders native to Mulgore.",
+   "Objective of": "- Drop Tender Strider Meat for the quest Kyle's Gone Missing!"
+  },
+  "links": [
+   "tallstrider",
+   "Mulgore",
+   "Tender Strider Meat",
+   "Kyle's Gone Missing!",
+   "es:Zancudo de llanura viejo"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Tallstriders"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 146036,
+   "revid": 5616273,
+   "timestamp": "2023-11-18T23:13:37Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "enforcer_emilgund",
+  "title": "Enforcer Emilgund",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Enforcer Emilgund",
+   "level": "Mulgore",
+   "type": "Rare",
+   "race": "Ogre",
+   "gender": "Male",
+   "creature": "Humanoid",
+   "faction": "Combat",
+   "affiliation": "Venture Company",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nEnforcer Emilgund is a rare mob ogre who guards the entrance to the Venture Co. Mine in Mulgore.",
+   "Abilities": "- -",
+   "Drops": "- Venture Company Legguards",
+   "Notes": "- He is on a 1.5-2.5 hour respawn timer."
+  },
+  "links": [
+   "rare mob",
+   "ogre",
+   "Venture Co. Mine",
+   "Mulgore",
+   "Venture Company Legguards"
+  ],
+  "categories": [
+   "Kalimdor rare mobs",
+   "Mulgore mobs",
+   "Ogre characters",
+   "Venture Company"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 236540,
+   "revid": 6893892,
+   "timestamp": "2026-09-29T20:10:39Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "flatland_cougar",
+  "title": "Flatland Cougar",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Flatland Cougar",
+   "race": "Mountain lion",
+   "creature": "Beast",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "location": "Mulgore",
+   "status": "Killable",
+   "pet": "Cat",
+   "profession": "Skinning"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Flatland Cougars are mountain lions found in Mulgore.",
+   "Objective of": "- Drop Cougar Claws for Thunderhorn Totem and Thunderhorn Totem (Classic).\n- Drop Flatland Cougar Femur for Mazzranache (quest) and Mazzranache (Classic)."
+  },
+  "links": [
+   "mountain lion",
+   "Mulgore",
+   "Cougar Claws",
+   "Thunderhorn Totem",
+   "Thunderhorn Totem (Classic)",
+   "Flatland Cougar Femur",
+   "Mazzranache (quest)",
+   "Mazzranache (Classic)",
+   "es:Puma de las estepas"
+  ],
+  "categories": [
+   "Mountain lions",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 104426,
+   "revid": 5620915,
+   "timestamp": "2023-11-19T02:47:10Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "flatland_prowler",
+  "title": "Flatland Prowler",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Flatland Prowler",
+   "race": "Mountain lion",
+   "creature": "Beast",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "pet": "Cat",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Flatland Prowlers are mountain lions found in Mulgore.",
+   "Abilities": "-",
+   "Objective of": "- Drop Flatland Prowler Claw for The Hunter's Way.\n\n- Drop Flatland Prowler Claw for The Hunter's Way (Classic)."
+  },
+  "links": [
+   "mountain lion",
+   "Mulgore",
+   "The Hunter's Way",
+   "The Hunter's Way (Classic)"
+  ],
+  "categories": [
+   "Mountain lions",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 264595,
+   "revid": 6381209,
+   "timestamp": "2025-06-14T16:08:42Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "galak_centaur",
+  "title": "Galak Centaur",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Galak Centaur",
+   "faction": "Combat",
+   "level": "8 - 9",
+   "race": "Centaur",
+   "gender": "Male",
+   "creature": "Humanoid",
+   "affiliation": "Galak tribe",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Galak Centaur are centaur who roam eastern Mulgore, near the border with the Barrens. They sometimes move two and two, other times accompanied by a Galak Outrunner."
+  },
+  "links": [
+   "centaur",
+   "Mulgore (Classic)",
+   "Barrens (Classic)",
+   "Galak Outrunner"
+  ],
+  "categories": [
+   "Centaur characters",
+   "Removed Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 126579,
+   "revid": 5608013,
+   "timestamp": "2023-11-18T16:42:33Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "galak_outrunner",
+  "title": "Galak Outrunner",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Galak Outrunner",
+   "race": "Centaur",
+   "gender": "Male",
+   "creature": "Humanoid",
+   "level": "9 - 10",
+   "faction": "Combat",
+   "occupation": "Outrunner",
+   "affiliation": "Galak tribe",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Galak Outrunners are centaur who roam eastern Mulgore, near the border with the Barrens. They sometimes move two and two, other times accompanied by a Galak Centaur.",
+   "Abilities": "-"
+  },
+  "links": [
+   "centaur",
+   "Mulgore (Classic)",
+   "Barrens (Classic)",
+   "Galak Centaur"
+  ],
+  "categories": [
+   "Centaur characters",
+   "Removed Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 392095,
+   "revid": 6364901,
+   "timestamp": "2025-06-13T05:17:58Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "gazelle_mob",
+  "title": "Gazelle (mob)",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Gazelle",
+   "level": "1",
+   "race": "Gazelle",
+   "creature": "Beast",
+   "faction": "Combat",
+   "location": "Northern Barrens; Southern Barrens; Desolace; Mulgore",
+   "pet": "Stag"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Gazelles are small, hooved gazelles native to the Barrens as well as Desolace and Mulgore. They often travel in herds.\n\nSome Sickly Gazelles have become poisoned by the corrupted waters of Dreadmist Peak and require the aid of a healing salve to restore them to normal.",
+   "To All The Squirrels I've Loved Before": "Those seeking to complete To All The Squirrels I've Loved Before may have more luck finding a herd in the Southern Barrens (in the broad vicinity of Camp Taurajo) or to the north and west of Forgotten Pools in the Northern Barrens - however gazelles can be found running anywhere in the zone. Herds of gazelles move fairly quickly.\n\nNote that Sickly Gazelles do not count towards the To All The Squirrels I've Loved Before achievement."
+  },
+  "links": [
+   "gazelle",
+   "Barrens",
+   "Desolace",
+   "Mulgore",
+   "Sickly Gazelle",
+   "Dreadmist Peak",
+   "To All The Squirrels I've Loved Before",
+   "Southern Barrens",
+   "Camp Taurajo",
+   "Forgotten Pools",
+   "Northern Barrens"
+  ],
+  "categories": [
+   "Desolace mobs",
+   "Gazelles",
+   "Mulgore mobs",
+   "Northern Barrens mobs",
+   "Southern Barrens mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 325817,
+   "revid": 6472924,
+   "timestamp": "2025-09-14T18:23:33Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "gazelle_fawn",
+  "title": "Gazelle Fawn",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Gazelle Fawn",
+   "level": "1",
+   "faction": "Combat",
+   "race": "Gazelle",
+   "creature": "Critter",
+   "location": "Mulgore"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Gazelle Fawns are gazelles located throughout Mulgore.",
+   "Pet Journal": "Young gazelles quickly learn to flee when they hear the war cries of tauren hunters in Mulgore. They don't hear the good hunters, unfortunately.",
+   "Criteria of": "- Kalimdor Safari"
+  },
+  "links": [
+   "gazelle",
+   "Mulgore",
+   "tauren",
+   "Kalimdor Safari"
+  ],
+  "categories": [
+   "Critters",
+   "Gazelles",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 523805,
+   "revid": 6861884,
+   "timestamp": "2026-09-05T09:57:10Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "ghost_howl",
+  "title": "Ghost Howl",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Ghost Howl",
+   "gender": "Male",
+   "race": "Wolf",
+   "creature": "Beast",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "location": "Mulgore",
+   "status": "Killable",
+   "pet": "Wolf",
+   "profession": "Skinning"
+  },
+  "coords": [
+   {
+    "x": 39.0,
+    "y": 41.0,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "Ghost Howl is a wolf found roaming the plains around the base of Thunder Bluff in Mulgore.",
+   "Background": "Ghost Howl is a massive white wolf and a respected beast among the tauren for his aid against the Burning Legion. During the Ghost Howl's battles he attained a savage wound from a particularly nasty demon. Despite Azeroth's victory, the wolf continues to carry the wound, the pain of an unhealable wound tormenting his spirit and causing him to grow hostile towards the tauren and their allies. He now spends his final days roaming Mulgore in solitude.\n\nThe aging hunter Skorn Whitecloud, resident of Bloodhoof Village, once encountered the mighty Ghost Howl in his youth and, though unsuccessful in his own attempts to end the wolf's suffering spirit, commends those adventurers able to slay and salvage his demon-scarred hide.",
+   "Abilities": "- - -",
+   "Strategies": "The key to finding Ghost Howl is mainly patience. He is an uncommon mob and won't always be where common sightings say he is. He has been spotted the most times around , the ditch just off to the West of the main road before heading up into Thunder Bluff. His roaming path also seems to span up and around the very North-West/North-East parts of the region, all within relative distance to Thunder Bluff.",
+   "Quests": "- The Demon Scarred Cloak",
+   "Loot": "- Demon Scarred Cloak (Quest Starting Item)",
+   "Notes": "- In order to get the quest for killing Ghost Howl, you must kill him first and then right-click on the Demon Scarred Cloak to be prompted by the Quest text. You can also wear the item after you've handed it in by dragging it onto your Back item slot. Right-clicking does not work.\n- After you've completed the quest for Ghost Howl, Skorn Whitecloud will now always say, \"You killed Ghost Howl. You're a stud.\", when spoken to.\n- Ghost Howl is tameable.",
+   "Speculation": "Though his exact contributions are vague, Skorn doesn't mention whether they fought during the War of the Ancients or the Third War it can be assumed that Ghost Howl fought against the Burning Legion's army in an attempt to take Mulgore during the Legion's second invasion and the Battle of Mount Hyjal."
+  },
+  "links": [
+   "wolf",
+   "Thunder Bluff",
+   "Mulgore",
+   "tauren",
+   "Burning Legion",
+   "demon",
+   "Azeroth",
+   "hunter",
+   "Skorn Whitecloud",
+   "Bloodhoof Village",
+   "The Demon Scarred Cloak",
+   "Demon Scarred Cloak",
+   "tame",
+   "War of the Ancients",
+   "Third War",
+   "second invasion",
+   "Battle of Mount Hyjal"
+  ],
+  "categories": [
+   "Kalimdor rare mobs",
+   "Mulgore mobs",
+   "Wolves"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 47849,
+   "revid": 6365175,
+   "timestamp": "2025-06-13T05:27:04Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "grim_totem",
+  "title": "Grim Totem",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Grim Totem",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "race": "Totem",
+   "creature": "Uncategorized",
+   "location": "Mulgore; Wetlands"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Grim Totems are totems summoned by Grimtotem Straggler, Grimtotem Vagabond, Grimtotem Defiler, Grimtotem Vandal in Mulgore, and by Dragonmaw Shadowwarder in Wetlands.",
+   "Notes": "- Their base model is that of a healing totem, albeit this one is covered by shadow magic."
+  },
+  "links": [
+   "totem",
+   "Grimtotem Straggler",
+   "Grimtotem Vagabond",
+   "Grimtotem Defiler",
+   "Grimtotem Vandal",
+   "Mulgore",
+   "Dragonmaw Shadowwarder",
+   "Wetlands"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Totems",
+   "Wetlands mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 533789,
+   "revid": 5756785,
+   "timestamp": "2023-11-22T18:47:13Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "grimtotem_ambusher",
+  "title": "Grimtotem Ambusher",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Grimtotem Ambusher",
+   "gender": "Male",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "race": "Tauren",
+   "creature": "Humanoid",
+   "affiliation": "Grimtotem tribe",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Grimtotem Ambushers are tauren located in Mulgore."
+  },
+  "links": [
+   "tauren",
+   "Mulgore"
+  ],
+  "categories": [
+   "Grimtotem tribe",
+   "Mulgore mobs",
+   "Tauren characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 313870,
+   "revid": 5769426,
+   "timestamp": "2023-11-23T02:42:38Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "grimtotem_defender",
+  "title": "Grimtotem Defender",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Grimtotem Defender",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "race": "Tauren",
+   "gender": "Male",
+   "creature": "Humanoid",
+   "affiliation": "Grimtotem tribe",
+   "location": "Stonetalon Pass, Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Grimtotem Defenders are tauren battling against Thunder Bluff Braves in Stonetalon Pass in Mulgore.",
+   "Abilities": "-"
+  },
+  "links": [
+   "tauren",
+   "Thunder Bluff Brave",
+   "Stonetalon Pass (Mulgore)",
+   "Mulgore"
+  ],
+  "categories": [
+   "Grimtotem tribe",
+   "Mulgore mobs",
+   "Tauren characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 309021,
+   "revid": 6366228,
+   "timestamp": "2025-06-13T06:02:30Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "grimtotem_defiler",
+  "title": "Grimtotem Defiler",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Grimtotem Defiler",
+   "creature": "Humanoid",
+   "race": "Tauren",
+   "gender": "Female",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "affiliation": "Grimtotem tribe",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Grimtotem Defilers are tauren of the Grimtotem tribe that wander around the Thunderhorn Water Well in Mulgore. After the Grimtotem were exiled following the Cataclysm, these vile tauren have tainted the well and guard it.",
+   "Abilities": "- Grim Totem - Summons a ward that lasts 15 sec. and periodically deals Shadow damage to nearby enemies.\n- Poison Bottle - Throw a poison bottle, dealing Nature damage every 3 seconds.\n- Poison Bottle - Throw a poison bottle, dealing Nature damage every 3 seconds."
+  },
+  "links": [
+   "tauren",
+   "Grimtotem tribe",
+   "Thunderhorn Water Well",
+   "Mulgore",
+   "Cataclysm (event)",
+   "Thunderhorn Cleansing"
+  ],
+  "categories": [
+   "Grimtotem tribe",
+   "Mulgore mobs",
+   "Tauren characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 13218,
+   "revid": 5743883,
+   "timestamp": "2023-11-22T11:10:24Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "grimtotem_straggler",
+  "title": "Grimtotem Straggler",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Grimtotem Straggler",
+   "creature": "Humanoid",
+   "race": "Tauren",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "affiliation": "Grimtotem tribe",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Grimtotem Stragglers are members of the Grimtotem tribe that wander around the Winterhoof Water Well in Mulgore. After the Grimtotem were exiled following the Cataclysm, these vile tauren have tainted the well and guard it.",
+   "Abilities": "- Grim Totem - Summons a ward that lasts 15 sec. and periodically deals Shadow damage to nearby enemies.\n- Dirt Toss - Blinds the target, causing it to wander confused for up to 2 sec."
+  },
+  "links": [
+   "Grimtotem tribe",
+   "Winterhoof Water Well",
+   "Mulgore",
+   "Cataclysm (event)",
+   "tauren",
+   "Winterhoof Cleansing"
+  ],
+  "categories": [
+   "Grimtotem tribe",
+   "Mulgore mobs",
+   "Tauren characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 144885,
+   "revid": 5743882,
+   "timestamp": "2023-11-22T11:10:22Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "grimtotem_vagabond",
+  "title": "Grimtotem Vagabond",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Grimtotem Vagabond",
+   "creature": "Humanoid",
+   "gender": "Male",
+   "race": "Tauren",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "affiliation": "Grimtotem tribe",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Grimtotem Vagabonds are tauren of the Grimtotem tribe that wander around the Thunderhorn Water Well in Mulgore. After the Grimtotem were exiled following the Cataclysm, these vile tauren have tainted the well and guard it.",
+   "Abilities": "- Grim Totem - Summons a ward that lasts 15 sec. and periodically deals Shadow damage to nearby enemies.\n- Bonk - Bonks an enemy on the head, dealing 150% of normal damage and reducing their chance to Dodge or Parry an attack by 20% for 6 sec."
+  },
+  "links": [
+   "tauren",
+   "Grimtotem tribe",
+   "Thunderhorn Water Well",
+   "Mulgore",
+   "Cataclysm (event)",
+   "Thunderhorn Cleansing"
+  ],
+  "categories": [
+   "Grimtotem tribe",
+   "Mulgore mobs",
+   "Tauren characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 355022,
+   "revid": 5743884,
+   "timestamp": "2023-11-22T11:10:26Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "grimtotem_vandal",
+  "title": "Grimtotem Vandal",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Grimtotem Vandal",
+   "creature": "Humanoid",
+   "race": "Tauren",
+   "level": "Mulgore",
+   "class": "Warrior",
+   "faction": "Combat",
+   "affiliation": "Grimtotem tribe",
+   "status": "Killable",
+   "location": "Mulgore"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Grimtotem Stragglers are members of the Grimtotem tribe that wander around the Wildmane Water Well in Mulgore. After the Grimtotem were exiled following the Cataclysm, these vile tauren have tainted the well and guard it.",
+   "Abilities": "- Grim Totem - Summons a ward that lasts 15 sec. and periodically deals Shadow damage to nearby enemies.\n- Bladestorm - In a whirlwind of steel you attack all enemies within 8 yards, causing weapon damage from both melee weapons to each enemy.\n- Bladestorm - Instantly Whirlwind all nearby targets and for the next 6 sec you will perform a whirlwind attack every 1 sec. While under the effects of Bladestorm, you can move but cannot perform any other abilities."
+  },
+  "links": [
+   "Grimtotem tribe",
+   "Wildmane Water Well",
+   "Mulgore",
+   "Cataclysm (event)",
+   "tauren",
+   "Wildmane Totem",
+   "Grim Totem"
+  ],
+  "categories": [
+   "Grimtotem tribe",
+   "Mulgore mobs",
+   "Tauren characters",
+   "Warrior characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 122620,
+   "revid": 5743885,
+   "timestamp": "2023-11-22T11:10:28Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "hazzranache",
+  "title": "Hazzranache",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Hazzranache",
+   "race": "Tallstrider",
+   "creature": "Critter",
+   "level": "1",
+   "location": "Mulgore",
+   "faction": "combat"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Hazzranache is a critter tallstrider in Mulgore. They are one of Mazzranache's fledgelings."
+  },
+  "links": [
+   "critter",
+   "tallstrider",
+   "Mulgore",
+   "Mazzranache"
+  ],
+  "categories": [
+   "Critters",
+   "Mulgore mobs",
+   "Tallstriders"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 187116,
+   "revid": 6704721,
+   "timestamp": "2026-04-30T19:43:47Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "jazzranache",
+  "title": "Jazzranache",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Jazzranache",
+   "race": "Tallstrider",
+   "creature": "Critter",
+   "level": "1",
+   "location": "Mulgore",
+   "faction": "combat"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Jazzranache is a critter tallstrider in Mulgore. They are one of Mazzranache's fledgelings."
+  },
+  "links": [
+   "critter",
+   "tallstrider",
+   "Mulgore",
+   "Mazzranache",
+   "Spazzranache"
+  ],
+  "categories": [
+   "Critters",
+   "Mulgore mobs",
+   "Tallstriders"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 273749,
+   "revid": 6704293,
+   "timestamp": "2026-04-30T09:12:22Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "kodo_bull",
+  "title": "Kodo Bull",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Kodo Bull",
+   "level": "Mulgore",
+   "location": "Mulgore",
+   "faction": "Combat",
+   "race": "Kodo",
+   "pet": "Scalehide",
+   "creature": "Beast",
+   "gender": "Male"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Kodo Bulls are male kodos found roaming Mulgore with other kodos trailing.",
+   "Drops": "- Kodo Meat\n- Thin Kodo Leather"
+  },
+  "links": [
+   "kodo",
+   "Mulgore",
+   "Kodo Meat",
+   "Thin Kodo Leather",
+   "es:Kodo dominante"
+  ],
+  "categories": [
+   "Kodo",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 429594,
+   "revid": 5616343,
+   "timestamp": "2023-11-18T23:17:35Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "kodo_calf",
+  "title": "Kodo Calf",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Kodo Calf",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "pet": "Scalehide",
+   "race": "Kodo",
+   "creature": "Beast",
+   "location": "Mulgore"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Kodo Calves can be found in Mulgore."
+  },
+  "links": [
+   "Mulgore",
+   "es:Cría de kodo"
+  ],
+  "categories": [
+   "Kodo",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 537070,
+   "revid": 5616344,
+   "timestamp": "2023-11-18T23:17:38Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "kodo_matriarch",
+  "title": "Kodo Matriarch",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Kodo Matriarch",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "gender": "Female",
+   "pet": "Scalehide",
+   "race": "Kodo",
+   "creature": "Beast",
+   "location": "Mulgore"
+  },
+  "coords": [
+   {
+    "x": 31.1,
+    "y": 22.6,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "Kodo Matriarchs can be found in Mulgore."
+  },
+  "links": [
+   "Mulgore",
+   "es:Matriarca kodo"
+  ],
+  "categories": [
+   "Kodo",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 23868,
+   "revid": 5616345,
+   "timestamp": "2023-11-18T23:17:40Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "lurkmane",
+  "title": "Lurkmane",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Lurkmane",
+   "race": "Gnoll",
+   "creature": "Humanoid",
+   "level": "6 - 7",
+   "type": "Elite",
+   "resource": "Mana",
+   "affiliation": "Palemane tribe",
+   "faction": "Combat",
+   "location": "Palemane Rock,",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Lurkmane is a gnoll found in Palemane Rock in .",
+   "Drops": "- Rune of Furious Thunder\n- Prairie Dog Musk"
+  },
+  "links": [
+   "gnoll",
+   "Palemane Rock",
+   "Rune of Furious Thunder",
+   "Prairie Dog Musk"
+  ],
+  "categories": [
+   "Gnoll characters",
+   "Mulgore mobs",
+   "Named mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 583295,
+   "revid": 5995507,
+   "timestamp": "2024-03-26T20:17:34Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "malicious_spirit_mulgore",
+  "title": "Malicious Spirit (Mulgore)",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Malicious Spirit",
+   "level": "bfa-max",
+   "faction": "Combat",
+   "race": "Ghost",
+   "creature": "Undead",
+   "location": "Bloodhoof Village, Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Malicious Spirits are ghosts that attack Bloodhoof Village in Mulgore during the Heritage of the Shu'halo.",
+   "Abilities": "- -",
+   "Objective of": "- Storm in Bloodhoof"
+  },
+  "links": [
+   "ghost",
+   "Bloodhoof Village",
+   "Mulgore",
+   "Heritage of the Shu'halo",
+   "Storm in Bloodhoof"
+  ],
+  "categories": [
+   "Ghosts",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 396152,
+   "revid": 6370544,
+   "timestamp": "2025-06-13T08:28:24Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "mazzranache",
+  "title": "Mazzranache",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Mazzranache",
+   "race": "Tallstrider",
+   "creature": "Beast",
+   "level": "Mulgore",
+   "type": "Rare",
+   "faction": "Combat",
+   "location": "Mulgore",
+   "status": "Killable",
+   "pet": "Tallstrider",
+   "profession": "Skinning"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nMazzranache is a rare tallstrider found in Mulgore, south-west of Thunder Bluff. He has a unique, pink skin.",
+   "Abilities": "- - - -",
+   "Notes": "- Maur Raincaller was attacked by Mazzranache. He won't ask for vengeance, but he would appreciate it if you helped him clean the infection.\n- Before , he roamed alone. Now, he roams with four fledgelings: Jazzranache, Spazzranache, Hazzranache, and Razzranache. They scatter away in fear when Mazzranache is killed.\n- He is the most popular of the tallstrider family as a pet, due to his flamingo-like appearance. Up until patch 1.12, he had an unusually slow pursuit speed, which has since been normalized.\n- Nergazurai, a pink hornstrider found in the Ohn'ahran Plains, is an homage to him."
+  },
+  "links": [
+   "rare mob",
+   "tallstrider",
+   "Mulgore",
+   "Thunder Bluff",
+   "Maur Raincaller",
+   "Mazzranache (quest)",
+   "Jazzranache",
+   "Spazzranache",
+   "Hazzranache",
+   "Razzranache",
+   "pet",
+   "patch 1.12",
+   "Nergazurai",
+   "hornstrider",
+   "Ohn'ahran Plains"
+  ],
+  "categories": [
+   "Kalimdor rare mobs",
+   "Mulgore mobs",
+   "Tallstriders"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 95340,
+   "revid": 6370990,
+   "timestamp": "2025-06-13T08:43:19Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "mokwa",
+  "title": "Mokwa",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Mokwa",
+   "race": "Cougar",
+   "creature": "Beast",
+   "level": "7",
+   "type": "Rare",
+   "faction": "Combat",
+   "pet": "Cat",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Mokwa is a cougar located north of Palemane Rock in . The beast can be lured out with a piece of Mulgore Bird Meat.",
+   "Abilities": "-",
+   "Drops": "- Rune of Flanking"
+  },
+  "links": [
+   "cougar",
+   "Palemane Rock",
+   "Mulgore Bird Meat",
+   "Rune of Flanking"
+  ],
+  "categories": [
+   "Kalimdor rare mobs",
+   "Mountain lions",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 574841,
+   "revid": 6371398,
+   "timestamp": "2025-06-13T08:57:46Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "mountain_cottontail",
+  "title": "Mountain Cottontail",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Mountain Cottontail",
+   "level": "1",
+   "faction": "Combat",
+   "race": "Rabbit",
+   "creature": "Critter",
+   "location": "Redridge Mountains; Highmountain; Mulgore"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Mountain Cottontails are rabbits located throughout the Redridge Mountains.",
+   "Pet Journal": "Mountain cottontails can leap up a steep incline with speed you would not believe.",
+   "Criteria of": "- Eastern Kingdoms Safari\n- Kalimdor Safari"
+  },
+  "links": [
+   "rabbit",
+   "Redridge Mountains",
+   "Eastern Kingdoms Safari",
+   "Kalimdor Safari"
+  ],
+  "categories": [
+   "Critters",
+   "Highmountain mobs",
+   "Mulgore mobs",
+   "Rabbits",
+   "Redridge Mountains mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 451445,
+   "revid": 6861678,
+   "timestamp": "2026-09-05T09:51:20Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "mountain_cougar",
+  "title": "Mountain Cougar",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Mountain Cougar",
+   "race": "Cougar",
+   "creature": "Beast",
+   "level": "3",
+   "faction": "Combat",
+   "location": "Mulgore",
+   "status": "Killable",
+   "pet": "Cat"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Mountain Cougars are mountain lions found in Mulgore.",
+   "Objective of": "- Drop Mountain Cougar Pelt for The Hunt Continues."
+  },
+  "links": [
+   "mountain lion",
+   "Mulgore (Classic)",
+   "Mountain Cougar Pelt",
+   "The Hunt Continues",
+   "es:Puma montés"
+  ],
+  "categories": [
+   "Mountain lions",
+   "Removed Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 477057,
+   "revid": 5591952,
+   "timestamp": "2023-10-31T05:28:14Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "mouse_critter",
+  "title": "Mouse (critter)",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "faction": "Combat",
+   "name": "Mouse",
+   "race": "Mouse",
+   "creature": "Critter",
+   "level": "1",
+   "location": "Throughout Westfall; Mulgore; Dustwallow Marsh; Duskwood; Grizzly Hills"
+  },
+  "coords": [
+   {
+    "x": 32.0,
+    "y": 52.0,
+    "map": "Westfall"
+   },
+   {
+    "x": 11.0,
+    "y": 62.0,
+    "map": "Wetlands"
+   },
+   {
+    "x": 20.0,
+    "y": 75.0,
+    "map": "Grizzly Hills"
+   }
+  ],
+  "sections": {
+   "Description": "Mice are critters found in various locations in Azeroth.",
+   "Location": "Found in various places, such as: \n- behind the inn or at the Jansen Stead \n- in the basement of the Deepwater Tavern \n- with the pack of deer \n- - -",
+   "Pet Journal": "It seems that mice are completely incapable of resisting cheese even in the face of imprisonment, injury, or death.",
+   "Achievements": "Killing one of these is required for Pest Control.",
+   "Notes": "They share spawn points with other critters such as prairie dogs and snakes. If you do not see any mice, try killing the other critters such as the snake behind the inn and see what re-spawns in its place. You may have to try a couple of times to get the mouse to spawn.\n\nAs they are fast runners, set up a macro to: \n\n \n/Tar mouse \n/stopmacro [noexists] \n/cast Shoot\n \n\nReplacing \"Shoot\" with your instant spell such as Moonfire"
+  },
+  "links": [
+   "critter",
+   "Azeroth",
+   "cheese",
+   "Pest Control",
+   "Prairie Dog",
+   "Snake"
+  ],
+  "categories": [
+   "Achievement objectives",
+   "Critters",
+   "Crystalsong Forest mobs",
+   "Desolace mobs",
+   "Duskwood mobs",
+   "Dustwallow Marsh mobs",
+   "Exodar mobs",
+   "Grizzly Hills mobs",
+   "Mice",
+   "Mulgore mobs",
+   "Netherstorm mobs",
+   "Silvermoon City (Burning Crusade) mobs",
+   "Westfall mobs",
+   "Wetlands mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 397822,
+   "revid": 6861530,
+   "timestamp": "2026-09-05T09:47:06Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "necrofiend",
+  "title": "Necrofiend",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Necrofiend",
+   "level": "bfa-max",
+   "faction": "Combat",
+   "race": "Haunt",
+   "creature": "Undead",
+   "location": "Sun Rock Retreat, Stonetalon Mountains; Bloodhoof Village, Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Necrofiends are haunts found in the Sun Rock Retreat, Stonetalon Mountains when crossed over into the Shadowlands. They later attacked Bloodhoof Village in Mulgore during the Heritage of the Shu'halo.",
+   "Abilities": "-",
+   "Objective of": "- Storm in Bloodhoof"
+  },
+  "links": [
+   "haunt",
+   "Sun Rock Retreat",
+   "Stonetalon Mountains",
+   "Shadowlands",
+   "Bloodhoof Village",
+   "Mulgore",
+   "Heritage of the Shu'halo",
+   "Storm in Bloodhoof"
+  ],
+  "categories": [
+   "Haunts",
+   "Mulgore mobs",
+   "Stonetalon Mountains mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 163955,
+   "revid": 6372118,
+   "timestamp": "2025-06-13T09:22:23Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "orno_grimtotem",
+  "title": "Orno Grimtotem",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Orno Grimtotem",
+   "level": "Mulgore",
+   "type": "Elite",
+   "race": "Tauren",
+   "creature": "Humanoid",
+   "faction": "Combat",
+   "gender": "Male",
+   "affiliation": "Grimtotem tribe",
+   "location": "Stonetalon Pass, Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Orno Grimtotem is a Magatha loyalist and the leader of the Grimtotem forces invading Mulgore. His Grimtotem forces corrupted the water wells within the region while he made his pass of operations at Stonetalon Pass. However, Baine's forces were able to heal the wells and find out his location. As his Grimtotem Defenders were engaged with Thunder Bluff Braves, Orno was noted to be observing the battlefield before being confronted by an agent of the Horde.\n\nDuring the subsequent battle, Orno became enraged when he realized there was a chance that he could lose. Upon this realization, he stunned his opponent and then was subsequently confronted by Baine Bloodhoof. Seeing this is to be the perfect chance, Orno ignored his former foe and ordered his men to attack the young Bloodhoof. However, Baine would prove himself to be no weakling and Orno would lose his life.",
+   "Abilities": "-",
+   "Objective of": "- War Dance"
+  },
+  "links": [
+   "Magatha",
+   "Grimtotem",
+   "Mulgore",
+   "Stonetalon Pass (Mulgore)",
+   "Grimtotem Defender",
+   "Thunder Bluff Brave",
+   "Adventurer",
+   "Horde",
+   "Baine Bloodhoof",
+   "War Dance"
+  ],
+  "categories": [
+   "Grimtotem tribe",
+   "Mulgore mobs",
+   "Named mobs",
+   "Tauren characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 530490,
+   "revid": 6366247,
+   "timestamp": "2025-06-13T06:03:11Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "palemane_poacher",
+  "title": "Palemane Poacher",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Palemane Poacher",
+   "creature": "Humanoid",
+   "race": "Gnoll",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "affiliation": "Palemane tribe",
+   "character": "Poacher",
+   "location": "Mulgore",
+   "status": "Killable",
+   "profession": "Pickpocket"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nPalemane Poachers are Palemane gnolls found in both Palemane Rock and the gnoll camp under Red Cloud Mesa in Mulgore.",
+   "Abilities": "- -",
+   "Objective of": "- 15 Palemane gnolls need to be killed for Sharing the Land."
+  },
+  "links": [
+   "Palemane tribe",
+   "gnoll",
+   "Palemane Rock",
+   "Red Cloud Mesa",
+   "Mulgore",
+   "Sharing the Land"
+  ],
+  "categories": [
+   "Gnoll characters",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 201808,
+   "revid": 6373226,
+   "timestamp": "2025-06-13T10:01:06Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "palemane_skinner",
+  "title": "Palemane Skinner",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Palemane Skinner",
+   "creature": "Humanoid",
+   "race": "Gnoll",
+   "level": "Mulgore",
+   "resource": "Mana",
+   "faction": "Combat",
+   "affiliation": "Palemane tribe",
+   "location": "Mulgore",
+   "status": "Killable",
+   "profession": "Pickpocket"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nPalemane Skinners are Palemane gnolls found in both Palemane Rock and the gnoll camp under Red Cloud Mesa in Mulgore.",
+   "Abilities": "-",
+   "Objective of": "- 15 Palemane gnolls need to be killed for Sharing the Land."
+  },
+  "links": [
+   "Palemane tribe",
+   "gnoll",
+   "Palemane Rock",
+   "Red Cloud Mesa",
+   "Mulgore",
+   "Sharing the Land"
+  ],
+  "categories": [
+   "Gnoll characters",
+   "Mulgore mobs",
+   "Skinners"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 176454,
+   "revid": 6373227,
+   "timestamp": "2025-06-13T10:01:08Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "palemane_tanner",
+  "title": "Palemane Tanner",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Palemane Tanner",
+   "creature": "Humanoid",
+   "race": "Gnoll",
+   "level": "Mulgore",
+   "resource": "Mana",
+   "faction": "Combat",
+   "affiliation": "Palemane tribe",
+   "location": "Mulgore",
+   "status": "Killable",
+   "profession": "Pickpocket"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nPalemane Tanners are Palemane gnolls found in both Palemane Rock and the gnoll camp under Red Cloud Mesa in Mulgore.",
+   "Abilities": "- Tanning Solution - Reduces chance to hit by 10% for 5 seconds.\n\n-",
+   "Objective of": "- 15 Palemane gnolls need to be killed for Sharing the Land.",
+   "Quotes": "- -"
+  },
+  "links": [
+   "Palemane tribe",
+   "gnoll",
+   "Palemane Rock",
+   "Red Cloud Mesa",
+   "Mulgore",
+   "Sharing the Land"
+  ],
+  "categories": [
+   "Gnoll characters",
+   "Leatherworkers",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 11314,
+   "revid": 6373228,
+   "timestamp": "2025-06-13T10:01:10Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "plagued_resident",
+  "title": "Plagued Resident",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Plagued Resident",
+   "race": "Ghoul",
+   "creature": "Undead",
+   "affiliation": "Scourge",
+   "faction": "Combat",
+   "level": "10",
+   "occupation": "Commoner",
+   "location": "Starting zones"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Plagued Residents are just what the name suggests - civilians across Azeroth who have succumbed to the plague and lost their sanity. During the Zombie Infestation world event, these infected people began wandering around low level areas, attacking any living player or NPC nearby. The infection apparently can make residents insane even if they haven't become Scourge... yet. They come from all walks of life, just like every other walking dead."
+  },
+  "links": [
+   "Azeroth",
+   "Zombie Infestation",
+   "world event",
+   "Scourge"
+  ],
+  "categories": [
+   "Commoners",
+   "Ghouls",
+   "Removed Azuremyst Isle mobs",
+   "Removed Dun Morogh mobs",
+   "Removed Durotar mobs",
+   "Removed Elwynn Forest mobs",
+   "Removed Eversong Woods (Burning Crusade) mobs",
+   "Removed Mulgore mobs",
+   "Removed Teldrassil mobs",
+   "Removed Tirisfal Glades mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 475914,
+   "revid": 6601163,
+   "timestamp": "2026-01-13T23:29:35Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "plainstrider",
+  "title": "Plainstrider",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Plainstrider",
+   "race": "Tallstrider",
+   "creature": "Beast",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "location": "Red Cloud Mesa, Mulgore",
+   "status": "Killable",
+   "pet": "Tallstrider"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Plainstriders are tallstriders that are native to Red Cloud Mesa in Mulgore. They are colored brown. Often, they are hunted for their meat and feathers by the tauren in the area.",
+   "Abilities": "-",
+   "Objective of": "- Drop Tender Strider Meat for Kyle's Gone Missing!\n\n- Drop Plainstrider Feather and Plainstrider Meat for The Hunt Begins."
+  },
+  "links": [
+   "tallstrider",
+   "Red Cloud Mesa",
+   "Mulgore",
+   "tauren",
+   "Tender Strider Meat",
+   "Kyle's Gone Missing!",
+   "Plainstrider Feather",
+   "Plainstrider Meat",
+   "The Hunt Begins"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Tallstriders"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 285842,
+   "revid": 6404705,
+   "timestamp": "2025-07-07T19:23:52Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "prairie_stalker",
+  "title": "Prairie Stalker",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Prairie Stalker",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "race": "Wolf",
+   "creature": "Beast",
+   "location": "Mulgore",
+   "pet": "Wolf"
+  },
+  "coords": [
+   {
+    "x": 32.0,
+    "y": 41.7,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "Prairie Stalkers are wolves found in Mulgore.",
+   "Abilities": "-",
+   "Drops": "- Stalker Claws\n- Prairie Wolf Paw\n\n- Prairie Wolf Heart"
+  },
+  "links": [
+   "wolf",
+   "Mulgore",
+   "Stalker Claws",
+   "Prairie Wolf Paw",
+   "Prairie Wolf Heart"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Wolves"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 213892,
+   "revid": 6373649,
+   "timestamp": "2025-06-13T10:15:35Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "prairie_wolf",
+  "title": "Prairie Wolf",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Prairie Wolf",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "race": "Wolf",
+   "creature": "Beast",
+   "location": "Mulgore",
+   "status": "Killable",
+   "pet": "Wolf"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Prairie Wolves are wolves found in the areas west and south of Bloodhoof Village in Mulgore.\n__NOTOC__",
+   "Abilities": "Retail\n- Classic\n-",
+   "Objective of": "Retail\n- Poison Water: Prairie Wolf Paw obtained (6)\n\nClassic\n\n- Poison Water (Classic): Prairie Wolf Paw obtained (6)\n- Mazzranache (Classic): Prairie Wolf Heart obtained"
+  },
+  "links": [
+   "Wolf",
+   "Bloodhoof Village",
+   "Mulgore",
+   "Poison Water",
+   "Prairie Wolf Paw",
+   "Poison Water (Classic)",
+   "Mazzranache (Classic)",
+   "Prairie Wolf Heart",
+   "hunter",
+   "Tame Beast",
+   "Prairie Stalker",
+   "Prairie Wolf Alpha"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Wolves"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 193317,
+   "revid": 6373650,
+   "timestamp": "2025-06-13T10:15:37Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "prairie_wolf_alpha",
+  "title": "Prairie Wolf Alpha",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Prairie Wolf Alpha",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "race": "Wolf",
+   "creature": "Beast",
+   "location": "Mulgore",
+   "status": "Killable",
+   "pet": "Wolf"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Prairie Wolf Alphas are wolves found in northern Mulgore. In Classic, they can also be found in eastern Mulgore along the road to the Barrens.",
+   "Abilities": "Retail\n- - Classic\n-",
+   "Objective of": "Retail\n- Poison Water: Prairie Wolf Paw obtained (6)\n- Wildmane Totem: Prairie Alpha Tooth obtained (4)\n\nClassic\n\n- Poison Water (Classic): Prairie Wolf Paw obtained (6)\n- Mazzranache (Classic): Prairie Wolf Heart obtained\n- Wildmane Totem (Classic): Prairie Alpha Tooth obtained (8)"
+  },
+  "links": [
+   "Wolf",
+   "Mulgore",
+   "World of Warcraft: Classic",
+   "Mulgore (Classic)",
+   "Barrens (Classic)",
+   "Poison Water",
+   "Prairie Wolf Paw",
+   "Wildmane Totem",
+   "Prairie Alpha Tooth",
+   "Poison Water (Classic)",
+   "Mazzranache (Classic)",
+   "Prairie Wolf Heart",
+   "Wildmane Totem (Classic)",
+   "zone scaling",
+   "Prairie Wolf",
+   "Prairie Stalker"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Wolves"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 291565,
+   "revid": 6373651,
+   "timestamp": "2025-06-13T10:15:39Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "rabbit_critter",
+  "title": "Rabbit (critter)",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Rabbit",
+   "race": "Rabbit",
+   "creature": "Critter",
+   "level": "1",
+   "faction": "Neutral",
+   "location": "Varies"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Rabbits are level 1 critters that can be found in Dun Morogh, Elwynn Forest, Redridge Mountains, Teldrassil, Stonetalon Mountains, Moonglade, Eversong Woods, Silvermoon City, Tirisfal Glades, and Scarlet Monastery.\n\nOne is found in Stormsong Valley.",
+   "Pet Journal": "When you have two rabbits, you'll often soon have three.",
+   "Achievements": "A criterion of To All The Squirrels I've Loved Before."
+  },
+  "links": [
+   "critter",
+   "Dun Morogh",
+   "Elwynn Forest",
+   "Redridge Mountains",
+   "Teldrassil",
+   "Stonetalon Mountains",
+   "Moonglade",
+   "Eversong Woods (Burning Crusade)",
+   "Silvermoon City",
+   "Tirisfal Glades",
+   "Scarlet Monastery",
+   "Stormsong Valley",
+   "To All The Squirrels I've Loved Before"
+  ],
+  "categories": [
+   "Azshara mobs",
+   "Azsuna mobs",
+   "Bastion mobs",
+   "Blade's Edge Mountains mobs",
+   "Boralus mobs",
+   "Critters",
+   "Crystalsong Forest mobs",
+   "Darkshore mobs",
+   "Dun Morogh mobs",
+   "Duskwood mobs",
+   "Elwynn Forest mobs",
+   "Eversong Woods (Burning Crusade) mobs",
+   "Eversong Woods mobs",
+   "Feralas mobs",
+   "Highmountain mobs",
+   "Hillsbrad Foothills mobs",
+   "Howling Fjord mobs",
+   "Moonglade mobs",
+   "Mount Hyjal mobs",
+   "Mulgore mobs",
+   "Nagrand mobs",
+   "Rabbits",
+   "Redridge Mountains mobs",
+   "Silvermoon City (Burning Crusade) mobs",
+   "Silverpine Forest mobs",
+   "Stonetalon Mountains mobs",
+   "Stormsong Valley NPCs",
+   "Stormwind City mobs",
+   "Tirisfal Glades mobs",
+   "Western Plaguelands mobs",
+   "Westfall mobs",
+   "Wetlands mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 119872,
+   "revid": 6860770,
+   "timestamp": "2026-09-05T09:25:25Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "razzranache",
+  "title": "Razzranache",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Razzranache",
+   "race": "Tallstrider",
+   "creature": "Critter",
+   "level": "1",
+   "location": "Mulgore",
+   "faction": "combat"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Razzranache is a critter tallstrider in Mulgore. They are one of Mazzranache's fledgelings."
+  },
+  "links": [
+   "critter",
+   "tallstrider",
+   "Mulgore",
+   "Mazzranache"
+  ],
+  "categories": [
+   "Critters",
+   "Mulgore mobs",
+   "Tallstriders"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 28770,
+   "revid": 6704578,
+   "timestamp": "2026-04-30T17:56:37Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "sister_hatelash",
+  "title": "Sister Hatelash",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Sister Hatelash",
+   "level": "Mulgore",
+   "type": "Rare",
+   "resource": "Mana",
+   "faction": "Combat",
+   "race": "Harpy",
+   "creature": "Humanoid",
+   "gender": "Female",
+   "affiliation": "Windfury harpies",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [
+   {
+    "x": 29.4,
+    "y": 20.5,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "__NOTOC__\n\nSister Hatelash is a rare harpy found in Mulgore.",
+   "Abilities": "- - - -"
+  },
+  "links": [
+   "rare mob",
+   "harpy",
+   "Mulgore"
+  ],
+  "categories": [
+   "Harpies",
+   "Kalimdor rare mobs",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 316765,
+   "revid": 6366781,
+   "timestamp": "2025-06-13T06:20:22Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "skeletal_trooper",
+  "title": "Skeletal Trooper",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Skeletal Trooper",
+   "race": "Bone golem",
+   "level": "9 - 10",
+   "resource": "Mana",
+   "faction": "Combat",
+   "creature": "Undead",
+   "affiliation": "Scourge",
+   "location": "; ;",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Skeletal Troopers were found in , , , and during the Scourge Invasion event.",
+   "Abilities": "- -",
+   "Drops": "- Dim Necrotic Stone"
+  },
+  "links": [
+   "Scourge Invasion",
+   "Dim Necrotic Stone"
+  ],
+  "categories": [
+   "Bone golems",
+   "Removed Dun Morogh mobs",
+   "Removed Durotar mobs",
+   "Removed Mulgore mobs",
+   "Removed Teldrassil mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 57862,
+   "revid": 6616281,
+   "timestamp": "2026-01-26T09:12:45Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "snagglespear",
+  "title": "Snagglespear",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Snagglespear",
+   "race": "Gnoll",
+   "creature": "Humanoid",
+   "level": "Mulgore",
+   "type": "Rare",
+   "affiliation": "Palemane tribe",
+   "faction": "Combat",
+   "location": "Gnoll camps south of Bloodhoof Village in Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nSnagglespear is a rare gnoll found in the gnoll camps south of Bloodhoof Village in Mulgore. He may be the leader of the Palemane tribe. He is on a 1-2 hour respawn timer.",
+   "Abilities": "- - -"
+  },
+  "links": [
+   "rare mob",
+   "gnoll",
+   "Bloodhoof Village",
+   "Mulgore",
+   "Palemane tribe"
+  ],
+  "categories": [
+   "Gnoll characters",
+   "Kalimdor rare mobs",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 500588,
+   "revid": 6377968,
+   "timestamp": "2025-06-13T12:47:02Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "spazzranache",
+  "title": "Spazzranache",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Spazzranache",
+   "race": "Tallstrider",
+   "creature": "Critter",
+   "level": "1",
+   "location": "Mulgore",
+   "faction": "combat"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Spazzranache is a critter tallstrider in Mulgore. They are one of Mazzranache's fledgelings."
+  },
+  "links": [
+   "critter",
+   "tallstrider",
+   "Mulgore",
+   "Mazzranache",
+   "Jazzranache"
+  ],
+  "categories": [
+   "Critters",
+   "Mulgore mobs",
+   "Tallstriders"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 95020,
+   "revid": 6704350,
+   "timestamp": "2026-04-30T10:50:14Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "spectral_spirit",
+  "title": "Spectral Spirit",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Spectral Spirit",
+   "level": "9 - 10",
+   "faction": "Combat",
+   "race": "Wraith",
+   "creature": "Undead",
+   "affiliation": "Scourge",
+   "location": "; ;"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Spectral Spirits were wraiths found in , , , and during the Scourge Invasion event.",
+   "Abilities": "-",
+   "Drops": "- Dim Necrotic Stone"
+  },
+  "links": [
+   "wraith",
+   "Scourge Invasion",
+   "Dim Necrotic Stone"
+  ],
+  "categories": [
+   "Removed Dun Morogh mobs",
+   "Removed Durotar mobs",
+   "Removed Mulgore mobs",
+   "Removed Teldrassil mobs",
+   "Wraiths"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 181588,
+   "revid": 6625390,
+   "timestamp": "2026-02-04T18:20:33Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "stonebull_crayfish_mob",
+  "title": "Stonebull Crayfish (mob)",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Stonebull Crayfish",
+   "level": "Mulgore",
+   "location": "Stonebull Lake, Mulgore.",
+   "race": "Crawdad",
+   "creature": "Beast"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Stonebull Crayfishs are level 1-5 crawdads found in Stonebull Lake in Mulgore.",
+   "Objective of": "- Loot these for the quest Craving Crayfish."
+  },
+  "links": [
+   "crawdad",
+   "Stonebull Lake",
+   "Mulgore",
+   "Craving Crayfish",
+   "es:Cangrejo de río de Toro de Piedra (mob)"
+  ],
+  "categories": [
+   "Arthropods",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 464388,
+   "revid": 5702987,
+   "timestamp": "2023-11-21T08:07:25Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "supervisor_fizsprocket",
+  "title": "Supervisor Fizsprocket",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Supervisor Fizsprocket",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "affiliation": "Venture Company",
+   "race": "Goblin",
+   "creature": "Humanoid",
+   "gender": "Male",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Supervisor Fizsprocket is a goblin member of the Venture Company and the supervisor of the Venture Co. Mine in Mulgore. The Venture Co. was refused mining rights in Mulgore, but they would not take no for an answer. Mogul Razdunk and the company's advisory board were encouraging Fizsprocket to expand Mulgore operations to lumber harvesting as well. The board was going to provide the supervisor with several of their newest model shredders and raw materials to construct a mill. The tauren in the area were enraged with his mining division in their delicate land. Tauren Outrunners had destroyed one of the supply caravans on its way to the mine, and Morin Cloudstalker asked adventurers to kill Fizsprocket and take his clipboard.",
+   "Abilities": "- - - -",
+   "Objective of": "- Drops Fizsprocket's Clipboard for Supervisor Fizsprocket (quest).\n\n- He needed to be killed for the original version of Supervisor Fizsprocket (Classic)."
+  },
+  "links": [
+   "goblin",
+   "Venture Company",
+   "Venture Co. Mine",
+   "Mulgore",
+   "The Venture Co.",
+   "Mogul Razdunk",
+   "Venture Co. Documents",
+   "tauren",
+   "Outrunner",
+   "Ravaged Caravan",
+   "Morin Cloudstalker",
+   "adventurer",
+   "Fizsprocket's Clipboard",
+   "Supervisor Fizsprocket (quest)",
+   "Supervisor Fizsprocket (Classic)"
+  ],
+  "categories": [
+   "Foremen",
+   "Goblin characters",
+   "Mulgore mobs",
+   "Named mobs",
+   "Venture Company"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 90462,
+   "revid": 6364038,
+   "timestamp": "2025-06-13T03:41:26Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "swoop_mob",
+  "title": "Swoop (mob)",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Swoop",
+   "race": "Vulture",
+   "creature": "Beast",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "location": "Mulgore",
+   "status": "Killable",
+   "pet": "Carrion bird"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nSwoops are vultures found in Mulgore.",
+   "Abilities": "-",
+   "Objective of": "- Drop Trophy Swoop Quill for Swoop Hunting."
+  },
+  "links": [
+   "vulture",
+   "Mulgore",
+   "Trophy Swoop Quill",
+   "Swoop Hunting"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Vultures"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 83410,
+   "revid": 6720626,
+   "timestamp": "2026-05-20T23:55:23Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "taloned_swoop",
+  "title": "Taloned Swoop",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Taloned Swoop",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "race": "Vulture",
+   "creature": "Beast",
+   "location": "Mulgore",
+   "status": "Killable",
+   "pet": "Carrion bird"
+  },
+  "coords": [
+   {
+    "x": 36.5,
+    "y": 16.3,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "Taloned Swoops are vultures found in Mulgore.",
+   "Abilities": "- -"
+  },
+  "links": [
+   "vulture",
+   "Mulgore"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Vultures"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 33771,
+   "revid": 6720628,
+   "timestamp": "2026-05-20T23:55:37Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "the_rake",
+  "title": "The Rake",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "The Rake",
+   "race": "Lion",
+   "creature": "Beast",
+   "level": "Mulgore",
+   "type": "Rare",
+   "faction": "Combat",
+   "location": "Mulgore",
+   "status": "Killable",
+   "profession": "Skinning",
+   "pet": "Cat"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nThe Rake is a rare mob lion found in Mulgore, east of Thunder Bluff in the Golden Plains. He is on a one hour spawn timer.",
+   "History": "The Rake was formerly one of the most commonly seen hunter pets due to his attack speed of 1.2, the second-best attack speed available in a tameable pet. The only ones faster were Broken Tooth and the Bloodseeker Bat with a 1.0 attack speed, though there are a few other beasts that also had a 1.2 attack speed. Since pet attack-speed normalization in patch 2.0.1, he has lost this significance. Numerous savannah cats in the Barrens are identical in appearance, and are easily available for taming. Since Deathwing's return, the Rake's only attack is Leaping Rush.",
+   "Abilities": "- -",
+   "Notable loot": "- Lionfur Armor"
+  },
+  "links": [
+   "rare mob",
+   "lion",
+   "Mulgore",
+   "Thunder Bluff",
+   "Golden Plains",
+   "spawn",
+   "hunter",
+   "pet",
+   "attack speed",
+   "tame",
+   "Broken Tooth",
+   "Bloodseeker Bat",
+   "patch 2.0.1",
+   "Barrens",
+   "Lionfur Armor"
+  ],
+  "categories": [
+   "Kalimdor rare mobs",
+   "Lions",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 516823,
+   "revid": 6442504,
+   "timestamp": "2025-08-18T07:49:24Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "thornguard_quilboar",
+  "title": "Thornguard (quilboar)",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Thornguard",
+   "race": "Quilboar",
+   "gender": "Male",
+   "creature": "Humanoid",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "class": "Warrior",
+   "affiliation": "Bristleback tribe",
+   "status": "Killable",
+   "location": "Thornmantle's Hideout, Mulgore",
+   "profession": "Pickpocket"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "The Thornguards are two Bristleback quilboar who guard the entrance to Thornmantle's Hideout on Red Cloud Mesa.",
+   "Abilities": "- -",
+   "Notes": "- Only two of these mobs spawn at a time."
+  },
+  "links": [
+   "Bristleback tribe",
+   "quilboar",
+   "Thornmantle's Hideout",
+   "Red Cloud Mesa"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Quilboar characters",
+   "Warrior characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 36521,
+   "revid": 6381584,
+   "timestamp": "2025-06-14T18:33:58Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "unleashed_nature_spirit",
+  "title": "Unleashed Nature Spirit",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Unleashed Nature Spirit",
+   "race": "Treant",
+   "creature": "Elemental",
+   "level": "7",
+   "type": "Elite",
+   "faction": "Combat",
+   "location": "Starbreeze Village, ;"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Unleashed Nature Spirit is a treant located in Starbreeze Village in and near the Bael'dun Digsite in western . It appears when the Glade Crown or Prairie Crown are used at a Wooden Effigy.",
+   "Abilities": "-",
+   "Drops": "- Rune of Natural Potential"
+  },
+  "links": [
+   "treant",
+   "Starbreeze Village",
+   "Bael'dun Digsite",
+   "Glade Crown",
+   "Prairie Crown",
+   "Wooden Effigy",
+   "Rune of Natural Potential"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Teldrassil mobs",
+   "Treants"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 567088,
+   "revid": 6385326,
+   "timestamp": "2025-06-15T12:13:31Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "venture_co_hireling",
+  "title": "Venture Co. Hireling",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Venture Co. Hireling",
+   "slides": "File:Venture Co. Hireling goblin.jpg Goblin\nFile:Venture Co. Hireling human.jpg Human\nFile:Venture Co. Hireling gnoll.jpg Gnoll\nFile:Venture Co. Hireling dwarf.jpg Dwarf",
+   "gender": "Both",
+   "level": "5 - 6",
+   "faction": "Combat",
+   "races": "Goblin, Human, Dark Iron dwarf, Gnoll",
+   "creature": "Humanoid",
+   "affiliation": "Venture Company",
+   "location": "Winterhoof Water Well,",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Venture Co. Hirelings are Venture Company members located at the Winterhoof Water Well in ."
+  },
+  "links": [
+   "Venture Company",
+   "Winterhoof Water Well"
+  ],
+  "categories": [
+   "Dark Iron dwarf characters",
+   "Gnoll characters",
+   "Goblin characters",
+   "Human characters",
+   "Removed Mulgore mobs",
+   "Venture Company"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 325890,
+   "revid": 6570766,
+   "timestamp": "2025-12-22T22:14:14Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "venture_co_laborer",
+  "title": "Venture Co. Laborer",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Venture Co. Laborer",
+   "races": "Goblin, Ogre, Dark Iron dwarf, Gnoll",
+   "gender": "Male",
+   "creature": "Humanoid",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "affiliation": "Venture Company",
+   "location": "Ravaged Caravan, Mulgore",
+   "status": "Killable",
+   "profession": "Pickpocket"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Venture Co. Laborers are members of the Venture Company that can be found wandering the Ravaged Caravan in Mulgore.",
+   "Abilities": "- -"
+  },
+  "links": [
+   "Venture Company",
+   "Ravaged Caravan",
+   "Mulgore"
+  ],
+  "categories": [
+   "Dark Iron dwarf characters",
+   "Gnoll characters",
+   "Goblin characters",
+   "Mulgore mobs",
+   "Ogre characters",
+   "Venture Company"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 423659,
+   "revid": 6383532,
+   "timestamp": "2025-06-15T00:59:38Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "venture_co_poacher",
+  "title": "Venture Co. Poacher",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Venture Co. Poacher",
+   "race": "Goblin",
+   "creature": "Humanoid",
+   "gender": "Male",
+   "level": "6-7",
+   "faction": "Combat",
+   "affiliation": "Venture Company",
+   "occupation": "Poacher",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Venture Co. Poacher is a goblin that spawns when casting Hunter's Mark on the Rustling Bush in .",
+   "Drops": "- Rune of Marksmanship"
+  },
+  "links": [
+   "goblin",
+   "Hunter's Mark",
+   "Rustling Bush (Season of Discovery)",
+   "Rune of Marksmanship"
+  ],
+  "categories": [
+   "Goblin characters",
+   "Mulgore mobs",
+   "Venture Company"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 574859,
+   "revid": 5982549,
+   "timestamp": "2024-03-06T14:14:46Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "venture_co_supervisor",
+  "title": "Venture Co. Supervisor",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Venture Co. Supervisor",
+   "races": "Goblin, Dark Iron dwarf, Human",
+   "gender": "Both",
+   "creature": "Humanoid",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "affiliation": "Venture Company",
+   "location": "Venture Co. Mine, Mulgore"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Venture Co. Supervisors are members of the Venture Company located at the Venture Co. Mine in Mulgore.",
+   "Abilities": "- -",
+   "Objective of": "6 of them needed to be killed for The Venture Co. (Classic)."
+  },
+  "links": [
+   "Venture Company",
+   "Venture Co. Mine",
+   "Mulgore",
+   "The Venture Co. (Classic)"
+  ],
+  "categories": [
+   "Dark Iron dwarf characters",
+   "Foremen",
+   "Goblin characters",
+   "Human characters",
+   "Mulgore mobs",
+   "Venture Company"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 441767,
+   "revid": 6385475,
+   "timestamp": "2025-06-15T12:18:19Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "venture_co_taskmaster",
+  "title": "Venture Co. Taskmaster",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Venture Co. Taskmaster",
+   "faction": "Combat",
+   "level": "Mulgore",
+   "races": "Goblin, Gnoll, Jungle troll, Dark Iron dwarf",
+   "creature": "Humanoid",
+   "affiliation": "Venture Company",
+   "gender": "Male",
+   "location": "Ravaged Caravan, Mulgore",
+   "status": "Killable",
+   "profession": "Pickpocket"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Venture Co. Taskmasters are members of the Venture Company located at the Ravaged Caravan in Mulgore."
+  },
+  "links": [
+   "Venture Company",
+   "Ravaged Caravan",
+   "Mulgore"
+  ],
+  "categories": [
+   "Dark Iron dwarf characters",
+   "Foremen",
+   "Gnoll characters",
+   "Goblin characters",
+   "Jungle troll characters",
+   "Mulgore mobs",
+   "Venture Company"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 394625,
+   "revid": 5743876,
+   "timestamp": "2023-11-22T11:10:10Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "venture_co_worker",
+  "title": "Venture Co. Worker",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Venture Co. Worker",
+   "races": "Goblin, Gnoll, Dark Iron dwarf, Ogre",
+   "gender": "Male",
+   "creature": "Humanoid",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "location": "Mulgore",
+   "affiliation": "Venture Company",
+   "status": "Killable",
+   "profession": "Pickpocket"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nVenture Co. Workers are members of the Venture Company found in the Venture Co. Mine in Mulgore. Their project overseer is Supervisor Fizsprocket.",
+   "Abilities": "- -",
+   "Objective of": "- 7 of them need to be killed for The Venture Co..\n\n- 14 of them needed to be killed for the original version of The Venture Co. (Classic)."
+  },
+  "links": [
+   "Venture Company",
+   "Venture Co. Mine",
+   "Mulgore",
+   "Supervisor Fizsprocket",
+   "The Venture Co.",
+   "The Venture Co. (Classic)"
+  ],
+  "categories": [
+   "Dark Iron dwarf characters",
+   "Gnoll characters",
+   "Goblin characters",
+   "Miners",
+   "Mulgore mobs",
+   "Ogre characters",
+   "Venture Company"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 131087,
+   "revid": 6382447,
+   "timestamp": "2025-06-14T18:57:38Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "venture_lackey",
+  "title": "Venture Lackey",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Venture Lackey",
+   "gender": "Both",
+   "level": "bfa-max",
+   "faction": "Combat",
+   "races": "Human, Dark Iron dwarf, Jungle troll",
+   "creature": "Humanoid",
+   "affiliation": "Venture Company",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Venture Lackeys are Dark Iron dwarves, jungle trolls, and humans accompanying Verd Twiceswindle by a cave north of Red Rocks in Mulgore.",
+   "Abilities": "-"
+  },
+  "links": [
+   "Dark Iron dwarf",
+   "jungle troll",
+   "human",
+   "Verd Twiceswindle",
+   "Mulgore cave",
+   "Red Rocks",
+   "Mulgore"
+  ],
+  "categories": [
+   "Dark Iron dwarf characters",
+   "Human characters",
+   "Jungle troll characters",
+   "Mulgore mobs",
+   "Venture Company"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 153178,
+   "revid": 6763652,
+   "timestamp": "2026-07-04T10:42:42Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "wandering_swordsman",
+  "title": "Wandering Swordsman",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Wandering Swordsman",
+   "race": "Human",
+   "gender": "Male",
+   "creature": "Humanoid",
+   "faction": "Neutral",
+   "occupation": "Duelist",
+   "location": "Various",
+   "status": "Defeatable"
+  },
+  "coords": [
+   {
+    "x": 31.2,
+    "y": 67.9,
+    "map": "Badlands (Classic)"
+   }
+  ],
+  "sections": {
+   "Description": "The Wandering Swordsman is a rare human found in various zones.\n\nWarriors can challenge him to a duel; when defeated, he leaves behind the Swordsman's Reward containing the Rune of Blood Frenzy in the starting zones, or the Rune of the Commander in the .\n\nWhen challenged in , he will reveal his true identity as the horusath Khonsu; defeating him will give the quest Infinite Midnight, which rewards the warrior with Timeless Wanderer's Insights.",
+   "Quotes": "Starting zones\n\nBadlands\n\nFight Night\nSilithus\n\nSilithus",
+   "Objective of": "- Fight Night"
+  },
+  "links": [
+   "Rare mob",
+   "human",
+   "Warrior",
+   "Swordsman's Reward",
+   "Rune of Blood Frenzy",
+   "Rune of the Commander",
+   "horusath",
+   "Khonsu",
+   "Infinite Midnight",
+   "Timeless Wanderer's Insights",
+   "Gadgetzan",
+   "Fight Night"
+  ],
+  "categories": [
+   "Badlands NPCs",
+   "Dun Morogh NPCs",
+   "Durotar NPCs",
+   "Elwynn Forest NPCs",
+   "Human characters",
+   "Mulgore NPCs",
+   "Rare mobs",
+   "Silithus NPCs",
+   "Tanaris NPCs",
+   "Teldrassil NPCs",
+   "Tirisfal Glades NPCs",
+   "Warrior characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 567078,
+   "revid": 6304763,
+   "timestamp": "2025-04-26T21:29:38Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "windfury_harpy",
+  "title": "Windfury Harpy",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Windfury Harpy",
+   "race": "Harpy",
+   "level": "Mulgore",
+   "gender": "Female",
+   "faction": "Combat",
+   "affiliation": "Windfury harpies",
+   "creature": "Humanoid",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Windfury Harpies can be found in various locations in Mulgore.",
+   "Abilities": "- -",
+   "Objective of": "- They drop Windfury Talon for Dangers of the Windfury."
+  },
+  "links": [
+   "Mulgore",
+   "Windfury Talon",
+   "Dangers of the Windfury",
+   "hswiki:Windfury Harpy",
+   "Hearthstone (game)"
+  ],
+  "categories": [
+   "Harpies",
+   "Hearthstone cards",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 31330,
+   "revid": 6381785,
+   "timestamp": "2025-06-14T18:40:08Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "windfury_matriarch",
+  "title": "Windfury Matriarch",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Windfury Matriarch",
+   "level": "Mulgore",
+   "resource": "Mana",
+   "faction": "Combat",
+   "affiliation": "Windfury harpies",
+   "gender": "Female",
+   "race": "Harpy",
+   "creature": "Humanoid",
+   "status": "Killable",
+   "location": "Mulgore"
+  },
+  "coords": [
+   {
+    "x": 29.1,
+    "y": 21.6,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "Windfury Matriarchs are Windfury harpies found in various locations in northern Mulgore.",
+   "Abilities": "-",
+   "Objective of": "- They drop Bronze Feather for Preparation for Ceremony."
+  },
+  "links": [
+   "Windfury harpies",
+   "Mulgore",
+   "Bronze Feather",
+   "Preparation for Ceremony"
+  ],
+  "categories": [
+   "Harpies",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 538124,
+   "revid": 6385874,
+   "timestamp": "2025-06-15T12:30:29Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "windfury_sorceress",
+  "title": "Windfury Sorceress",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Windfury Sorceress",
+   "level": "Mulgore",
+   "resource": "Mana",
+   "gender": "Female",
+   "faction": "Combat",
+   "race": "Harpy",
+   "creature": "Humanoid",
+   "occupation": "Sorcerer",
+   "affiliation": "Windfury harpies",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Windfury Sorceresses are Windfury harpies found in various locations in northern Mulgore.",
+   "Abilities": "- - -",
+   "Objective of": "- Drop Azure Feather for Preparation for Ceremony."
+  },
+  "links": [
+   "Windfury harpies",
+   "Mulgore",
+   "Azure Feather",
+   "Preparation for Ceremony"
+  ],
+  "categories": [
+   "Harpies",
+   "Mulgore mobs",
+   "Sorcerers"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 395923,
+   "revid": 6384055,
+   "timestamp": "2025-06-15T01:14:27Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "windfury_wind_witch",
+  "title": "Windfury Wind Witch",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Windfury Wind Witch",
+   "level": "Mulgore",
+   "resource": "Mana",
+   "gender": "Female",
+   "faction": "Combat",
+   "race": "Harpy",
+   "creature": "Humanoid",
+   "affiliation": "Windfury harpies",
+   "location": "Mulgore"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Windfury Wind Witches are Windfury harpies found in various locations in Mulgore.",
+   "Abilities": "- -",
+   "Objective of": "- They drop Windfury Talon for Dangers of the Windfury."
+  },
+  "links": [
+   "Windfury harpies",
+   "Harpy",
+   "Mulgore",
+   "Windfury Talon",
+   "Dangers of the Windfury"
+  ],
+  "categories": [
+   "Harpies",
+   "Mulgore mobs",
+   "Witches"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 312555,
+   "revid": 6384056,
+   "timestamp": "2025-06-15T01:14:28Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "wiry_swoop",
+  "title": "Wiry Swoop",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Wiry Swoop",
+   "race": "Vulture",
+   "creature": "Beast",
+   "level": "Mulgore",
+   "faction": "Combat",
+   "location": "Mulgore",
+   "pet": "Carrion bird"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nWiry Swoops are vultures found in Mulgore.",
+   "Abilities": "-",
+   "Objective of": "- Drop Trophy Swoop Quill for Swoop Hunting."
+  },
+  "links": [
+   "vulture",
+   "Mulgore",
+   "Trophy Swoop Quill",
+   "Swoop Hunting"
+  ],
+  "categories": [
+   "Mulgore mobs",
+   "Vultures"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 397183,
+   "revid": 6720646,
+   "timestamp": "2026-05-20T23:59:25Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "young_battleboar",
+  "title": "Young Battleboar",
+  "kind": "mob",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Young Battleboar",
+   "race": "Boar",
+   "creature": "Beast",
+   "level": "Mulgore",
+   "classiclvl": "3 - 4",
+   "faction": "Combat",
+   "affiliation": "Bristleback tribe",
+   "location": "Red Cloud Mesa, Mulgore",
+   "status": "Killable",
+   "pet": "Boar"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nBattleboars are boars found in Red Cloud Mesa in Mulgore. Killing them and collecting their meat and snouts was required by Grull Hawkwind.",
+   "Abilities": "-",
+   "Objective of": "- They drop Battleboar Flank and Battleboar Snout for The Battleboars.",
+   "In the RPG": "Kalimdor's quilboars specially train battleboars, which bear sharp metal caps on their tusks that increase their deadliness."
+  },
+  "links": [
+   "boar",
+   "Red Cloud Mesa",
+   "Mulgore",
+   "Grull Hawkwind",
+   "The Battleboars",
+   "quilboar",
+   "Monster Guide Web Supplement",
+   "Bristleback Battleboar",
+   "Tamed Battleboar"
+  ],
+  "categories": [
+   "Boars",
+   "Mulgore mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 140352,
+   "revid": 6384351,
+   "timestamp": "2025-06-15T01:22:53Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "bountiful_table",
+  "title": "Bountiful Table",
+  "kind": "mob",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "The Bountiful Tables are tables set up during the Pilgrim's Bounty world event. Several tables are located outside the main cities (Orgrimmar, Thunder Bluff, Undercity, and Silvermoon City for Horde; Stormwind City, Ironforge, Darnassus, and The Exodar for Alliance), and smaller groups of tables can be found at various other towns.",
+   "How the table works": "Each Bountiful Table has 5 chairs around it, allowing up to 5 characters to sit at one table. Each seat is named for the Pilgrim's Bounty dish shown to the right of that location:\n- The Turkey Chair ( Slow-Roasted Turkey )\n- The Cranberry Chair ( Cranberry Chutney )\n- The Stuffing Chair ( Spice Bread Stuffing )\n- The Sweet Potato Chair ( Candied Sweet Potato )\n- The Pie Chair ( Pumpkin Pie )\n\nThe chairs use the vehicle mechanics in that you \"mount\" it, and while there are provided an action bar unique to that position. \n\nEach seat at the table is in easy reach of one dish. Initially, only two options are available: pass your dish, and \"eat (your dish)\".\n\nThe first option of each chair is \"pass your dish\", with the dish icon representing the dish you can reach on the table. Target one of the other chairs, and select this option, to pass your dish to that chair. If someone is sitting in that chair, AND already has that dish on their plate, you bounce the food off their head. (In the case of the chutney, 'theoretically', since chutney is not well known for bouncing...). Otherwise, it adds your dish to that plate, even if nobody is currently sitting there. \n\nThe other 5 options presented are to eat the food depicted (turkey, chutney, stuffing, sweet potato, or pie). As others pass their dish (to you), those options will become enabled.\n\nEating any of the food at the table gives you a short-lived (5 minute) buff, with the buff icon showing that food item. These buffs stack up to 5. If you get all 5 buffs up to 5, you lose those buffs and gain instead The Spirit of Sharing, a 60 minute buff that increases your reputation gains by 10%.",
+   "Related achievements": "- - bounce food off a given person's head\n- - acquire The Spirit of Sharing at all four of your faction's capital cities.\n- - pass one of each dish\n- - take a seat at a bountiful table at each enemy capital.",
+   "Objective of": "- Celebration of Sharing",
+   "Notes": "\"Bouncing food off another person's head\" is done by passing food while you have someone targeted and they already have a full stack of that food available. You can get the warning \"invalid target\" if you try passing food while having someone targeted who is not at the table.\n\nFood from other positions at the table are consumed, and may need to be passed again. You can also move to another chair.\n\nFood passed from another chair will last for up to 5 minutes at that position unless consumed first."
+  },
+  "links": [
+   "Ironforge",
+   "Pilgrim's Bounty",
+   "Orgrimmar",
+   "Thunder Bluff",
+   "Undercity",
+   "Silvermoon City",
+   "Horde",
+   "Stormwind City",
+   "Darnassus",
+   "The Exodar",
+   "Alliance",
+   "The Turkey Chair",
+   "Slow-Roasted Turkey",
+   "The Cranberry Chair",
+   "Cranberry Chutney",
+   "The Stuffing Chair",
+   "Spice Bread Stuffing",
+   "The Sweet Potato Chair",
+   "Candied Sweet Potato",
+   "The Pie Chair",
+   "Pumpkin Pie",
+   "Vehicles (mechanic)",
+   "The Spirit of Sharing",
+   "Celebration of Sharing"
+  ],
+  "categories": [
+   "Azuremyst Isle objects",
+   "Crystalsong Forest objects",
+   "Darnassus objects",
+   "Dornogal objects",
+   "Dun Morogh objects",
+   "Durotar objects",
+   "Elwynn Forest objects",
+   "Eversong Woods (Burning Crusade) objects",
+   "Mission mobs",
+   "Thunder Bluff objects",
+   "Tirisfal Glades objects",
+   "Valdrakken objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 72261,
+   "revid": 6500256,
+   "timestamp": "2025-10-05T20:33:12Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "dark_tendril",
+  "title": "Dark Tendril",
+  "kind": "mob",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Dark Tendril",
+   "level": "Highmountain",
+   "faction": "Combat",
+   "race": "Tentacle",
+   "creature": "Aberration",
+   "location": "Thunder Bluff; Highmountain",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Dark Tendrils are tentacles located in Thunder Bluff and Highmountain.",
+   "Abilities": "- Hurl the Void - Hurl a ball of void energies at the current target's location, inflicting Shadow damage to all enemies within 3 yards of the impact.\n- Lash - Lash out at all enemies within 10 yards, knocking them back.",
+   "Objective of": "- Drop Shadowice Shard for Ice and Shadow."
+  },
+  "links": [
+   "tentacle",
+   "Thunder Bluff",
+   "Highmountain",
+   "Shadowice Shard",
+   "Ice and Shadow"
+  ],
+  "categories": [
+   "Highmountain mobs",
+   "Tentacles",
+   "Thunder Bluff mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 33706,
+   "revid": 5752001,
+   "timestamp": "2023-11-22T15:34:10Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "malevolent_spirit",
+  "title": "Malevolent Spirit",
+  "kind": "mob",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Malevolent Spirit",
+   "level": "bfa-max",
+   "type": "Elite",
+   "faction": "Combat",
+   "race": "Wraith",
+   "creature": "Undead",
+   "location": "Thunder Bluff",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "The Malevolent Spirit is a wraith that attacked Thunder Bluff during the Heritage of the Shu'halo.",
+   "Abilities": "- - - -",
+   "Objective of": "- Answer the Call"
+  },
+  "links": [
+   "wraith",
+   "Thunder Bluff",
+   "Heritage of the Shu'halo",
+   "Spiritwalker Ussoh",
+   "Spirit Link Totem (NPC)",
+   "Answer the Call"
+  ],
+  "categories": [
+   "Thunder Bluff mobs",
+   "Wraiths"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 521658,
+   "revid": 6370508,
+   "timestamp": "2025-06-13T08:27:13Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "prairie_dog",
+  "title": "Prairie Dog",
+  "kind": "mob",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Prairie Dog",
+   "level": "1",
+   "race": "Ground squirrel",
+   "creature": "Critter",
+   "faction": "Combat",
+   "location": "Mulgore; Northern Barrens; Southern Barrens; Westfall; Arathi Highlands; Nagrand;"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nPrairie Dogs are a type of ground squirrel found on grassy plains throughout Azeroth (especially on Kalimdor), as well as in both versions of Nagrand.",
+   "Pet Journal": "Distinct from their tree dwelling cousins, these ground squirrels make their homes on the plains of Azeroth and beyond.",
+   "Notes": "- Using /love on a Prairie Dog is required for the To All The Squirrels I've Loved Before achievement.\n- Prairie Dogs, Rabbits and Mice can be seen occasionally donning helmets and rifles on a plateau high above Stonetalon Pass, Mulgore.\n- In , Prairie Dog Musk allows hunters to tame Prairie Dogs as companion pets."
+  },
+  "links": [
+   "Mulgore",
+   "Stonetalon Mountains",
+   "ground squirrel",
+   "Azeroth",
+   "Kalimdor",
+   "Nagrand",
+   "To All The Squirrels I've Loved Before",
+   "Rabbit (critter)",
+   "Mouse (critter)",
+   "Stonetalon Pass (Mulgore)",
+   "Prairie Dog Musk",
+   "Brown Prairie Dog",
+   "Mechanical Prairie Dog"
+  ],
+  "categories": [
+   "Arathi Highlands mobs",
+   "Critters",
+   "Desolace mobs",
+   "Dornogal mobs",
+   "Exile's Reach NPCs",
+   "Frostwall mobs",
+   "Ground squirrels",
+   "Isle of Dorn mobs",
+   "Mulgore mobs",
+   "Nagrand (alternate universe) mobs",
+   "Nagrand mobs",
+   "Northern Barrens mobs",
+   "Ohn'ahran Plains mobs",
+   "Shadowmoon Valley (alternate universe) mobs",
+   "Southern Barrens mobs",
+   "Thunder Bluff mobs",
+   "Vol'dun mobs",
+   "Waking Shores mobs",
+   "Westfall mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 408044,
+   "revid": 6861555,
+   "timestamp": "2026-09-05T09:47:51Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "qytelek",
+  "title": "Qy'telek",
+  "kind": "mob",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Qy'telek",
+   "title": "Herald of Uul'gyneth",
+   "level": "Legion allied race",
+   "faction": "Combat",
+   "race": "N'raqi",
+   "creature": "Uncategorized",
+   "occupation": "Herald",
+   "location": "Thunder Bluff",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Qy'telek is a n'raqi located in Thunder Bluff.",
+   "Abilities": "- -",
+   "Objective of": "- Dark Forces"
+  },
+  "links": [
+   "n'raqi",
+   "Thunder Bluff",
+   "Dark Forces"
+  ],
+  "categories": [
+   "Emissaries",
+   "N'raqi",
+   "Named mobs",
+   "Thunder Bluff mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 301510,
+   "revid": 6374133,
+   "timestamp": "2025-06-13T10:32:07Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "ruk_warstomper",
+  "title": "Ruk Warstomper",
+  "kind": "mob",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Ruk Warstomper",
+   "title": "Battlemaster",
+   "level": "Full",
+   "type": "Elite",
+   "faction": "Horde",
+   "affiliation": "Thunder Bluff",
+   "race": "Tauren",
+   "creature": "Humanoid",
+   "character": "Warrior",
+   "occupation": "Battlemaster",
+   "gender": "Male",
+   "location": "Hunter Rise, Thunder Bluff",
+   "status": "Alive"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Ruk Warstomper is a tauren battlemaster located on the Hunter Rise of Thunder Bluff. Shortly after the Cataclysm, Ruk dealt with the quilboar problem in Mulgore.\n\nDuring the Fourth War, he was encountered by the Alliance forces at Bael Modan in Southern Barrens.",
+   "Abilities": "- - - -",
+   "Objective of": "- Barrens at War (Alliance)",
+   "Quotes": "Gossip when not eligible\nYou are not yet seasoned enough to enter a battleground, . Return when you have gained more experience.\n\nGossip\nAre you ready to fight for the Horde, ?"
+  },
+  "links": [
+   "tauren",
+   "battlemaster",
+   "Hunter Rise",
+   "Thunder Bluff",
+   "Cataclysm (event)",
+   "quilboar",
+   "Mulgore",
+   "As Our Fathers Before Us",
+   "Fourth War",
+   "Alliance",
+   "Bael Modan",
+   "Southern Barrens",
+   "Barrens at War (Alliance)",
+   "Horde"
+  ],
+  "categories": [
+   "Battlemasters",
+   "Leaders of Azeroth characters",
+   "Mission mobs",
+   "Tauren characters",
+   "Thunder Bluff NPCs",
+   "Warrior characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 254391,
+   "revid": 6544221,
+   "timestamp": "2025-11-15T19:54:44Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "shadow_of_uul",
+  "title": "Shadow of Uul",
+  "kind": "mob",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Shadow of Uul",
+   "level": "Highmountain",
+   "faction": "Combat",
+   "race": "Haunt",
+   "creature": "Elemental",
+   "location": "Thunder Bluff; Highmountain",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Shadows of Uul are located in Thunder Bluff and Highmountain.",
+   "Abilities": "- Consuming Bite - Bite the target, inflicting Shadow damage and consuming its energy to enrage the caster, increasing damage done by 8% for 15 sec."
+  },
+  "links": [
+   "Thunder Bluff",
+   "Highmountain"
+  ],
+  "categories": [
+   "Haunts",
+   "Highmountain mobs",
+   "Thunder Bluff mobs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 266246,
+   "revid": 5752002,
+   "timestamp": "2023-11-22T15:34:12Z",
+   "license": "CC BY-SA"
+  }
+ }
+]

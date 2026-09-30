@@ -1,0 +1,1394 @@
+[
+ {
+  "id": "ambercorn",
+  "title": "Ambercorn",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Ambercorn can be found on the ground under the trees in Mulgore.",
+   "As a quest objective": "Two Ambercorn must be collected for Zarlman Two-Moons in Rite of Vision (2)."
+  },
+  "links": [
+   "Mulgore (Classic)",
+   "Zarlman Two-Moons",
+   "Rite of Vision (2)",
+   "Mulgore Pine Cone"
+  ],
+  "categories": [
+   "Classic objects",
+   "Removed Mulgore objects",
+   "Seeds"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 303001,
+   "revid": 6669904,
+   "timestamp": "2026-03-11T02:52:39Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "artifact_storage_season_of_discovery",
+  "title": "Artifact Storage (Season of Discovery)",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 31.6,
+    "y": 49.5,
+    "map": "Mulgore (Classic)"
+   }
+  ],
+  "sections": {
+   "Description": "The Artifact Storage chest can be found in the Bael'dun Digsite in . It requires an Artifact Storage Key to open, and contains the Sulfurous Icon for shamans."
+  },
+  "links": [
+   "Bael'dun Digsite",
+   "Artifact Storage Key",
+   "Sulfurous Icon"
+  ],
+  "categories": [
+   "Chests",
+   "Fixed devices",
+   "Mulgore objects",
+   "Season of Discovery objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 574873,
+   "revid": 6496356,
+   "timestamp": "2025-10-03T20:25:23Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "bristleback_loot_cache",
+  "title": "Bristleback Loot Cache",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 61.6,
+    "y": 76.0,
+    "map": "Mulgore (Classic)"
+   }
+  ],
+  "sections": {
+   "Description": "The Bristleback Loot Cache can be found in Brambleblade Ravine in . It contains the Lunar Idol for druids or the Rune of Victory Rush for warriors."
+  },
+  "links": [
+   "Brambleblade Ravine",
+   "Lunar Idol",
+   "Rune of Victory Rush"
+  ],
+  "categories": [
+   "Chests",
+   "Fixed devices",
+   "Mulgore objects",
+   "Season of Discovery objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 574589,
+   "revid": 6667300,
+   "timestamp": "2026-03-07T15:29:12Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "dirt_stained_map",
+  "title": "Dirt-Stained Map",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 63.0,
+    "y": 82.0,
+    "map": "Mulgore (Classic)"
+   }
+  ],
+  "sections": {
+   "Description": "The Dirt-stained Map is located in Brambleblade Ravine in Mulgore.",
+   "As a quest objective": "This item starts Attack on Camp Narache.",
+   "Notes": "Rarely done, most people never even knew this item existed."
+  },
+  "links": [
+   "Brambleblade Ravine",
+   "Mulgore (Classic)",
+   "Attack on Camp Narache"
+  ],
+  "categories": [
+   "Classic objects",
+   "In-universe maps",
+   "Removed Mulgore objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 122505,
+   "revid": 6370648,
+   "timestamp": "2025-06-13T08:31:47Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "drohns_distillery_festive_wagon",
+  "title": "Drohn's Distillery Festive Wagon",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Drohn's Distillery Festive Wagon can be found in outside the Horde major cities (except for Orgrimmar) during the Brewfest holiday.\n\nUsing your or will fill them up, when you spend at least 10 seconds drinking it, you will gain a +2 Stamina and spirit Well Fed buff."
+  },
+  "links": [
+   "Horde",
+   "Orgrimmar",
+   "Brewfest",
+   "Well Fed",
+   "Barleybrew Festive Keg",
+   "Barleybrew Festive Wagon",
+   "Drohn's Distillery Festive Keg",
+   "Thunderbrew Festive Keg",
+   "Thunderbrew Festive Wagon",
+   "T'chali's Voodoo Brew Festive Keg",
+   "T'chali's Voodoo Brew Festive Wagon",
+   "Gordok Festive Keg",
+   "Gordok Festive Wagon"
+  ],
+  "categories": [
+   "Removed Eversong Woods (Burning Crusade) objects",
+   "Removed Mulgore objects",
+   "Removed Tirisfal Glades objects",
+   "Wagons"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 536738,
+   "revid": 6889309,
+   "timestamp": "2026-09-26T22:10:59Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "flower_of_sincerity",
+  "title": "Flower of Sincerity",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Flowers of Sincerity are flowers located just east of Thunder Bluff in Mulgore. They grow only during Lunar Festival.",
+   "As a quest objective": "This item is an objective of Crown of Courage (quest)."
+  },
+  "links": [
+   "Thunder Bluff",
+   "Mulgore",
+   "Lunar Festival",
+   "Crown of Courage (quest)"
+  ],
+  "categories": [
+   "Flowers",
+   "Mulgore objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 551987,
+   "revid": 6666001,
+   "timestamp": "2026-03-06T02:25:00Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "gordok_festive_wagon",
+  "title": "Gordok Festive Wagon",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Gordok Festive Wagon can be found in outside the major cities (except for Ironforge and Orgrimmar) during the Brewfest holiday.\n\nUsing your Yellow Brewfest Stein or Blue Brewfest Stein will fill them up, when you spend at least 10 seconds drinking it, you will gain a +20 Stamina and spirit Well Fed buff."
+  },
+  "links": [
+   "Ironforge",
+   "Orgrimmar",
+   "Brewfest",
+   "Yellow Brewfest Stein",
+   "Blue Brewfest Stein",
+   "Well Fed",
+   "Barleybrew Festive Keg",
+   "Barleybrew Festive Wagon",
+   "Drohn's Distillery Festive Keg",
+   "Drohn's Distillery Festive Wagon",
+   "Thunderbrew Festive Keg",
+   "Thunderbrew Festive Wagon",
+   "T'chali's Voodoo Brew Festive Keg",
+   "T'chali's Voodoo Brew Festive Wagon",
+   "Gordok Festive Keg"
+  ],
+  "categories": [
+   "Removed Azuremyst Isle objects",
+   "Removed Elwynn Forest objects",
+   "Removed Eversong Woods (Burning Crusade) objects",
+   "Removed Mulgore objects",
+   "Removed Teldrassil objects",
+   "Removed Tirisfal Glades objects",
+   "Wagons"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 248869,
+   "revid": 6889314,
+   "timestamp": "2026-09-26T22:11:29Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "ironforge_the_awakening_of_the_dwarves",
+  "title": "Ironforge - the Awakening of the Dwarves",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "\"Ironforge - the Awakening of the Dwarves\" is a section of the History of Warcraft, Chapter II. It is set 2,500 years before Warcraft: Orcs & Humans. \n\nFound at:\n- Hall of Explorers in Ironforge.\n- Stoutlager Inn in Thelsamar, Loch Modan.\n- The Domicile in Blackrock Depths\n- Bael'dun Keep in Bael Modan, Southern Barrens\n- Bael'dun Digsite in Mulgore\n- Southmoon Ruins in Tanaris\n\nTimeline: \n- ← Previous book: The Guardians of Tirisfal\n- → Next book: The Seven Kingdoms",
+   "Notes": "The site version incorrectly uses \"became\" in place of \"become\" in the sentence \"Their rocky hides had softened and become smooth skin\"."
+  },
+  "links": [
+   "History of Warcraft",
+   "Warcraft: Orcs & Humans",
+   "Hall of Explorers",
+   "Ironforge",
+   "Stoutlager Inn",
+   "Thelsamar",
+   "Loch Modan",
+   "Domicile",
+   "Blackrock Depths",
+   "Bael'dun Keep",
+   "Bael Modan",
+   "Southern Barrens",
+   "Bael'dun Digsite",
+   "Mulgore",
+   "Southmoon Ruins",
+   "Tanaris",
+   "The Guardians of Tirisfal",
+   "The Seven Kingdoms",
+   "Titan",
+   "Azeroth",
+   "earthen",
+   "Great Sundering",
+   "Well of Eternity",
+   "Uldaman",
+   "Uldum",
+   "Ulduar",
+   "Curse of flesh",
+   "dwarf",
+   "Ironforge Mountain",
+   "Khaz Modan",
+   "Khaz'goroth",
+   "Great Forge",
+   "es:Forjaz: el despertar de los enanos"
+  ],
+  "categories": [
+   "Achievement objectives",
+   "Blackrock Depths objects",
+   "History of Warcraft",
+   "Ironforge objects",
+   "Loch Modan objects",
+   "Mulgore objects",
+   "Southern Barrens objects",
+   "Tanaris objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 215731,
+   "revid": 6012742,
+   "timestamp": "2024-04-21T12:52:57Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "locked_chest_mulgore",
+  "title": "Locked Chest (Mulgore)",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Locked Chest is a chest located by a cave north of Red Rocks in Mulgore. It is opened by Verd's Chest Key.",
+   "Objective of": "- Sheza's Prized Leather"
+  },
+  "links": [
+   "chest",
+   "Mulgore cave",
+   "Red Rocks",
+   "Mulgore",
+   "Verd's Chest Key",
+   "Sheza's Prized Leather"
+  ],
+  "categories": [
+   "Chests",
+   "Mulgore objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 306298,
+   "revid": 6763655,
+   "timestamp": "2026-07-04T10:44:54Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "lunar_chest",
+  "title": "Lunar Chest",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 53.0,
+    "y": 78.0,
+    "map": "Teldrassil (Classic)"
+   },
+   {
+    "x": 36.0,
+    "y": 70.0,
+    "map": "Mulgore (Classic)"
+   }
+  ],
+  "sections": {
+   "Description": "The Lunar Chest can be found in and . It contains the Rune of the Sun for druids.\n\nTo make the chest appear, to go either in southern Teldrassil or in southern Mulgore. Cast Moonfire on each of the three Lunar Stones at those locations, and the Lunar Chest will appear within the circle of flowers on the ground."
+  },
+  "links": [
+   "Rune of the Sun",
+   "Moonfire",
+   "Lunar Stone"
+  ],
+  "categories": [
+   "Chests",
+   "Fixed devices",
+   "Mulgore objects",
+   "Season of Discovery objects",
+   "Teldrassil objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 574680,
+   "revid": 6496879,
+   "timestamp": "2025-10-03T22:02:57Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "lunar_stone",
+  "title": "Lunar Stone",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 53.0,
+    "y": 78.0,
+    "map": "Teldrassil (Classic)"
+   },
+   {
+    "x": 36.0,
+    "y": 70.0,
+    "map": "Mulgore (Classic)"
+   }
+  ],
+  "sections": {
+   "Description": "Three Lunar Stones can be found at either in southern or in southern . Casting Moonfire on each of the three stones will cause the Lunar Chest will appear within the circle of flowers on the ground."
+  },
+  "links": [
+   "Moonfire",
+   "Lunar Chest"
+  ],
+  "categories": [
+   "Fixed devices",
+   "Mulgore objects",
+   "Season of Discovery objects",
+   "Teldrassil objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 574681,
+   "revid": 6496880,
+   "timestamp": "2025-10-03T22:03:01Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "prairie_flower",
+  "title": "Prairie Flower",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Prairie Flowers are located in . The flowers can be combined to create a Prairie Crown, usable at the Wooden Effigy in the western part of the zone."
+  },
+  "links": [
+   "Prairie Crown",
+   "Wooden Effigy",
+   "Glade Flower"
+  ],
+  "categories": [
+   "Flowers",
+   "Mulgore objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 567083,
+   "revid": 6666020,
+   "timestamp": "2026-03-06T02:28:42Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "rustling_bush_season_of_discovery",
+  "title": "Rustling Bush (Season of Discovery)",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 29.0,
+    "y": 50.0,
+    "map": "Dun Morogh (Classic)"
+   },
+   {
+    "x": 40.5,
+    "y": 52.0,
+    "map": "Durotar (Classic)"
+   },
+   {
+    "x": 59.0,
+    "y": 54.0,
+    "map": "Mulgore (Classic)"
+   },
+   {
+    "x": 47.0,
+    "y": 46.0,
+    "map": "Teldrassil (Classic)"
+   }
+  ],
+  "sections": {
+   "Description": "Rustling Bushes can be found in , , , or . Casting Hunter's Mark on the bush will cancel the and spawn a poacher that drops Rune of Marksmanship when killed.",
+   "List of bushes": "- Dun Morogh - Near Brewnall Village at . Spawns a Razormane Poacher.\n- Durotar - West of Razor Hill at . Spawns a Razormane Poacher.\n- Mulgore - Northeast of Bloodhoof Village at . Spawns a Venture Co. Poacher.\n- Teldrassil - Center of the zone at . Spawns a Fallenroot Poacher."
+  },
+  "links": [
+   "Hunter's Mark",
+   "Rune of Marksmanship",
+   "Brewnall Village",
+   "Razormane Poacher",
+   "Razor Hill",
+   "Bloodhoof Village",
+   "Venture Co. Poacher",
+   "Fallenroot Poacher"
+  ],
+  "categories": [
+   "Dun Morogh objects",
+   "Durotar objects",
+   "Fixed devices",
+   "Mulgore objects",
+   "Season of Discovery objects",
+   "Teldrassil objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 574856,
+   "revid": 6497034,
+   "timestamp": "2025-10-03T22:38:15Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "silverbound_treasure_chest",
+  "title": "Silverbound Treasure Chest",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\nSilverbound Treasure Chests are chests that rarely appear in certain locations that usually contain a item.",
+   "Contents": "- Crystalblade of the Draenei\n- Gauntlets of Purification\n- Holy Protection Potion\n- Disciple's Gloves\n- Various common, uncommon, and rare gear\n- Crafting reagents\n- Potions",
+   "Locations": "Eastern Kingdoms\nArathi Highlands, Tirisfal Glades, Elwynn Forest, Duskwood, Badlands, Dun Morogh, Loch Modan.\nKalimdor\nNorthern Barrens, Felwood, Dustwallow Marsh, Mulgore, Teldrassil, Stonetalon Mountains, Winterspring.\nOutland\nNagrand, Terokkar Forest, Zangarmarsh, Hellfire Peninsula, Netherstorm, Shadowmoon Valley, Blade's Edge Mountains."
+  },
+  "links": [
+   "chest",
+   "Crystalblade of the Draenei",
+   "Gauntlets of Purification",
+   "Holy Protection Potion",
+   "Disciple's Gloves",
+   "Arathi Highlands",
+   "Tirisfal Glades",
+   "Elwynn Forest",
+   "Duskwood",
+   "Badlands",
+   "Dun Morogh",
+   "Loch Modan",
+   "Northern Barrens",
+   "Felwood",
+   "Dustwallow Marsh",
+   "Mulgore",
+   "Teldrassil",
+   "Stonetalon Mountains",
+   "Winterspring",
+   "Nagrand",
+   "Terokkar Forest",
+   "Zangarmarsh",
+   "Hellfire Peninsula",
+   "Netherstorm",
+   "Shadowmoon Valley",
+   "Blade's Edge Mountains"
+  ],
+  "categories": [
+   "Arathi Highlands objects",
+   "Badlands objects",
+   "Blade's Edge Mountains objects",
+   "Chests",
+   "Dun Morogh objects",
+   "Duskwood objects",
+   "Dustwallow Marsh objects",
+   "Elwynn Forest objects",
+   "Felwood objects",
+   "Hellfire Peninsula objects",
+   "Loch Modan objects",
+   "Mulgore objects",
+   "Nagrand objects",
+   "Netherstorm objects",
+   "Northern Barrens objects",
+   "Shadowmoon Valley objects",
+   "Stonetalon Mountains objects",
+   "Teldrassil objects",
+   "Terokkar Forest objects",
+   "Tirisfal Glades objects",
+   "Winterspring objects",
+   "Zangarmarsh objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 216035,
+   "revid": 6403796,
+   "timestamp": "2025-07-06T20:55:34Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "spirit_portal",
+  "title": "Spirit Portal",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Spirit Portals are portals found in Bloodhoof Village in Mulgore during the Heritage of the Shu'halo.",
+   "Objective of": "- Storm in Bloodhoof"
+  },
+  "links": [
+   "portal",
+   "Bloodhoof Village",
+   "Mulgore",
+   "Heritage of the Shu'halo",
+   "Storm in Bloodhoof"
+  ],
+  "categories": [
+   "Mulgore objects",
+   "Portals"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 425666,
+   "revid": 5778522,
+   "timestamp": "2023-11-23T08:27:09Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "swordsmans_reward",
+  "title": "Swordsman's Reward",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "The Swordsman's Reward appears after defeating the Wandering Swordsman. It contains Rune of Blood Frenzy in the starting zones, or the Rune of the Commander in the ."
+  },
+  "links": [
+   "Wandering Swordsman",
+   "Rune of Blood Frenzy",
+   "Rune of the Commander"
+  ],
+  "categories": [
+   "Badlands objects",
+   "Chests",
+   "Dun Morogh objects",
+   "Durotar objects",
+   "Elwynn Forest objects",
+   "Mulgore objects",
+   "Season of Discovery objects",
+   "Teldrassil objects",
+   "Tirisfal Glades objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 576632,
+   "revid": 6497188,
+   "timestamp": "2025-10-03T23:01:53Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "tchalis_voodoo_brew_festive_wagon",
+  "title": "T'chali's Voodoo Brew Festive Wagon",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "T'chali's Voodoo Brew Festive Wagon can be found in outside the Horde major cities (except for Orgrimmar) during the Brewfest holiday.\n\nUsing your Yellow Brewfest Stein or Blue Brewfest Stein will fill them up, when you spend at least 10 seconds drinking it, you will gain a +8 Stamina and spirit Well Fed buff."
+  },
+  "links": [
+   "Horde",
+   "Orgrimmar",
+   "Brewfest",
+   "Yellow Brewfest Stein",
+   "Blue Brewfest Stein",
+   "Well Fed",
+   "Barleybrew Festive Keg",
+   "Barleybrew Festive Wagon",
+   "Drohn's Distillery Festive Keg",
+   "Drohn's Distillery Festive Wagon",
+   "Thunderbrew Festive Keg",
+   "Thunderbrew Festive Wagon",
+   "T'chali's Voodoo Brew Festive Keg",
+   "Gordok Festive Keg",
+   "Gordok Festive Wagon"
+  ],
+  "categories": [
+   "Removed Eversong Woods (Burning Crusade) objects",
+   "Removed Mulgore objects",
+   "Removed Tirisfal Glades objects",
+   "Wagons"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 300059,
+   "revid": 6889313,
+   "timestamp": "2026-09-26T22:11:17Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "the_battle_of_grim_batol_history_of_warcraft",
+  "title": "The Battle of Grim Batol (History of Warcraft)",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "\"The Battle of Grim Batol\" is a section of the History of Warcraft, Chapter IV. It is set shortly after Warcraft II: Beyond the Dark Portal, and recounts the events of the novel Day of the Dragon.\n\nFound at:\n- Deepwater Tavern in Wetlands.\n- Hall of Explorers in Ironforge.\n- War Room of Stormwind Keep in Stormwind City.\n- Bael'dun Digsite in Mulgore.\n\nTimeline: \n- ← Previous book: Icecrown and the Frozen Throne\n- → Next book: Lethargy of the Orcs",
+   "Notes": "The text is largely a copy of the \"Day of the Dragon\" section of the Warcraft III manual, with some rewording."
+  },
+  "links": [
+   "History of Warcraft",
+   "Warcraft II: Beyond the Dark Portal",
+   "Day of the Dragon",
+   "Deepwater Tavern",
+   "Wetlands",
+   "Hall of Explorers",
+   "Ironforge",
+   "War Room",
+   "Stormwind Keep",
+   "Stormwind City",
+   "Bael'dun Digsite",
+   "Mulgore",
+   "Icecrown and the Frozen Throne",
+   "Lethargy of the Orcs",
+   "Old Horde",
+   "Grommash Hellscream",
+   "Warsong clan",
+   "Kilrogg Deadeye",
+   "Bleeding Hollow clan",
+   "internment camp",
+   "Lordaeron",
+   "Alliance of Lordaeron",
+   "Khaz Modan",
+   "Dragonmaw clan",
+   "Nekros Skullcrusher",
+   "Demon Soul",
+   "Alexstrasza",
+   "Red dragonflight",
+   "Wildhammer clan",
+   "Grim Batol",
+   "Azeroth",
+   "Rhonin",
+   "Warcraft III: Reign of Chaos Game Manual",
+   "es:La batalla de Grim Batol",
+   "pl:The Battle of Grim Batol"
+  ],
+  "categories": [
+   "Achievement objectives",
+   "History of Warcraft",
+   "Ironforge objects",
+   "Lore",
+   "Mulgore objects",
+   "Stormwind City objects",
+   "Wetlands objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 459830,
+   "revid": 6012596,
+   "timestamp": "2024-04-21T10:40:12Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "water_barrel",
+  "title": "Water Barrel",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "The Water Barrel is a barrel of water found in low level zones, such as Durotar, Tirisfal Glades, Elwynn Forest, Azuremyst Isle, Mulgore, Dun Morogh, and Teldrassil.",
+   "Contains": "- 1-5 Refreshing Spring Water"
+  },
+  "links": [
+   "zone",
+   "Durotar",
+   "Tirisfal Glades",
+   "Elwynn Forest",
+   "Azuremyst Isle",
+   "Mulgore",
+   "Dun Morogh",
+   "Teldrassil",
+   "Refreshing Spring Water"
+  ],
+  "categories": [
+   "Azuremyst Isle objects",
+   "Barrels",
+   "Container objects",
+   "Dun Morogh objects",
+   "Durotar objects",
+   "Elwynn Forest objects",
+   "Mulgore objects",
+   "Teldrassil objects",
+   "Tirisfal Glades objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 288880,
+   "revid": 5647495,
+   "timestamp": "2023-11-19T21:55:52Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "water_pitcher",
+  "title": "Water Pitcher",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 50.2,
+    "y": 81.3,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "__NOTOC__\n\nThe Water Pitcher is located in Mulgore.",
+   "As a quest objective": "- A Humble Task"
+  },
+  "links": [
+   "Mulgore (Classic)",
+   "A Humble Task"
+  ],
+  "categories": [
+   "Classic objects",
+   "Removed Mulgore objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 402122,
+   "revid": 5610726,
+   "timestamp": "2023-11-18T18:52:24Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "well_stone",
+  "title": "Well Stone",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 53.7,
+    "y": 65.5,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "Well Stones are located in Mulgore.",
+   "As a quest objective": "This item is an objective of Rite of Vision."
+  },
+  "links": [
+   "Mulgore (Classic)",
+   "Rite of Vision"
+  ],
+  "categories": [
+   "Classic objects",
+   "Removed Mulgore objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 273360,
+   "revid": 5610744,
+   "timestamp": "2023-11-18T18:53:35Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "windfury_cone",
+  "title": "Windfury Cone",
+  "kind": "object",
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Windfury Cones are found on the ground in Windfury Ridge in . Mortar and Pestle (Season of Discovery) can be used to turn 8 of them into Pine Salve."
+  },
+  "links": [
+   "Windfury Ridge",
+   "Mortar and Pestle (Season of Discovery)",
+   "Pine Salve"
+  ],
+  "categories": [
+   "Mulgore objects",
+   "Seeds"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 575851,
+   "revid": 6841657,
+   "timestamp": "2026-08-24T14:07:20Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "magic_mushroom",
+  "title": "\"Magic\" Mushroom",
+  "kind": "object",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "\"Magic\" Mushrooms are found in the Pools of Vision in Thunder Bluff.",
+   "As a quest objective": "- \"Magic\" Mushrooms"
+  },
+  "links": [
+   "Pools of Vision",
+   "Thunder Bluff",
+   "\"Magic\" Mushrooms"
+  ],
+  "categories": [
+   "Mushrooms",
+   "Thunder Bluff objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 197495,
+   "revid": 5854989,
+   "timestamp": "2023-11-25T14:32:12Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "festive_keg",
+  "title": "Festive Keg",
+  "kind": "object",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "The Festive Keg is located in all the major cities, as well as Booty Bay, during special events. They fill Empty Festive Mug with a light brew."
+  },
+  "links": [
+   "Orgrimmar",
+   "Booty Bay",
+   "Empty Festive Mug"
+  ],
+  "categories": [
+   "Cape of Stranglethorn objects",
+   "Dun Morogh objects",
+   "Durotar objects",
+   "Eversong Woods (Burning Crusade) objects",
+   "Orgrimmar objects",
+   "Stormwind City objects",
+   "Teldrassil objects",
+   "Thunder Bluff objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 454131,
+   "revid": 6500263,
+   "timestamp": "2025-10-05T20:33:49Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "festive_mug",
+  "title": "Festive Mug",
+  "kind": "object",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "The Festive Mugs are located in all the major cities, as well as Booty Bay, during special events.",
+   "Contain": "They contain Empty Festive Mug which can be filled up to Filled Festive Mugs at the Festive Keg."
+  },
+  "links": [
+   "Booty Bay",
+   "Empty Festive Mug",
+   "Filled Festive Mug",
+   "Festive Keg"
+  ],
+  "categories": [
+   "Cape of Stranglethorn objects",
+   "Dun Morogh objects",
+   "Durotar objects",
+   "Eversong Woods (Burning Crusade) objects",
+   "Exodar objects",
+   "Orgrimmar objects",
+   "Shattrath City objects",
+   "Stormwind City objects",
+   "Teldrassil objects",
+   "Thunder Bluff objects",
+   "Undercity objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 122442,
+   "revid": 6500264,
+   "timestamp": "2025-10-05T20:33:56Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "forestlord_and_the_first_druids",
+  "title": "Forestlord and the first Druids",
+  "kind": "object",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Forestlord and the First Druids is a part of tauren mythology. It is recorded in-game in a scroll hanging behind Hamuul Runetotem in the Arch Druid's tent on Elder Rise, Thunder Bluff. It is evidence of the druidic heritage that the Tauren race lost and is recently trying to regain.",
+   "Canonicity": "- According to Micky Neilson and Blizzard historians, the first druid was, in fact, Malfurion Stormrage, not the tauren. Nethaera at one point pointed out that \"like all history, it tends to be from the perspective of the writer\", and that while the tauren believe they were the first druids, the night elves were the first druids. Thus, Forestlord and the first Druids falls into the category of flavor lore.\n- This matter is touched upon and mentioned in Exploring Azeroth: Kalimdor where Zekhan is aware of Cenarion Circle declaring Malfurion as the first druid, while tauren myths claim otherwise."
+  },
+  "links": [
+   "tauren mythology",
+   "Hamuul Runetotem",
+   "Elder Rise",
+   "Thunder Bluff",
+   "Micky Neilson",
+   "Blizzard Entertainment",
+   "Malfurion Stormrage",
+   "Nethaera",
+   "night elf",
+   "flavor lore",
+   "Exploring Azeroth: Kalimdor",
+   "Zekhan",
+   "Cenarion Circle",
+   "World of Warcraft: Exploring Azeroth: Kalimdor"
+  ],
+  "categories": [
+   "Readable objects",
+   "Tauren",
+   "Thunder Bluff objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 544980,
+   "revid": 6062418,
+   "timestamp": "2024-06-14T10:37:10Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "fresh_hunted_fowl",
+  "title": "Fresh-Hunted Fowl",
+  "kind": "object",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Fresh-Hunted Fowl is found in Thunder Bluff.",
+   "As a quest objective": "This item is an objective of Perfectly Picked Portions."
+  },
+  "links": [
+   "Thunder Bluff",
+   "Perfectly Picked Portions"
+  ],
+  "categories": [
+   "Thunder Bluff objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 225667,
+   "revid": 6062866,
+   "timestamp": "2024-06-14T17:33:52Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "hatred_of_the_centaur",
+  "title": "Hatred of the Centaur",
+  "kind": "object",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Hatred of the Centaur is a part of tauren mythology. It is recorded in-game on a wall hanging in the Archdruid's tent in Thunder Bluff."
+  },
+  "links": [
+   "tauren mythology",
+   "Thunder Bluff",
+   "Age of Memory",
+   "Cenarius",
+   "Shu'halo",
+   "druidism",
+   "Desolace",
+   "centaur",
+   "Earthmother"
+  ],
+  "categories": [
+   "Centaur",
+   "Lore",
+   "Readable objects",
+   "Tauren",
+   "Thunder Bluff objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 202598,
+   "revid": 6052219,
+   "timestamp": "2024-05-31T12:27:43Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "mists_of_dawn",
+  "title": "Mists of Dawn",
+  "kind": "object",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Mists of Dawn is a part of tauren mythology. It is recorded in-game on a wall hanging in the Archdruid's tent in Thunder Bluff."
+  },
+  "links": [
+   "tauren mythology",
+   "Thunder Bluff",
+   "Earthmother",
+   "An'she",
+   "Mu'sha",
+   "tauren"
+  ],
+  "categories": [
+   "Lore",
+   "Readable objects",
+   "Tauren",
+   "Thunder Bluff objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 69019,
+   "revid": 6052220,
+   "timestamp": "2024-05-31T12:27:45Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "scenic_getaway_portal",
+  "title": "Scenic Getaway Portal",
+  "kind": "object",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 51.5,
+    "y": 58.4,
+    "map": "Val'sharah"
+   },
+   {
+    "x": 43.9,
+    "y": 42.3,
+    "map": "Jade Forest"
+   },
+   {
+    "x": 22.8,
+    "y": 46.8,
+    "map": "Winterspring"
+   },
+   {
+    "x": 79.7,
+    "y": 77.3,
+    "map": "Northern Stranglethorn"
+   }
+  ],
+  "sections": {
+   "Description": "Scenic Getaway Portals are portals found in Rocktusk Farm in Durotar, near the Stormwind Gate in Elwynn Forest, Valdrakken, and other capital cities during the Love is in the Air.",
+   "Quotes": "The drop-off locations (and return portals!) are at:\n- Temple of Elune, Val'sharah \n- West of Dawn's Blossom, Jade Forest \n- Frostfire Hot Springs, Winterspring \n- The unnamed lake south of Zul'Gurub, Northern Stranglethorn"
+  },
+  "links": [
+   "Rocktusk Farm",
+   "Durotar",
+   "Stormwind Gate",
+   "Elwynn Forest",
+   "Valdrakken",
+   "Love is in the Air",
+   "Val'sharah",
+   "Jade Forest",
+   "Winterspring",
+   "Frostfire Hot Springs",
+   "Northern Stranglethorn",
+   "Temple of Elune",
+   "Dawn's Blossom",
+   "Zul'Gurub"
+  ],
+  "categories": [
+   "Darnassus objects",
+   "Dornogal objects",
+   "Durotar objects",
+   "Elwynn Forest objects",
+   "Exodar objects",
+   "Ironforge objects",
+   "Portals",
+   "Silvermoon City (Burning Crusade) objects",
+   "Thunder Bluff objects",
+   "Undercity objects",
+   "Valdrakken objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 578586,
+   "revid": 6646916,
+   "timestamp": "2026-02-11T12:55:48Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "shiny_stone",
+  "title": "Shiny Stone",
+  "kind": "object",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Shiny Stones are found scattered on the ground below Thunder Bluff. They can be tracked with Find Minerals.",
+   "Objective of": "- Shiny Baubles"
+  },
+  "links": [
+   "Thunder Bluff",
+   "Find Minerals",
+   "Shiny Baubles"
+  ],
+  "categories": [
+   "Mining nodes",
+   "Thunder Bluff objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 108756,
+   "revid": 6337588,
+   "timestamp": "2025-05-25T18:58:22Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "sorrow_of_the_earthmother",
+  "title": "Sorrow of the Earthmother",
+  "kind": "object",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Sorrow of the Earthmother is a part of tauren mythology. It is recorded in-game on a wall hanging in the Archdruid's tent in Thunder Bluff."
+  },
+  "links": [
+   "tauren mythology",
+   "Thunder Bluff",
+   "Old God",
+   "Shu'halo",
+   "Earthmother",
+   "An'she",
+   "Mu'sha"
+  ],
+  "categories": [
+   "Lore",
+   "Readable objects",
+   "Tauren",
+   "Thunder Bluff objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 515081,
+   "revid": 6052221,
+   "timestamp": "2024-05-31T12:27:48Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "the_white_stag_and_the_moon",
+  "title": "The White Stag and the Moon",
+  "kind": "object",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "The White Stag and the Moon is a part of tauren mythology. It is recorded in-game on a wall hanging in the Archdruid's tent in Thunder Bluff.",
+   "Notes": "This is only one version of the myth, a tale shaped by the proud hunters who have passed it down for generations."
+  },
+  "links": [
+   "tauren mythology",
+   "Thunder Bluff",
+   "Earthmother",
+   "Shu'halo",
+   "Malorne",
+   "Mu'sha",
+   "An'she",
+   "demigod",
+   "Cenarius",
+   "Druid of the Antler"
+  ],
+  "categories": [
+   "Lore",
+   "Readable objects",
+   "Tauren",
+   "Thunder Bluff objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 363116,
+   "revid": 6052222,
+   "timestamp": "2024-05-31T12:27:50Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "toasting_goblet",
+  "title": "Toasting Goblet",
+  "kind": "object",
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "The Toasting Goblet is found on inn tables in the cities of Azeroth. It is only available during the New Year, ending of Midsummer Fire Festival and Lunar Festival.",
+   "Usage": "When used, it gives the Toast buff of +10% Stamina buff, to a friendly target."
+  },
+  "links": [
+   "Azeroth",
+   "New Year",
+   "Midsummer Fire Festival",
+   "Lunar Festival",
+   "Toast"
+  ],
+  "categories": [
+   "Cape of Stranglethorn objects",
+   "Dun Morogh objects",
+   "Durotar objects",
+   "Eversong Woods (Burning Crusade) objects",
+   "Exodar objects",
+   "Mulgore objects",
+   "New Year",
+   "Orgrimmar objects",
+   "Stormwind City objects",
+   "Teldrassil objects",
+   "Thunder Bluff objects",
+   "Undercity objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 479269,
+   "revid": 6519101,
+   "timestamp": "2025-10-20T08:42:24Z",
+   "license": "CC BY-SA"
+  }
+ }
+]

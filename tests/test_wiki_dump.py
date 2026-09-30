@@ -123,3 +123,28 @@ def test_no_redirects_asks_the_api_to_filter(server, tmp_path):
     client.get = lambda **kw: (seen.append(kw), real_get(**kw))[1]
     wiki_dump.dump(client, tmp_path, [14], redirects=False, log=lambda *_: None)
     assert seen and all(kw.get("gapfilterredir") == "nonredirects" for kw in seen)
+
+
+class StubClient:
+    """Answers categorymembers/titles queries from a tiny in-memory wiki."""
+
+    MEMBERS = {"Category:Zone": [{"ns": 0, "title": "A"}, {"ns": 14, "title": "Category:Sub"}],
+               "Category:Sub": [{"ns": 0, "title": "B"}, {"ns": 14, "title": "Category:Zone"}]}
+
+    def get(self, **kw):
+        if kw.get("list") == "categorymembers":
+            return {"query": {"categorymembers": self.MEMBERS[kw["cmtitle"]]}}
+        pages = [{"pageid": i, "ns": 0, "title": t, "revisions": [{"revid": i, "timestamp": "t",
+                  "slots": {"main": {"content": f"text {t}"}}}]} for i, t in enumerate(kw["titles"].split("|"), 1)]
+        return {"query": {"pages": pages}}
+
+
+def test_category_titles_follow_subcategories_without_looping():
+    assert wiki_dump.category_titles(StubClient(), "Zone", depth=2) == {"A": "Category:Zone", "B": "Category:Sub"}
+    assert wiki_dump.category_titles(StubClient(), "Zone", depth=0) == {"A": "Category:Zone"}
+
+
+def test_dump_categories_writes_rows_with_source(tmp_path):
+    assert wiki_dump.dump_categories(StubClient(), tmp_path, ["Zone"], log=lambda *_: None) == 2
+    rows = _lines(tmp_path / "categories.jsonl")
+    assert {(r["title"], r["category"]) for r in rows} == {("A", "Category:Zone"), ("B", "Category:Sub")}

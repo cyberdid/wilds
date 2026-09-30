@@ -7,3 +7,5 @@ temp/
 saves/
 legacy/
 data/wow/
+data/azeroth/raw/
+data/azeroth/*/maps/
