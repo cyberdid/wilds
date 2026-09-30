@@ -3,6 +3,10 @@
   "id": "pokey_thornmantle",
   "title": "\"Pokey\" Thornmantle",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -47,6 +51,10 @@
   "id": "adult_plainstrider",
   "title": "Adult Plainstrider",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -87,6 +95,10 @@
   "id": "agitated_earth_spirit",
   "title": "Agitated Earth Spirit",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -128,6 +140,10 @@
   "id": "armored_battleboar",
   "title": "Armored Battleboar",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -178,6 +194,10 @@
   "id": "arrachea",
   "title": "Arra'chea",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -225,6 +245,10 @@
   "id": "bristleback_battleboar",
   "title": "Bristleback Battleboar",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": true,
   "infobox": "npcbox",
@@ -271,6 +295,10 @@
   "id": "bristleback_gun_thief",
   "title": "Bristleback Gun Thief",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -321,6 +349,10 @@
   "id": "bristleback_interloper",
   "title": "Bristleback Interloper",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -370,6 +402,10 @@
   "id": "bristleback_invader",
   "title": "Bristleback Invader",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -417,6 +453,10 @@
   "id": "bristleback_invaders",
   "title": "Bristleback Invaders",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -461,6 +501,10 @@
   "id": "bristleback_quilboar",
   "title": "Bristleback Quilboar",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": true,
   "infobox": "npcbox",
@@ -505,6 +549,10 @@
   "id": "bristleback_shaman",
   "title": "Bristleback Shaman",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": true,
   "infobox": "npcbox",
@@ -560,6 +608,10 @@
   "id": "bristleback_thorncaller",
   "title": "Bristleback Thorncaller",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -613,6 +665,10 @@
   "id": "chief_sharptusk_thornmantle",
   "title": "Chief Sharptusk Thornmantle",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": true,
   "infobox": "npcbox",
@@ -663,6 +719,10 @@
   "id": "chief_squealer_thornmantle",
   "title": "Chief Squealer Thornmantle",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -725,6 +785,10 @@
   "id": "darkmoon_carnie",
   "title": "Darkmoon Carnie",
   "kind": "mob",
+  "aggro": {
+   "alliance": 1,
+   "horde": 1
+  },
   "zone": "mulgore",
   "removed": true,
   "infobox": "npcbox",
@@ -782,9 +846,77 @@
   }
  },
  {
+  "id": "doomsayer_wiserunner",
+  "title": "Doomsayer Wiserunner",
+  "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Doomsayer Wiserunner",
+   "title": "Twilight's Hammer",
+   "level": "Mulgore",
+   "type": "Rare",
+   "resource": "Mana",
+   "faction": "Combat",
+   "affiliation": "Twilight's Hammer",
+   "faffiliation": "Thunder Bluff, Horde",
+   "foccupation": "Seer",
+   "race": "Tauren",
+   "creature": "Humanoid",
+   "character": "Shaman",
+   "gender": "Male",
+   "location": "Mulgore",
+   "status": "Killable"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nDoomsayer Wiserunner is a tauren rare mob located in a cave north of the Bael'dun Digsite in Mulgore. After the Cataclysm, he is a new recruit to the Twilight's Hammer.\n\nHe was formerly known as Seer Wiserunner and once helped new tauren with their Rite of Wisdom.",
+   "Abilities": "- - - - -",
+   "Quests": "- Rite of Wisdom (Classic) \n- Rite of Vision (3)",
+   "Quotes": "-"
+  },
+  "links": [
+   "tauren",
+   "rare mob",
+   "Bael'dun Digsite",
+   "Mulgore",
+   "Cataclysm (event)",
+   "Twilight's Hammer",
+   "Rite of Wisdom",
+   "movement speed",
+   "Rite of Wisdom (Classic)",
+   "Rite of Vision (3)"
+  ],
+  "categories": [
+   "Kalimdor rare mobs",
+   "Mulgore mobs",
+   "Quest givers",
+   "Removed Mulgore NPCs",
+   "Shaman characters",
+   "Tauren characters",
+   "Twilight's Hammer"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 301213,
+   "revid": 6610672,
+   "timestamp": "2026-01-22T20:34:07Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
   "id": "echo_of_corruption",
   "title": "Echo of Corruption",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -823,6 +955,10 @@
   "id": "elder_plainstrider",
   "title": "Elder Plainstrider",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -863,6 +999,10 @@
   "id": "enforcer_emilgund",
   "title": "Enforcer Emilgund",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -910,6 +1050,10 @@
   "id": "flatland_cougar",
   "title": "Flatland Cougar",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -956,6 +1100,10 @@
   "id": "flatland_prowler",
   "title": "Flatland Prowler",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -997,6 +1145,10 @@
   "id": "galak_centaur",
   "title": "Galak Centaur",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": true,
   "infobox": "npcbox",
@@ -1037,6 +1189,10 @@
   "id": "galak_outrunner",
   "title": "Galak Outrunner",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": true,
   "infobox": "npcbox",
@@ -1079,6 +1235,10 @@
   "id": "gazelle_mob",
   "title": "Gazelle (mob)",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1128,6 +1288,10 @@
   "id": "gazelle_fawn",
   "title": "Gazelle Fawn",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1168,6 +1332,10 @@
   "id": "ghost_howl",
   "title": "Ghost Howl",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1236,6 +1404,10 @@
   "id": "grim_totem",
   "title": "Grim Totem",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1279,6 +1451,10 @@
   "id": "grimtotem_ambusher",
   "title": "Grimtotem Ambusher",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1318,6 +1494,10 @@
   "id": "grimtotem_defender",
   "title": "Grimtotem Defender",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1360,6 +1540,10 @@
   "id": "grimtotem_defiler",
   "title": "Grimtotem Defiler",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1404,6 +1588,10 @@
   "id": "grimtotem_straggler",
   "title": "Grimtotem Straggler",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1447,6 +1635,10 @@
   "id": "grimtotem_vagabond",
   "title": "Grimtotem Vagabond",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1491,6 +1683,10 @@
   "id": "grimtotem_vandal",
   "title": "Grimtotem Vandal",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1537,6 +1733,10 @@
   "id": "hazzranache",
   "title": "Hazzranache",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1575,6 +1775,10 @@
   "id": "jazzranache",
   "title": "Jazzranache",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1614,6 +1818,10 @@
   "id": "kodo_bull",
   "title": "Kodo Bull",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1655,6 +1863,10 @@
   "id": "kodo_calf",
   "title": "Kodo Calf",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1691,6 +1903,10 @@
   "id": "kodo_matriarch",
   "title": "Kodo Matriarch",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1734,6 +1950,10 @@
   "id": "lurkmane",
   "title": "Lurkmane",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1777,6 +1997,7 @@
   "id": "malicious_spirit_mulgore",
   "title": "Malicious Spirit (Mulgore)",
   "kind": "mob",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1815,9 +2036,69 @@
   }
  },
  {
+  "id": "maur_raincaller",
+  "title": "Maur Raincaller",
+  "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": 1
+  },
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Maur Raincaller",
+   "level": "Mulgore",
+   "faction": "Horde",
+   "affiliation": "Thunder Bluff",
+   "race": "Tauren",
+   "creature": "Humanoid",
+   "gender": "Male",
+   "location": "Bloodhoof Village, Mulgore",
+   "status": "Alive"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nMaur Raincaller is a tauren quest giver located in Bloodhoof Village in Mulgore.\n\nDuring the Fourth War, he was encountered by the Alliance when they marched to capture the Crossroads in the Northern Barrens.",
+   "Quests": "- Mazzranache (quest)",
+   "Objective of": "- At a Crossroads (Alliance)",
+   "Notes": "- An unused ID suggests, he would be present during the scrapped Legion Invasion of Mulgore."
+  },
+  "links": [
+   "tauren",
+   "quest giver",
+   "Bloodhoof Village",
+   "Mulgore",
+   "Fourth War",
+   "Alliance",
+   "Crossroads",
+   "Northern Barrens",
+   "At a Crossroads (Alliance)",
+   "Mazzranache (quest)",
+   "Legion Invasion"
+  ],
+  "categories": [
+   "Mission mobs",
+   "Mulgore NPCs",
+   "Quest givers",
+   "Tauren characters"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 445405,
+   "revid": 6580911,
+   "timestamp": "2026-01-02T00:14:51Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
   "id": "mazzranache",
   "title": "Mazzranache",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1873,6 +2154,10 @@
   "id": "mokwa",
   "title": "Mokwa",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1915,6 +2200,10 @@
   "id": "mountain_cottontail",
   "title": "Mountain Cottontail",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -1957,6 +2246,10 @@
   "id": "mountain_cougar",
   "title": "Mountain Cougar",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": true,
   "infobox": "npcbox",
@@ -1998,6 +2291,10 @@
   "id": "mouse_critter",
   "title": "Mouse (critter)",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2069,6 +2366,7 @@
   "id": "necrofiend",
   "title": "Necrofiend",
   "kind": "mob",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2114,6 +2412,10 @@
   "id": "orno_grimtotem",
   "title": "Orno Grimtotem",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2165,6 +2467,10 @@
   "id": "palemane_poacher",
   "title": "Palemane Poacher",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2210,6 +2516,10 @@
   "id": "palemane_skinner",
   "title": "Palemane Skinner",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2256,6 +2566,10 @@
   "id": "palemane_tanner",
   "title": "Palemane Tanner",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2303,6 +2617,10 @@
   "id": "plagued_resident",
   "title": "Plagued Resident",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": true,
   "infobox": "npcbox",
@@ -2350,6 +2668,10 @@
   "id": "plainstrider",
   "title": "Plainstrider",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2396,6 +2718,10 @@
   "id": "prairie_stalker",
   "title": "Prairie Stalker",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2443,6 +2769,10 @@
   "id": "prairie_wolf",
   "title": "Prairie Wolf",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2492,6 +2822,10 @@
   "id": "prairie_wolf_alpha",
   "title": "Prairie Wolf Alpha",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2545,6 +2879,10 @@
   "id": "rabbit_critter",
   "title": "Rabbit (critter)",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2623,6 +2961,10 @@
   "id": "razzranache",
   "title": "Razzranache",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2661,6 +3003,10 @@
   "id": "sister_hatelash",
   "title": "Sister Hatelash",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2710,6 +3056,10 @@
   "id": "skeletal_trooper",
   "title": "Skeletal Trooper",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": true,
   "infobox": "npcbox",
@@ -2753,6 +3103,10 @@
   "id": "snagglespear",
   "title": "Snagglespear",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2796,6 +3150,10 @@
   "id": "spazzranache",
   "title": "Spazzranache",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2835,6 +3193,10 @@
   "id": "spectral_spirit",
   "title": "Spectral Spirit",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": true,
   "infobox": "npcbox",
@@ -2877,6 +3239,10 @@
   "id": "stonebull_crayfish_mob",
   "title": "Stonebull Crayfish (mob)",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2915,6 +3281,10 @@
   "id": "supervisor_fizsprocket",
   "title": "Supervisor Fizsprocket",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -2971,6 +3341,10 @@
   "id": "swoop_mob",
   "title": "Swoop (mob)",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3012,6 +3386,10 @@
   "id": "taloned_swoop",
   "title": "Taloned Swoop",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3056,6 +3434,10 @@
   "id": "the_rake",
   "title": "The Rake",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3112,6 +3494,10 @@
   "id": "thornguard_quilboar",
   "title": "Thornguard (quilboar)",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3157,6 +3543,10 @@
   "id": "unleashed_nature_spirit",
   "title": "Unleashed Nature Spirit",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3201,6 +3591,10 @@
   "id": "venture_co_hireling",
   "title": "Venture Co. Hireling",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": true,
   "infobox": "npcbox",
@@ -3244,6 +3638,10 @@
   "id": "venture_co_laborer",
   "title": "Venture Co. Laborer",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3289,6 +3687,10 @@
   "id": "venture_co_poacher",
   "title": "Venture Co. Poacher",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3331,6 +3733,10 @@
   "id": "venture_co_supervisor",
   "title": "Venture Co. Supervisor",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3376,6 +3782,10 @@
   "id": "venture_co_taskmaster",
   "title": "Venture Co. Taskmaster",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3421,6 +3831,10 @@
   "id": "venture_co_worker",
   "title": "Venture Co. Worker",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3471,6 +3885,10 @@
   "id": "venture_lackey",
   "title": "Venture Lackey",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3518,6 +3936,10 @@
   "id": "wandering_swordsman",
   "title": "Wandering Swordsman",
   "kind": "mob",
+  "aggro": {
+   "alliance": 1,
+   "horde": 1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3583,6 +4005,10 @@
   "id": "windfury_harpy",
   "title": "Windfury Harpy",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3627,6 +4053,10 @@
   "id": "windfury_matriarch",
   "title": "Windfury Matriarch",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3676,6 +4106,10 @@
   "id": "windfury_sorceress",
   "title": "Windfury Sorceress",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3721,6 +4155,10 @@
   "id": "windfury_wind_witch",
   "title": "Windfury Wind Witch",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3765,6 +4203,10 @@
   "id": "wiry_swoop",
   "title": "Wiry Swoop",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": -1
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3805,6 +4247,10 @@
   "id": "young_battleboar",
   "title": "Young Battleboar",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "mulgore",
   "removed": false,
   "infobox": "npcbox",
@@ -3854,6 +4300,7 @@
   "id": "bountiful_table",
   "title": "Bountiful Table",
   "kind": "mob",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "",
@@ -3918,6 +4365,7 @@
   "id": "dark_tendril",
   "title": "Dark Tendril",
   "kind": "mob",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "npcbox",
@@ -3957,9 +4405,71 @@
   }
  },
  {
+  "id": "kary_thunderhorn",
+  "title": "Kary Thunderhorn",
+  "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": 1
+  },
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "npcbox",
+  "info": {
+   "name": "Kary Thunderhorn",
+   "title": "Hunter Trainer",
+   "level": "Full",
+   "faction": "Horde",
+   "affiliation": "Thunder Bluff, Thunderhorn clan",
+   "race": "Tauren",
+   "creature": "Humanoid",
+   "gender": "Female",
+   "location": "Hunter Rise, Thunder Bluff",
+   "status": "Alive"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nKary Thunderhorn is a tauren hunter trainer located on Hunter Rise in Thunder Bluff.\n\nWhen tauren warbraves were on the move from the city into the Barrens, Alliance champions were sent to hold them at the Great Gate of Mulgore and encountered Kary Thunderhorn at the Ruins of Taurajo.",
+   "Objective of": "- Great Gate of Mulgore (Alliance)",
+   "Quests": "- The Hunter's Path (Orc and Troll) \n- The Hunter's Path (Tauren)",
+   "Quotes": "Non-hunter gossip"
+  },
+  "links": [
+   "tauren",
+   "hunter trainer",
+   "Hunter Rise",
+   "Thunder Bluff",
+   "warbrave",
+   "Barrens",
+   "Alliance",
+   "Great Gate",
+   "Mulgore",
+   "Ruins of Taurajo",
+   "Great Gate of Mulgore (Alliance)",
+   "The Hunter's Path (Orc and Troll)",
+   "The Hunter's Path (Tauren)"
+  ],
+  "categories": [
+   "Hunter characters",
+   "Hunter trainers",
+   "Mission mobs",
+   "Quest givers",
+   "Tauren characters",
+   "Thunder Bluff NPCs"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 337922,
+   "revid": 6581284,
+   "timestamp": "2026-01-02T06:33:56Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
   "id": "malevolent_spirit",
   "title": "Malevolent Spirit",
   "kind": "mob",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "npcbox",
@@ -4003,6 +4513,10 @@
   "id": "prairie_dog",
   "title": "Prairie Dog",
   "kind": "mob",
+  "aggro": {
+   "alliance": 0,
+   "horde": 0
+  },
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "npcbox",
@@ -4068,6 +4582,7 @@
   "id": "qytelek",
   "title": "Qy'telek",
   "kind": "mob",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "npcbox",
@@ -4111,6 +4626,10 @@
   "id": "ruk_warstomper",
   "title": "Ruk Warstomper",
   "kind": "mob",
+  "aggro": {
+   "alliance": -1,
+   "horde": 1
+  },
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "npcbox",
@@ -4172,6 +4691,7 @@
   "id": "shadow_of_uul",
   "title": "Shadow of Uul",
   "kind": "mob",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "npcbox",

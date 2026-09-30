@@ -3,6 +3,7 @@
   "id": "ambercorn",
   "title": "Ambercorn",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": true,
   "infobox": "",
@@ -35,6 +36,7 @@
   "id": "artifact_storage_season_of_discovery",
   "title": "Artifact Storage (Season of Discovery)",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -72,6 +74,7 @@
   "id": "bristleback_loot_cache",
   "title": "Bristleback Loot Cache",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -109,6 +112,7 @@
   "id": "dirt_stained_map",
   "title": "Dirt-Stained Map",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": true,
   "infobox": "",
@@ -147,6 +151,7 @@
   "id": "drohns_distillery_festive_wagon",
   "title": "Drohn's Distillery Festive Wagon",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": true,
   "infobox": "",
@@ -188,6 +193,7 @@
   "id": "flower_of_sincerity",
   "title": "Flower of Sincerity",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -219,6 +225,7 @@
   "id": "gordok_festive_wagon",
   "title": "Gordok Festive Wagon",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": true,
   "infobox": "",
@@ -265,6 +272,7 @@
   "id": "ironforge_the_awakening_of_the_dwarves",
   "title": "Ironforge - the Awakening of the Dwarves",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -331,6 +339,7 @@
   "id": "locked_chest_mulgore",
   "title": "Locked Chest (Mulgore)",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -364,6 +373,7 @@
   "id": "lunar_chest",
   "title": "Lunar Chest",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -407,6 +417,7 @@
   "id": "lunar_stone",
   "title": "Lunar Stone",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -445,9 +456,48 @@
   }
  },
  {
+  "id": "mysterious_tree_stump",
+  "title": "Mysterious Tree Stump",
+  "kind": "object",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": true,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 34.9,
+    "y": 61.5,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "The Mysterious Tree Stump is located in Palemane Rock of Mulgore.",
+   "Quests": "- Your Fortune Awaits You... (4)"
+  },
+  "links": [
+   "Palemane Rock",
+   "Mulgore",
+   "Your Fortune Awaits You... (4)"
+  ],
+  "categories": [
+   "Object quest enders",
+   "Removed Mulgore objects",
+   "Removed content in Darkmoon Faire"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 84947,
+   "revid": 5646653,
+   "timestamp": "2023-11-19T21:17:57Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
   "id": "prairie_flower",
   "title": "Prairie Flower",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -477,6 +527,7 @@
   "id": "rustling_bush_season_of_discovery",
   "title": "Rustling Bush (Season of Discovery)",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -534,9 +585,47 @@
   }
  },
  {
+  "id": "sealed_supply_crate",
+  "title": "Sealed Supply Crate",
+  "kind": "object",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 53.8,
+    "y": 48.3,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "The Sealed Supply Crate can be found in Mulgore.",
+   "Quests": "- The Ravaged Caravan (Horde) (1) \n- The Ravaged Caravan (Horde) (2)"
+  },
+  "links": [
+   "Mulgore",
+   "The Ravaged Caravan (Horde) (1)",
+   "The Ravaged Caravan (Horde) (2)"
+  ],
+  "categories": [
+   "Mulgore objects",
+   "Object quest givers"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 165250,
+   "revid": 5651452,
+   "timestamp": "2023-11-20T00:35:43Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
   "id": "silverbound_treasure_chest",
   "title": "Silverbound Treasure Chest",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -611,6 +700,7 @@
   "id": "spirit_portal",
   "title": "Spirit Portal",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -643,6 +733,7 @@
   "id": "swordsmans_reward",
   "title": "Swordsman's Reward",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -679,6 +770,7 @@
   "id": "tchalis_voodoo_brew_festive_wagon",
   "title": "T'chali's Voodoo Brew Festive Wagon",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": true,
   "infobox": "",
@@ -722,6 +814,7 @@
   "id": "the_battle_of_grim_batol_history_of_warcraft",
   "title": "The Battle of Grim Batol (History of Warcraft)",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -789,6 +882,7 @@
   "id": "water_barrel",
   "title": "Water Barrel",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -832,6 +926,7 @@
   "id": "water_pitcher",
   "title": "Water Pitcher",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": true,
   "infobox": "",
@@ -867,6 +962,7 @@
   "id": "well_stone",
   "title": "Well Stone",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": true,
   "infobox": "",
@@ -902,6 +998,7 @@
   "id": "windfury_cone",
   "title": "Windfury Cone",
   "kind": "object",
+  "aggro": {},
   "zone": "mulgore",
   "removed": false,
   "infobox": "",
@@ -931,6 +1028,7 @@
   "id": "magic_mushroom",
   "title": "\"Magic\" Mushroom",
   "kind": "object",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "",
@@ -961,6 +1059,7 @@
   "id": "festive_keg",
   "title": "Festive Keg",
   "kind": "object",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "",
@@ -996,6 +1095,7 @@
   "id": "festive_mug",
   "title": "Festive Mug",
   "kind": "object",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "",
@@ -1036,6 +1136,7 @@
   "id": "forestlord_and_the_first_druids",
   "title": "Forestlord and the first Druids",
   "kind": "object",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "",
@@ -1078,6 +1179,7 @@
   "id": "fresh_hunted_fowl",
   "title": "Fresh-Hunted Fowl",
   "kind": "object",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "",
@@ -1106,6 +1208,7 @@
   "id": "hatred_of_the_centaur",
   "title": "Hatred of the Centaur",
   "kind": "object",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "",
@@ -1141,9 +1244,45 @@
   }
  },
  {
+  "id": "holly_preserver",
+  "title": "Holly Preserver",
+  "kind": "object",
+  "aggro": {},
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "The Holly Preserver is located in the major cities during the Winter Veil event.",
+   "Quests": "- The Hero of the Day"
+  },
+  "links": [
+   "Winter Veil",
+   "The Hero of the Day"
+  ],
+  "categories": [
+   "Ironforge objects",
+   "Object quest enders",
+   "Orgrimmar objects",
+   "Shattrath City objects",
+   "Stormwind City objects",
+   "Thunder Bluff objects",
+   "Undercity objects"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 394835,
+   "revid": 6555721,
+   "timestamp": "2025-11-30T21:29:46Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
   "id": "mists_of_dawn",
   "title": "Mists of Dawn",
   "kind": "object",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "",
@@ -1178,6 +1317,7 @@
   "id": "scenic_getaway_portal",
   "title": "Scenic Getaway Portal",
   "kind": "object",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "",
@@ -1249,6 +1389,7 @@
   "id": "shiny_stone",
   "title": "Shiny Stone",
   "kind": "object",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "",
@@ -1279,6 +1420,7 @@
   "id": "sorrow_of_the_earthmother",
   "title": "Sorrow of the Earthmother",
   "kind": "object",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "",
@@ -1314,6 +1456,7 @@
   "id": "the_white_stag_and_the_moon",
   "title": "The White Stag and the Moon",
   "kind": "object",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "",
@@ -1353,6 +1496,7 @@
   "id": "toasting_goblet",
   "title": "Toasting Goblet",
   "kind": "object",
+  "aggro": {},
   "zone": "thunder_bluff",
   "removed": false,
   "infobox": "",

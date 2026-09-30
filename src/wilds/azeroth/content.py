@@ -25,11 +25,16 @@ def slug(title: str) -> str:
     return s or "page"
 
 
-def kind_of(categories: list[str]) -> str:
+def kind_of(categories: list[str], infobox: str = "") -> str:
+    """What a page is: the infobox decides first, categories second ('Quest givers' is an NPC)."""
     names = " | ".join(c.lower() for c in categories)
+    if infobox == "questbox":
+        return "quest"
+    if infobox == "npcbox":
+        return "mob" if re.search(r"\bmobs?\b", names) else "npc"
     if "subzone" in names:
         return "subzone"
-    if re.search(r"\bquests?\b", names):
+    if re.search(r"\bquests\b(?! givers)", names) and not re.search(r"\bnpcs?\b|\bmobs?\b", names):
         return "quest"
     if re.search(r"\bmobs?\b", names):
         return "mob"
@@ -61,11 +66,28 @@ def _infobox(text: str) -> tuple[str, dict[str, Any]]:
     return "", {}
 
 
+def _aggro(text: str) -> dict[str, int]:
+    """{{Aggro|alliance|horde}}: -1 hostile, 0 neutral, 1 friendly (and -2 'kill on sight' for some)."""
+    t = wt.template(text, "npcbox")
+    raw = (t.named.get("aggro") or t.named.get("reaction") or "") if t else ""
+    if not raw:
+        n = wt.template(text, "npclocations")
+        raw = n.named.get("reaction", "") if n else ""
+    a = wt.template(raw, "aggro") if raw else None
+    if not a or len(a.args) < 2:
+        return {}
+    try:
+        return {"alliance": int(a.args[0]), "horde": int(a.args[1])}
+    except ValueError:
+        return {}
+
+
 def record(page: dict[str, Any]) -> dict[str, Any]:
     text = page["text"]
     cats = wt.categories(text)
     source = page.get("category", "").removeprefix("Category:")
     box, info = _infobox(text)
+    aggro = _aggro(text)
     lead = text
     first = wt.find_templates(text)
     for t in first:  # the lead is the prose after the infobox
@@ -80,7 +102,8 @@ def record(page: dict[str, Any]) -> dict[str, Any]:
     return {
         "id": slug(page["title"]),
         "title": page["title"],
-        "kind": kind_of([*cats, source] if source else cats),
+        "kind": kind_of([*cats, source] if source else cats, box),
+        "aggro": aggro,
         "zone": zone_of([*cats, source] if source else cats, page["title"], text),
         "removed": removed,
         "infobox": box,
