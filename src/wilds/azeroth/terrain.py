@@ -58,6 +58,23 @@ class Macro:
         y = min(self.height - 1, max(0, int(v * self.height)))
         return self.rows[y][x]
 
+    def zone_status(self, tile: tuple[int, int], geometry: Geometry) -> str:
+        """Classify a map tile against the coarse zone outline in the macro image."""
+        tx, ty = tile
+        if not (0 <= tx < geometry.width and 0 <= ty < geometry.height):
+            return "outside"
+        mx = min(self.width - 1, int(tx / geometry.width * self.width))
+        my = min(self.height - 1, int(ty / geometry.height * self.height))
+        if self.rows[my][mx] == "v":
+            return "outside"
+        if mx in (0, self.width - 1) or my in (0, self.height - 1):
+            return "edge_ambiguous"
+        for ny in range(max(0, my - 1), min(self.height, my + 2)):
+            for nx in range(max(0, mx - 1), min(self.width, mx + 2)):
+                if self.rows[ny][nx] == "v":
+                    return "edge_ambiguous"
+        return "inside_mask"
+
     def component(self, x: int, y: int) -> set[tuple[int, int]]:
         """Connected cells of the same class as (x, y)."""
         cls = self.rows[y][x]
