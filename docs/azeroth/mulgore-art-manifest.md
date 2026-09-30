@@ -370,6 +370,17 @@ One tile = 16 px = 2 yards.
 | `az.obj.inn` | <=48x40 | 1 |  | tauren inn |
 | `az.obj.training_dummy` | <=16x24 | 1 |  | training dummy |
 | `az.obj.barrel` | <=16x16 | 1 | 2 |  |
+| `az.obj.fence` | 16x16 | 1 | 3 | low timber-and-rope fence section, tiles sideways |
+| `az.obj.haystack` | <=24x24 | 1 | 2 | stack of prairie hay |
+| `az.obj.cooking_pot` | <=16x16 | 2 |  | iron pot over coals, steam |
+| `az.obj.torch` | <=16x24 | 3 |  | standing torch on a pole |
+| `az.obj.signpost` | <=16x24 | 1 | 2 | wooden signpost with carved arrows |
+| `az.obj.prayer_flags` | <=32x24 | 2 |  | string of coloured prayer flags between poles, flutter |
+| `az.obj.stone_circle` | <=48x32 | 1 |  | ring of standing stones, sacred ground |
+| `az.obj.palisade` | <=32x24 | 1 | 2 | pointed log wall section (quilboar / gnoll camps) |
+| `az.obj.hide_stretcher` | <=24x24 | 1 |  | animal hide stretched on a frame |
+| `az.obj.kodo_saddle_rack` | <=24x16 | 1 |  | rack with kodo saddles and harness |
+| `az.obj.grave_cairn` | <=16x16 | 1 | 2 | stone cairn with feathers: tauren grave |
 | `az.obj.crate` | <=16x16 | 1 | 2 |  |
 | `az.obj.wagon` | <=40x24 | 1 |  | ravaged caravan wagon |
 | `az.obj.dig_tent` | <=32x28 | 1 |  | dwarven expedition tent |
@@ -398,8 +409,16 @@ One tile = 16 px = 2 yards.
 
 | name | size | frames | variants | note |
 |---|---|---|---|---|
-| `az.tb.platform` | 16x16 | 1 | 4 | plank-and-hide platform floor |
-| `az.tb.platform.edge` | 16x16 | 1 | 4 | platform edge over the drop |
+| `az.tb.platform` | 16x16 | 1 | 8 | plank-and-hide platform floor; must tile without a visible grid |
+| `az.tb.platform.edge` | 16x16 | 1 | 6 | platform edge over the drop |
+| `az.tb.platform.inlay` | 16x16 | 1 | 3 | floor tile with a painted tribal pattern, for plazas |
+| `az.tb.brazier` | <=16x24 | 3 |  | standing fire brazier |
+| `az.tb.drum` | <=16x16 | 1 | 2 | big ceremonial drum |
+| `az.tb.stairs` | 16x16 | 1 | 2 | wooden stairs between platform levels |
+| `az.tb.hanging_hides` | <=32x24 | 1 | 2 | hides and feathers hung from a beam |
+| `az.tb.prayer_flags` | <=32x16 | 2 |  | flags strung along a rope rail, flutter |
+| `az.tb.pot` | <=16x16 | 1 | 2 | clay pot / water jar |
+| `az.tb.banner_pole` | <=16x40 | 2 |  | tall Bloodhoof banner on a carved pole |
 | `az.tb.bridge` | 16x16 | 1 | 2 | rope bridge between rises |
 | `az.tb.rope_rail` | 16x16 | 1 | 2 | rope railing |
 | `az.tb.support_pillar` | <=16x48 | 1 | 2 | pillar below a rise |

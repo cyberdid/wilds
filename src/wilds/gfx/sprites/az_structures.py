@@ -49,7 +49,8 @@ WATER = RAMPS["water"]
 GREY = RAMPS["grey"]
 BLUE = ["water1", "water2", "water3", "water4"]
 GOLD = ["gold0", "gold1", "gold2", "gold3"]
-SHADOW = "ink:96"          # soft contact shadow on the ground (never outlined)
+SHADOW = "ink:90"          # soft contact shadow on the ground (never outlined)
+SHADOW_CORE = "ink:140"    # its denser core right under the object
 DEEP = "ink2"
 
 # --- canvas of palette names ----------------------------------------------------------------------
@@ -133,7 +134,7 @@ class Pic:
 
     def outline(self, skip: Iterable[str] = (), c: str = "ink") -> "Pic":
         """1px ink around every opaque pixel (shadows / smoke / glow halos in ``skip`` stay open)."""
-        skip = set(skip) | {SHADOW}
+        skip = set(skip) | {SHADOW, SHADOW_CORE}
         src = [row[:] for row in self.px]
         for y in range(self.h):
             for x in range(self.w):
@@ -147,11 +148,14 @@ class Pic:
         return self
 
     def shadow(self, cx: float, cy: float, rx: float, ry: float, c: str = SHADOW) -> "Pic":
-        """Contact shadow on the ground, only where nothing is drawn."""
+        """Contact shadow on the ground, only where nothing is drawn. The light comes from the
+        top-left, so it falls a little to the right, with a denser core near the object."""
+        cx += max(0.5, rx * 0.08)
         for y in range(self.h):
             for x in range(self.w):
-                if self.px[y][x] is None and ((x + 0.5 - cx) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2 <= 1:
-                    self.px[y][x] = c
+                d = ((x + 0.5 - cx) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2
+                if self.px[y][x] is None and d <= 1:
+                    self.px[y][x] = SHADOW_CORE if d < 0.45 and c == SHADOW else c
         return self
 
 
@@ -1083,33 +1087,83 @@ def _rock_arch() -> None:
     register("az.obj.rock_arch", _art(p, note="Palemane Rock: red mesa arch over the gnolls' cave"))
 
 
+def distance_field(mask: set[tuple[int, int]], w: int, h: int) -> list[list[float]]:
+    """Chamfer distance from every masked pixel to the nearest unmasked one."""
+    inf = 1e9
+    d = [[inf if (x, y) in mask else 0.0 for x in range(w)] for y in range(h)]
+    for y in range(h):
+        for x in range(w):
+            if d[y][x]:
+                for dx, dy, c in ((-1, 0, 1), (0, -1, 1), (-1, -1, 1.41), (1, -1, 1.41)):
+                    nx, ny = x + dx, y + dy
+                    d[y][x] = min(d[y][x], (d[ny][nx] if 0 <= nx < w and 0 <= ny < h else 0.0) + c)
+    for y in range(h - 1, -1, -1):
+        for x in range(w - 1, -1, -1):
+            if d[y][x]:
+                for dx, dy, c in ((1, 0, 1), (0, 1, 1), (1, 1, 1.41), (-1, 1, 1.41)):
+                    nx, ny = x + dx, y + dy
+                    d[y][x] = min(d[y][x], (d[ny][nx] if 0 <= nx < w and 0 <= ny < h else 0.0) + c)
+    return d
+
+
+def crag(p: Pic, pts: Sequence[tuple[float, float]], ramp: Sequence[str], seed: int, lit: float = 0.5,
+         strata: int = 0, relief: float = 1.0, open_bottom: bool = True) -> set[tuple[int, int]]:
+    """A faceted mountain mass: the inside distance to the silhouette is a ridge height map,
+    so every crag gets lit left/upper faces, shadowed right faces and a crisp ridge line,
+    with the same values whichever side of the picture it stands on."""
+    mask = {(x, y) for y in range(p.h) for x in range(p.w) if _in_poly(x + 0.5, y + 0.5, pts)}
+    if open_bottom:  # the mass continues below the picture: no edge along the bottom row
+        mask_ext = mask | {(x, p.h + k) for x in range(p.w) for k in range(8) if (x, p.h - 1) in mask}
+        d = distance_field(mask_ext, p.w, p.h + 8)
+    else:
+        d = distance_field(mask, p.w, p.h)
+    n = fbm(p.w, p.h + 8, seed, 3, 3)
+    hgt = [[(d[y][x] ** 0.75) * 0.7 * relief + n[y][x] * 2 for x in range(p.w)] for y in range(len(d))]
+    for x, y in mask:
+        gx = hgt[y][min(p.w - 1, x + 1)] - hgt[y][max(0, x - 1)]
+        gy = hgt[y + 1][x] - hgt[max(0, y - 1)][x]
+        v = lambert(-gx, -gy, 2.0)
+        v = lit + (v - 0.6) * 1.3 - (y / p.h) * 0.1
+        if strata and (y + int(n[y][x] * 4)) % strata == 0:
+            v -= 0.2
+        p.px[y][x] = tone(ramp, v, x, y, 0.14)
+    return mask
+
+
 def _stonetalon_pass() -> None:
     W, H = 48, 32
     p = Pic(W, H)
-    far = [(18, 31), (20, 10), (24, 6), (29, 10), (31, 31)]
-    left = [(0.5, 31.9), (0.5, 13), (5, 5), (10, 2), (15, 5), (19, 11), (22, 20), (21, 31.9)]
-    right = [(27, 31.9), (27, 20), (29, 13), (34, 6), (39, 3), (43, 7), (47.5, 13), (47.5, 31.9)]
-    rock(p, lambda x, y: _in_poly(x, y, far), STONE[0:3], 17, cells=2, lit=0.4)
-    rock(p, lambda x, y: _in_poly(x, y, left), STONE[0:5], 18, strata=6, lit=0.42, skew=0.6)
-    pts = rock(p, lambda x, y: _in_poly(x, y, right), STONE[0:5], 19, strata=6, lit=0.5, skew=0.6)
-    # the path climbing into the notch
-    path = [(15, 31.9), (34, 31.9), (27, 12), (23, 12)]
-    for y in range(H):
+    far = [(15, 32), (19, 11), (23, 7), (27, 9), (31, 13), (34, 32)]
+    left = [(0.5, 32), (0.5, 14), (4, 7), (9, 2), (13, 4), (17, 10), (21, 17), (23, 24), (22, 32)]
+    right = [(26, 32), (26, 23), (29, 15), (33, 8), (38, 4), (42, 6), (47.5, 14), (47.5, 32)]
+    crag(p, far, STONE[0:4], 17, lit=0.35, relief=0.6)
+    lpts = crag(p, left, STONE[0:5], 18, lit=0.55, strata=5)
+    rpts = crag(p, right, STONE[0:5], 19, lit=0.55, strata=5)
+    # the trail: a worn dirt band winding up into the notch, darker as it recedes
+    for y in range(12, H):
+        t = (y - 12) / (H - 13)
+        cx = 24.5 + math.sin(t * math.pi * 1.3) * 2.5
+        half = 0.8 + t * 4.2
         for x in range(W):
-            if _in_poly(x + 0.5, y + 0.5, path):
-                t = (y - 12) / 20
-                c = tone(MESA[2:5], 0.3 + t * 0.55 - abs(x + 0.5 - 24.5) / 30, x, y, 0.15)
-                if (x * 5 + y * 3) % 17 == 0:
-                    c = STONE[3]
-                p.set(x, y, c)
-    tufts(p, pts, 20, 0.25)
-    # the painted rock at the top of the path: a red hand of the Grimtotem
-    p.stamp(["r.r.r", "rrrr.", ".rrr."], {"r": RED[2]}, 6, 17)
-    for x, y in ((2, 29), (41, 28), (44, 25)):
-        p.stamp([".g.", "gGg"], {"g": LEAF[3], "G": LEAF[2]}, x, y)
+            e = abs(x + 0.5 - cx) / half
+            if e > 1:
+                continue
+            v = 0.25 + t * 0.45 + (0.12 if x + 0.5 < cx else 0) - (0.3 if e > 0.75 else 0)
+            p.set(x, y, tone(MESA[1:5], v, x, y, 0.1))
+    for x, y in ((22, 28), (26, 25), (21, 22), (27, 30), (24, 18)):
+        p.set(x, y, STONE[3])
+        p.set(x + 1, y, STONE[2])
+    # scree and grass at the feet of the crags
+    for (x, y) in sorted(lpts | rpts):
+        if y >= 27 and (x * 7 + y * 3) % 17 == 0:
+            p.set(x, y, LEAF[3])
+            p.set(x, y - 1, LEAF[4])
+    tufts(p, {xy for xy in lpts | rpts if xy[1] < 26}, 20, 0.2)
+    # the painted rock where the path tops out: a red Grimtotem hand
+    p.stamp(["r.r.r", "rrrrr", ".rrr.", ".rr.."], {"r": RED[2]}, 7, 17)
     p.outline()
     p.shadow(24, 31.5, 24, 1)
-    register("az.obj.stonetalon_pass", _art(p, note="the path into the Stonetalon mountains, painted rock"))
+    register("az.obj.stonetalon_pass", _art(p, note="the trail into the Stonetalon mountains, painted rock"))
 
 
 def _harpy_nest() -> None:
@@ -1401,48 +1455,72 @@ def brambles(p: Pic, test: Callable[[int, int], bool], seed: int, n: int, shade:
 
 
 def _thorn_hut(v: int) -> None:
+    """A quilboar hut: courses of thick bramble woven over bent stakes like a basket, long pale
+    thorns along the courses and the rim, stretched hides lashed over the top."""
     W, H = 32, 32
     p = Pic(W, H)
-    cx, base, rx, ry = 16.0, 30.0, 13.0, 19.0 if v == 0 else 16.0
-    info = dome_shade(p, cx, base, rx, ry, BRIER[0:3])
-
-    def shade(x, y):
-        return info[(x, y)][2] if (x, y) in info else 0.0
-    # bent saplings arching over the frame, then tangled briar all over
-    for off in (-8, -3, 3, 8):
-        for a in range(40):
-            t = a / 39 * math.pi
-            x = round(cx + off * 0.6 - math.cos(t) * (rx - 2 - abs(off) * 0.4))
-            y = round(base - 1 - math.sin(t) * (ry - 2 - abs(off) * 0.3))
-            if (x, y) in info:
-                p.set(x, y, BRIER[4] if shade(x, y) > 0.5 else BRIER[3])
-    brambles(p, lambda x, y: (x, y) in info, 40 + v, 45, lambda x, y: shade(x, y) + 0.15, 0.18)
-    # spiky silhouette: long thorns poking out of the rim, pale tips
-    r = rng_for("rim", v)
-    rim = sorted(xy for xy in info if (xy[0], xy[1] - 1) not in info or (xy[0] - 1, xy[1]) not in info
-                 or (xy[0] + 1, xy[1]) not in info)
-    for (x, y) in rim:
-        if r.random() < 0.28 and y < base - 2:
-            dx = -1 if x < cx else 1
-            p.set(x + dx, y - 1, BRIER[2])
+    cx, base, rx, ry = 16.0, 30.0, 13.5, 19.0 if v == 0 else 16.5
+    stakes = (-0.66, -0.33, 0.0, 0.33, 0.66)
+    info = {}
+    for y in range(H):
+        for x in range(W):
+            nx, ny = (x + 0.5 - cx) / rx, (y + 0.5 - base) / ry
+            if ny > 0 or nx * nx + ny * ny > 1:
+                continue
+            nz = math.sqrt(max(0.0, 1 - nx * nx - ny * ny))
+            lv = (lambert(nx, ny, nz + 0.1) + 0.25) / 1.25
+            hw = math.sqrt(max(1e-6, 1 - ny * ny))
+            u = nx / hw
+            course = (int(base) - y) // 3
+            r = (int(base) - y) % 3              # 2 = lit top of a course, 0 = its shadowed underside
+            seg = sum(1 for s_ in stakes if u > s_)
+            over = (course + seg) % 2 == 0      # the bramble passes over / under each stake
+            lvl = lv * 3.2 + (0.9 if r == 2 else (-1.0 if r == 0 else 0)) + (0.5 if over else -0.6)
+            near = min(abs(u - s_) * hw * rx for s_ in stakes)
+            if near < 0.6:                      # a stake shows where the bramble dips under it
+                lvl = lv * 3.2 + (0.3 if u * hw * rx < 0 else -0.4)
+                c = WOOD[max(1, min(4, int(round(lvl))))]
+            else:
+                c = BRIER[max(0, min(4, int(round(lvl))))]
+            p.px[y][x] = c
+            info[(x, y)] = (u, ny, lv, course, r, over)
+    # thorns: regular pale spikes on the lit crest of the "over" runs
+    for (x, y), (u, ny, lv, course, r, over) in sorted(info.items()):
+        if r == 2 and over and (x * 5 + course * 3) % 7 == 0 and (x, y - 1) in info:
+            p.set(x - (1 if u < 0 else -1), y - 1, BONE[3] if lv > 0.5 else BONE[2])
+    # the rim bristles with long thorns pointing outward
+    rim = [xy for xy in sorted(info) if (xy[0], xy[1] - 1) not in info]
+    for i, (x, y) in enumerate(rim):
+        if i % 3 == 1 and y < base - 3:
+            dx = -1 if x < cx - 2 else (1 if x > cx + 2 else 0)
+            p.set(x + dx, y - 1, BRIER[3])
             p.set(x + 2 * dx, y - 2, BONE[3])
-    # hide patches lashed over the gaps
-    patches = [((22, 18, 3, 2.5), SAND[1:4])] if v == 0 else \
-        [((9, 20, 4, 3), HIDE[1:4]), ((22, 22, 3, 2.5), SAND[1:4])]
-    for (px_, py_, prx, pry), ramp in patches:
-        p.ellipse(px_, py_, prx, pry, lambda x, y, ramp=ramp: tone(ramp, shade(x, y) + 0.1, x, y, 0.15))
-        for x in range(int(px_ - prx) + 1, int(px_ + prx), 2):
-            p.set(x, int(py_ - pry), "ink2")
-            p.set(x, int(py_ + pry) - 1, "ink2")
-    door_arch(p, 12, 19, 21, 29)
-    tusk_pair(p, 11, 20, 29, 7)
+    # stretched hides lashed on: a cap over the top (v0) or a big flank panel (v1)
+    def hide_panel(test, ramp):
+        for (x, y), (u, ny, lv, *_rest) in info.items():
+            if test(u, ny):
+                p.set(x, y, tone(ramp, lv + 0.05, x, y, 0.1))
+        for (x, y), (u, ny, lv, *_rest) in info.items():
+            if test(u, ny) and not test(*info.get((x, y + 1), (9, 9))[:2]) and x % 2 == 0:
+                p.set(x, y, "ink2")  # lacing along the lower edge
+    if v == 0:
+        hide_panel(lambda u, ny: ny < -0.72 + 0.12 * math.cos(u * 6), HIDE[1:5])
+        hide_panel(lambda u, ny: 0.35 < u < 0.8 and -0.55 < ny < -0.3, SAND[1:4])
+    else:
+        hide_panel(lambda u, ny: -0.85 < u < -0.3 and -0.75 < ny < -0.3, HIDE[1:5])
+        hide_panel(lambda u, ny: ny < -0.85, SAND[1:4])
+    door_arch(p, 12, 19, 20 if v == 0 else 21, 29)
+    tusk_pair(p, 11, 20, 29, 8)
     if v == 1:  # a boar skull over the doorway
         p.stamp([".abbba.", "abkbkba", ".abbba.", "t.bbb.t", "t..c..t"],
                 {"a": BONE[3], "b": BONE[4], "c": BONE[2], "t": BONE[4]}, 12, 14)
+    for x in range(3, 29):  # trodden earth at the hem
+        if p.get(x, 29) is not None:
+            p.set(x, 30, MESA[2] if x < 16 else MESA[1])
     p.outline(skip=())
-    p.shadow(16, 30.5, 15, 1.5)
-    register(f"az.obj.thorn_hut@{v}", _art(p, note=["quilboar hut: briar dome, hide patch, tusked door",
-                                                    "quilboar hut with a boar skull over the door"][v]))
+    p.shadow(16, 30.8, 15, 1.4)
+    register(f"az.obj.thorn_hut@{v}", _art(p, note=["quilboar hut: woven bramble dome, hide cap, tusked door",
+                                                    "quilboar hut: hide flank, boar skull over the door"][v]))
 
 
 def _barricade() -> None:
@@ -1472,7 +1550,7 @@ def _barricade() -> None:
 def _dig_tent() -> None:
     W, H = 32, 28
     p = Pic(W, H)
-    canvas = [BONE[1], BONE[2], BONE[3], BONE[4]]
+    canvas = [BONE[0], BONE[1], BONE[2], BONE[3]]
     # blue Explorers' pennant on a pole behind
     p.vline(27, 1, 12, WOOD[3])
     p.stamp(["bbbB", "bBB.", "B..."], {"b": BLUE[3], "B": BLUE[2]}, 28, 1)
@@ -1845,6 +1923,341 @@ def _wilds() -> None:
     _spirit_portal()
 
 
+
+# --- settlement dressing ------------------------------------------------------------------------
+
+
+def _fence(v: int) -> None:
+    """16x16, tiles sideways: rails run edge to edge on the same rows in every variant and
+    the one post sits in the middle, so any variants can be strung together."""
+    p = Pic(16, 16)
+    rails = (7, 11)
+    for i, ry in enumerate(rails):
+        if v == 1 and i == 0:  # a rope instead of the top rail, sagging between posts
+            for x in range(16):
+                p.set(x, ry + (1 if 3 <= x <= 5 or 10 <= x <= 12 else 0), SAND[3] if x % 2 else SAND[2])
+            continue
+        for x in range(16):
+            p.set(x, ry, WOOD[4] if (x + i) % 5 else WOOD[3])
+            p.set(x, ry + 1, WOOD[2] if x % 4 else WOOD[1])
+    p.vline(7, 4, 15, WOOD[4])
+    p.vline(8, 4, 15, WOOD[2])
+    p.set(7, 3, WOOD[5])
+    for ry in rails:  # rope lashing where rails meet the post
+        p.set(6, ry + 1, SAND[3])
+        p.set(9, ry + 1, SAND[2])
+    if v == 2:  # a feather charm hung on the post
+        p.vline(9, 5, 6, SAND[3])
+        p.stamp(["a", "a", "r"], {"a": BONE[4], "r": RED[2]}, 10, 6)
+    p.outline()
+    for x in range(16):  # shadow strip along the whole run
+        if p.get(x, 15) is None:
+            p.set(x, 15, SHADOW)
+    register(f"az.obj.fence@{v}", _art(p, note=["low log-rail fence", "rope-and-rail fence",
+                                                "rail fence with a feather charm"][v]))
+
+
+def _haystack(v: int) -> None:
+    W, H = 24, 24
+    p = Pic(W, H)
+    if v == 0:  # a domed stack, a hide cap tied down with rope and stones
+        info = dome_shade(p, 12, 22.5, 10.5, 17, SAND, ribs=())
+        r = rng_for("hay", v)
+        for (x, y), (u, ny, lv) in sorted(info.items()):
+            if r.random() < 0.18:  # loose straws
+                p.set(x, y, SAND[4] if lv > 0.45 else SAND[1])
+        for (x, y), (u, ny, lv) in info.items():
+            if ny < -0.62 + 0.08 * math.cos(u * 7):
+                p.set(x, y, tone(HIDE[1:5], lv, x, y, 0.1))
+        for y in (7, 8):
+            p.set(6, y + 3, SAND[1])
+        p.line(4, 12, 11, 7, SAND[1])
+        p.line(20, 12, 13, 7, SAND[1])
+        p.stamp(["ab", "bc"], {"a": STONE[4], "b": STONE[3], "c": STONE[1]}, 3, 12)
+        p.stamp(["ab", "bc"], {"a": STONE[4], "b": STONE[3], "c": STONE[1]}, 19, 12)
+    else:  # a long loaf-shaped rick, combed straw, roped in two bands
+        info = dome_shade(p, 12, 22.5, 11, 14, SAND, flat=2.0)
+        for (x, y), (u, ny, lv) in info.items():
+            if (x * 3 + y) % 5 == 0:
+                p.set(x, y, step(SAND, p.get(x, y), 1 if lv > 0.5 else -1))
+        for bx in (7, 16):
+            for (x, y), (u, ny, lv) in info.items():
+                if x == bx:
+                    p.set(x, y, SAND[1] if lv < 0.6 else SAND[2])
+        p.stamp(["ab", "bc"], {"a": STONE[4], "b": STONE[3], "c": STONE[1]}, 6, 21)
+        p.stamp(["ab", "bc"], {"a": STONE[4], "b": STONE[3], "c": STONE[1]}, 15, 21)
+    p.outline()
+    p.shadow(12, 23, 11, 1.2)
+    register(f"az.obj.haystack@{v}", _art(p, note=["hay stack with a hide cap roped down",
+                                                   "hay rick roped in two bands"][v]))
+
+
+def _cooking_pot() -> None:
+    frames = []
+    for fr in range(2):
+        p = Pic(16, 16)
+        # steam wisps drifting up, alternating
+        wisp = ["..a..", ".a.A.", "..aA.", ".aA..", "..A.."] if fr == 0 else [".a...", "..aA.", ".Aa..", "..aA.", "..A.."]
+        p.stamp(wisp, {"a": "grey4:150", "A": "white:170"}, 6, 0)
+        p.line(2, 14, 7, 3, WOOD[3])   # tripod
+        p.line(13, 14, 8, 3, WOOD[2])
+        p.vline(8, 4, 5, STEEL[2])
+        p.ellipse(8, 9.5, 4.5, 3.5, lambda x, y: tone(GREY[0:4], 0.85 - (x - 4) * 0.08 - (y - 7) * 0.04, x, y, 0.1))
+        p.hline(4, 12, 6, GREY[3])
+        p.hline(5, 11, 7, "azs_leaf2" if fr == 0 else "azs_leaf3")  # stew
+        p.set(7, 7, "tent3")
+        for x in range(5, 12):  # coals
+            p.set(x, 13, FIRE[3] if (x + fr) % 2 else FIRE[1])
+            p.set(x, 14, STONE[1] if x % 3 else FIRE[2])
+        p.stamp(["ab", ".."], {"a": STONE[4], "b": STONE[2]}, 3, 13)
+        p.stamp(["ab", ".."], {"a": STONE[3], "b": STONE[1]}, 11, 13)
+        p.outline(skip=FIRE[1:4])
+        p.shadow(8, 15, 6, 1)
+        frames.append(p)
+    register("az.obj.cooking_pot", _art(frames, fps=2, note="iron stew pot on a tripod over coals, steaming"))
+
+
+TORCH_FLAMES = [
+    ["...a..", "..ab..", "..bb.a", ".abcb.", ".bcdb.", ".bcdcb", "abcdcb", ".bccb."],
+    ["......", "..a...", ".ab...", ".bbca.", "abcdb.", ".bcdb.", "bcddcb", ".bccb."],
+    [".a....", "....a.", "...ba.", "..bcb.", ".bcdb.", "abcdcb", ".bcdcb", ".bccb."],
+]
+
+
+def _torch() -> None:
+    frames = []
+    for fr in range(3):
+        p = Pic(16, 24)
+        p.stamp(TORCH_FLAMES[fr], {"a": FIRE[2], "b": FIRE[3], "c": FIRE[4], "d": FIRE[5]}, 5, 0)
+        p.vline(7, 8, 23, WOOD[4])
+        p.vline(8, 8, 23, WOOD[2])
+        p.stamp(["abba", "acca", "abba"], {"a": HIDE[1], "b": HIDE[3], "c": HIDE[2]}, 6, 7)  # wrapped head
+        p.set(7, 9, FIRE[3])
+        p.stamp(["t..t", ".tt."], {"t": BONE[3]}, 6, 12)  # horn collar
+        p.stamp([".ab.", "abbc"], {"a": STONE[4], "b": STONE[3], "c": STONE[1]}, 6, 22)
+        p.outline(skip=FIRE[2:])
+        p.shadow(8, 23.3, 3, 0.8)
+        frames.append(p)
+    register("az.obj.torch", _art(frames, fps=6, note="standing torch: hide-wrapped head on a pole"))
+
+
+def _signpost(v: int) -> None:
+    p = Pic(16, 24)
+    p.vline(7, 3, 23, WOOD[4])
+    p.vline(8, 3, 23, WOOD[2])
+    arrow_r = ["aaaaab.", "cccccdb", "eeeeed."]
+    arrow_l = [".baaaaa", "bdccccc", ".deeeee"]
+    lg = {"a": WOOD[5], "b": WOOD[3], "c": WOOD[4], "d": WOOD[2], "e": WOOD[1]}
+    if v == 0:
+        p.stamp(arrow_r, lg, 8, 5)
+        p.stamp(arrow_l, lg, 1, 10)
+        p.hline(10, 12, 6, WOOD[2])  # carved marks
+        p.hline(3, 5, 11, WOOD[2])
+        p.set(7, 2, WOOD[5])
+    else:
+        p.stamp(arrow_r, lg, 8, 8)
+        p.set(11, 9, RED[2])
+        p.set(13, 9, RED[2])
+        skull(p, 8, -2)
+    p.stamp([".ab.", "abbc"], {"a": STONE[4], "b": STONE[3], "c": STONE[1]}, 6, 22)
+    p.outline()
+    p.shadow(8, 23.3, 4, 0.8)
+    register(f"az.obj.signpost@{v}", _art(p, note=["signpost: two carved arrow boards",
+                                                   "signpost with a kodo skull and one board"][v]))
+
+
+def _prayer_flags() -> None:
+    frames = []
+    cols = [(RED[2], RED[1]), ("gold2", "gold1"), (BLUE[3], BLUE[2]), (BONE[4], BONE[3]), (LEAF[4], LEAF[3])]
+    for fr in range(2):
+        p = Pic(32, 24)
+        for x in (1, 29):
+            p.vline(x, 3, 23, WOOD[4])
+            p.vline(x + 1, 3, 23, WOOD[2])
+            p.set(x, 2, BONE[4])
+        pts = []
+        for x in range(3, 29):  # the cord sags between the poles
+            t = (x - 2) / 27
+            y = round(4 + math.sin(t * math.pi) * 4)
+            p.set(x, y, SAND[3])
+            pts.append((x, y))
+        for i, x in enumerate(range(4, 28, 4)):
+            y = dict(pts)[x] + 1
+            lit, dark = cols[i % len(cols)]
+            sway = (1 if (i + fr) % 2 else 0)
+            for j in range(5):  # a flag, its tail swinging with the wind
+                dx = sway if j >= 3 else 0
+                p.hline(x + dx, x + 2 + dx, y + j, lit if j < 3 else dark)
+                p.set(x + 2 + dx, y + j, dark)
+        p.outline()
+        p.shadow(2, 23.3, 2, 0.8)
+        p.shadow(30, 23.3, 2, 0.8)
+        frames.append(p)
+    register("az.obj.prayer_flags", _art(frames, fps=2, note="string of prayer flags between two poles, fluttering"))
+
+
+def _stone_circle() -> None:
+    W, H = 48, 32
+    p = Pic(W, H)
+    cx, cy, rx, ry = 24.0, 21.0, 20.0, 7.5
+    # the ring of worn earth the stones stand on, and a painted hearth stone in the middle
+    for y in range(H):
+        for x in range(W):
+            d = ((x + 0.5 - cx) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2
+            if 0.75 < d <= 1.08:
+                p.set(x, y, "dust3:120")
+    stones = []
+    for k in range(9):
+        a = -math.pi / 2 + k * math.tau / 9
+        sx, sy = cx + math.cos(a) * rx, cy + math.sin(a) * ry
+        stones.append((sy, sx, k))
+    hearth = [".abbbb.", "abrrbbc", ".cccccc"]
+    for sy, sx, k in sorted(stones + [(cy, cx, -1)]):  # back to front, the hearth stone mid-way
+        if k < 0:
+            q = Pic(W, H).stamp(hearth, {"a": STONE[4], "b": STONE[3], "c": STONE[1], "r": RED[2]}, 21, 19)
+            q.outline()
+            for y in range(H):
+                for x in range(W):
+                    if q.px[y][x] is not None:
+                        p.px[y][x] = q.px[y][x]
+            continue
+        near = (sy - (cy - ry)) / (2 * ry)
+        hgt = round(7 + near * 6 + (k % 3))
+        wid = 2.2 + near * 1.3
+        base = round(sy)
+        pts = [(sx - wid, base + 0.9), (sx - wid * 0.9, base - hgt * 0.8), (sx - wid * 0.3, base - hgt),
+               (sx + wid * 0.6, base - hgt * 0.9), (sx + wid, base - hgt * 0.5), (sx + wid, base + 0.9)]
+        q = Pic(W, H)
+        q.poly(pts, lambda x, y, sx=sx, base=base, hgt=hgt: tone(
+            STONE[1:], 0.9 - (x + 0.5 - sx + 2.5) * 0.14 - (y - base + hgt) * 0.015, x, y, 0.15))
+        if k % 3 == 1:  # painted spirit marks on some faces
+            q.set(round(sx - 1), base - hgt // 2, RED[2])
+            q.set(round(sx - 1), base - hgt // 2 + 1, RED[2])
+        if k % 4 == 0:
+            q.set(round(sx - 1), base - hgt + 2, LEAF[3])
+        q.outline()
+        q.shadow(sx, base + 0.5, wid + 1, 1)
+        for y in range(H):
+            for x in range(W):
+                if q.px[y][x] is not None and not (":" in q.px[y][x] and p.px[y][x] not in (None, "dust3:120")):
+                    p.px[y][x] = q.px[y][x]
+    register("az.obj.stone_circle", _art(p, note="ring of standing stones with painted marks, sacred ground"))
+
+
+def _palisade(v: int) -> None:
+    W, H = 32, 24
+    p = Pic(W, H)
+    r = rng_for("palisade", v)
+    x = 1
+    while x < 30:
+        w = 3 if v == 0 else r.choice((3, 4))
+        top = (3 if v == 0 else r.randint(1, 5)) + (x % 2)
+        for xx in range(x, min(31, x + w)):
+            k = xx - x
+            for y in range(top + int(abs(k - (w - 1) / 2) * 1.2), 24):
+                p.set(xx, y, [WOOD[4], WOOD[3], WOOD[2], WOOD[1]][min(3, k * 4 // w)])
+        p.set(x + w // 2 - (1 if w == 4 else 0), top - 1, WOOD[5] if v == 0 else BONE[3])
+        x += w
+    for ry in (9, 18):  # lashings
+        for xx in range(1, 31):
+            if p.get(xx, ry):
+                p.set(xx, ry, SAND[3] if xx % 3 else SAND[1])
+    if v == 0:  # quilboar: briar wound along the wall, a boar skull
+        brambles(p, lambda x, y: 1 <= x <= 30 and 12 <= y <= 16, 5, 14, lambda x, y: 0.5, 0.45)
+        p.stamp([".abbba.", "abkbkba", ".abbba.", "t.bbb.t"],
+                {"a": BONE[3], "b": BONE[4], "t": BONE[4]}, 12, 5)
+    else:  # gnoll: hide scraps and bones hung on the stakes
+        p.rect(6, 11, 5, 5, lambda x, y: tone(HIDE[1:4], 0.8 - (x - 6) * 0.1, x, y, 0.2))
+        p.stamp(["t.t", ".t.", "t.t"], {"t": BONE[4]}, 21, 12)
+        p.vline(17, 10, 13, BONE[3])
+    p.outline()
+    p.shadow(16, 23.5, 16, 1)
+    register(f"az.obj.palisade@{v}", _art(p, note=["quilboar palisade: sharpened logs, briar, boar skull",
+                                                   "gnoll palisade: ragged stakes, hide and bones"][v]))
+
+
+def _hide_stretcher() -> None:
+    W, H = 24, 24
+    p = Pic(W, H)
+    # a square frame of lashed poles on two legs
+    for x0, y0, x1, y1 in ((3, 2, 3, 23), (19, 2, 19, 23)):
+        pole(p, x0, y0, x1, y1)
+    p.hline(2, 21, 2, WOOD[4])
+    p.hline(2, 21, 3, WOOD[2])
+    p.hline(2, 21, 17, WOOD[4])
+    p.hline(2, 21, 18, WOOD[2])
+    hide = [(8, 5), (11, 4.5), (15, 5), (17, 8), (16.5, 12), (17, 15), (12, 15.5), (7, 15), (6, 12), (6.5, 8)]
+    p.poly(hide, lambda x, y: tone(HIDE[2:], 0.95 - (x - 6) * 0.04 - (y - 5) * 0.03, x, y, 0.1))
+    for (hx, hy), (fx, fy) in zip(hide[::2], ((6, 4), (17, 4), (18, 9), (12, 16), (5, 12))):
+        p.line(round(hx), round(hy), fx, fy, SAND[2])  # cords to the frame
+    p.stamp(["..r..", ".rwr.", "r.r.r", "..r.."], {"r": RED[2]}, 9, 8)  # painted mark
+    p.outline()
+    p.shadow(12, 23.3, 10, 1)
+    register("az.obj.hide_stretcher", _art(p, note="kodo hide laced into a pole frame, painted"))
+
+
+def _kodo_saddle_rack() -> None:
+    W, H = 24, 16
+    p = Pic(W, H)
+    for x in (2, 20):  # A-legs
+        pole(p, x, 15, x + 1, 5, WOOD, 3)
+    p.hline(1, 22, 5, WOOD[4])
+    p.hline(1, 22, 6, WOOD[2])
+    for sx in (4, 13):  # saddles slung over the rail: hide seat, red blanket, a horn pommel
+        p.stamp([
+            "t.....t",
+            "hH...Hd",
+            "hHHHHHd",
+            "rrrrrrR",
+            "yyyyyyY",
+            "rRRRRRR",
+            "r.....R",
+        ], {"t": BONE[4], "h": HIDE[4], "H": HIDE[3], "d": HIDE[1], "r": RED[2], "R": RED[1],
+            "y": BONE[3], "Y": BONE[2]}, sx, 2)
+    p.vline(11, 7, 12, SAND[3])  # harness rope hanging with a ring
+    p.stamp(["ab", "ba"], {"a": STEEL[4], "b": STEEL[2]}, 11, 12)
+    p.outline()
+    p.shadow(12, 15.3, 11, 0.9)
+    register("az.obj.kodo_saddle_rack", _art(p, note="rack with two kodo saddles and a harness"))
+
+
+def _grave_cairn(v: int) -> None:
+    p = Pic(16, 16)
+    rock(p, lambda x, y: ((x - 8) / 6.5) ** 2 + ((y - 15) / 7) ** 2 <= 1 and y < 15, STONE[1:], 81 + v)
+    for y in range(9, 15):  # stacked stones: joints
+        for x in range(p.w):
+            if p.get(x, y) and (x * 3 + (y // 2) * 5) % 7 == 0:
+                p.set(x, y, STONE[1])
+    if v == 0:  # a feather staff planted in the cairn
+        p.vline(8, 1, 9, WOOD[4])
+        p.stamp(["ab", "ab", "rR"], {"a": BONE[4], "b": BONE[3], "r": RED[2], "R": RED[1]}, 9, 2)
+        p.stamp(["a", "a", "b"], {"a": BONE[4], "b": BLUE[2]}, 6, 3)
+    else:  # horns laid on top, prairie flowers left by mourners
+        p.stamp(["t....t", "tT..Tt", ".TTTT."], {"t": BONE[4], "T": BONE[3]}, 5, 6)
+        p.stamp(["f.p", "g.g"], {"f": BONE[4], "p": "flora4", "g": LEAF[3]}, 12, 13)
+    p.outline()
+    p.shadow(8, 15.3, 7, 0.9)
+    register(f"az.obj.grave_cairn@{v}", _art(p, note=["tauren grave cairn with a feather staff",
+                                                      "tauren grave cairn with horns and flowers"][v]))
+
+
+def _dressing() -> None:
+    for v in range(3):
+        _fence(v)
+    for v in range(2):
+        _haystack(v)
+        _signpost(v)
+        _palisade(v)
+        _grave_cairn(v)
+    _cooking_pot()
+    _torch()
+    _prayer_flags()
+    _stone_circle()
+    _hide_stretcher()
+    _kodo_saddle_rack()
+
+
 _buildings()
 _camp()
 _wilds()
+_dressing()

@@ -188,6 +188,18 @@ def structures() -> list[Need]:
         Need("az.obj.inn", "<=48x40", note="tauren inn"),
         Need("az.obj.training_dummy", "<=16x24", note="training dummy"),
         Need("az.obj.barrel", "<=16x16", variants=2),
+        # the small things that make a village look lived in
+        Need("az.obj.fence", "16x16", variants=3, note="low timber-and-rope fence section, tiles sideways"),
+        Need("az.obj.haystack", "<=24x24", variants=2, note="stack of prairie hay"),
+        Need("az.obj.cooking_pot", "<=16x16", frames=2, note="iron pot over coals, steam"),
+        Need("az.obj.torch", "<=16x24", frames=3, note="standing torch on a pole"),
+        Need("az.obj.signpost", "<=16x24", variants=2, note="wooden signpost with carved arrows"),
+        Need("az.obj.prayer_flags", "<=32x24", frames=2, note="string of coloured prayer flags between poles, flutter"),
+        Need("az.obj.stone_circle", "<=48x32", note="ring of standing stones, sacred ground"),
+        Need("az.obj.palisade", "<=32x24", variants=2, note="pointed log wall section (quilboar / gnoll camps)"),
+        Need("az.obj.hide_stretcher", "<=24x24", note="animal hide stretched on a frame"),
+        Need("az.obj.kodo_saddle_rack", "<=24x16", note="rack with kodo saddles and harness"),
+        Need("az.obj.grave_cairn", "<=16x16", variants=2, note="stone cairn with feathers: tauren grave"),
         Need("az.obj.crate", "<=16x16", variants=2),
         Need("az.obj.wagon", "<=40x24", note="ravaged caravan wagon"),
         # Bael'dun Digsite, Venture Co. Mine
@@ -217,8 +229,16 @@ def thunder_bluff() -> list[Need]:
     """The bluff city: platform tileset and multi-tile buildings."""
     return [
         # Thunder Bluff: platform tileset and composite buildings
-        Need("az.tb.platform", "16x16", variants=4, note="plank-and-hide platform floor"),
-        Need("az.tb.platform.edge", "16x16", variants=4, note="platform edge over the drop"),
+        Need("az.tb.platform", "16x16", variants=8, note="plank-and-hide platform floor; must tile without a visible grid"),
+        Need("az.tb.platform.edge", "16x16", variants=6, note="platform edge over the drop"),
+        Need("az.tb.platform.inlay", "16x16", variants=3, note="floor tile with a painted tribal pattern, for plazas"),
+        Need("az.tb.brazier", "<=16x24", frames=3, note="standing fire brazier"),
+        Need("az.tb.drum", "<=16x16", variants=2, note="big ceremonial drum"),
+        Need("az.tb.stairs", "16x16", variants=2, note="wooden stairs between platform levels"),
+        Need("az.tb.hanging_hides", "<=32x24", variants=2, note="hides and feathers hung from a beam"),
+        Need("az.tb.prayer_flags", "<=32x16", frames=2, note="flags strung along a rope rail, flutter"),
+        Need("az.tb.pot", "<=16x16", variants=2, note="clay pot / water jar"),
+        Need("az.tb.banner_pole", "<=16x40", frames=2, note="tall Bloodhoof banner on a carved pole"),
         Need("az.tb.bridge", "16x16", variants=2, note="rope bridge between rises"),
         Need("az.tb.rope_rail", "16x16", variants=2, note="rope railing"),
         Need("az.tb.support_pillar", "<=16x48", variants=2, note="pillar below a rise"),

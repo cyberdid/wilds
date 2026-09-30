@@ -249,6 +249,8 @@ class AzApp:
         self.now = 0.0
         self.running = True
         self._shadows: dict[int, pygame.Surface] = {}
+        self.floaters: list[list] = []   # [x, y, text, colour, born]
+        self.bursts: list[tuple[str, float, float, float, float]] = []  # sprite, x, y, born, life
         self.vis: dict[object, list[float]] = {}     # drawn position per creature / the hero
         self.moved_at: dict[object, float] = {}
         self.facing: dict[object, bool] = {}
@@ -359,8 +361,26 @@ class AzApp:
                     if sim.pending or sim.over:
                         self.acc = 0.0
                         break
+        self._effects()
         self._animate(dt)
         self._camera(dt)
+
+    def _effects(self) -> None:
+        """Turn the simulation's hit/hurt/level-up notes into sparks and floating numbers."""
+        for kind, pos, text in self.sim.fx:
+            x, y = float(pos[0]), float(pos[1])
+            if kind == "hit":
+                self.floaters.append([x, y, text, (255, 240, 140), self.now])
+                self.bursts.append(("az.fx.hit_spark", x, y, self.now, 0.4))
+            elif kind == "hurt":
+                self.floaters.append([x, y, "-" + text, (255, 90, 90), self.now])
+                self.bursts.append(("az.fx.hit_spark", x, y, self.now, 0.4))
+            elif kind == "levelup":
+                self.floaters.append([x, y, "РІВЕНЬ " + text, (120, 255, 150), self.now])
+                self.bursts.append(("az.fx.level_up", x, y, self.now, 1.4))
+        self.sim.fx.clear()
+        self.floaters = [f for f in self.floaters if self.now - f[4] < 1.2]
+        self.bursts = [b for b in self.bursts if self.now - b[3] < b[4]]
 
     def _animate(self, dt: float) -> None:
         """Ease the drawn positions towards the simulated ones (several tiles a frame at high speed)."""
@@ -505,6 +525,8 @@ class AzApp:
                         sprites.append((y - 0.4, NODES[(h >> 8) % len(NODES)], x, y, False, self.now + (h % 7)))
         self.plates: list[tuple[float, float, int, str, tuple]] = []
         self._collect(sprites, x0, y0, cols, rows)
+        for b_name, bx, by, born, _life in self.bursts:
+            sprites.append((by + 1.5, b_name, bx, by, False, self.now - born))
         for _, name, x, y, flip, t in sorted(sprites, key=lambda s: (s[0], s[2])):
             name = self._resolve(name, x, y)
             if name not in self.bank:
@@ -570,7 +592,10 @@ class AzApp:
                 for kind, obj in self.by_chunk.get((cx, cy), ()):
                     if kind == "structure":
                         s = obj
-                        sprites.append((s.pos[1], s.sprite, s.pos[0], s.pos[1], False, 0.0))
+                        sprites.append((s.pos[1], s.sprite, s.pos[0], s.pos[1], False, self.now + s.pos[0] * 0.21))
+                        if s.sprite in ("az.obj.bonfire", "az.tb.brazier", "az.obj.cooking_pot"):
+                            sprites.append((s.pos[1] + 0.5, "az.fx.campfire_smoke", s.pos[0], s.pos[1] - 1.2, False,
+                                            self.now + s.pos[0] * 0.3))
                     else:
                         p = obj
                         name = person_sprite(self.bank, self.records.get(quests.clean(p.title)), p.title, "idle")
@@ -580,7 +605,7 @@ class AzApp:
                         key = quests.clean(p.title)
                         marker = "az.fx.quest_turnin" if key in turn_ins else "az.fx.quest_marker" if key in givers else None
                         if marker:
-                            sprites.append((p.pos[1] + 0.9, marker, p.pos[0], p.pos[1] - 2.3, False, self.now))
+                            sprites.append((p.pos[1] + 0.9, marker, p.pos[0], p.pos[1] - 1.8, False, self.now))
         for c in sim.near_creatures(3):
             v = self.vis.get(c.id)
             if v is None:
@@ -602,6 +627,9 @@ class AzApp:
                 and max(abs(act.victim.pos[0] - sim.hero.pos[0]), abs(act.victim.pos[1] - sim.hero.pos[1])) <= 1
             moving = self.now - self.moved_at.get("hero", -9) < 0.5
             anim = "attack" if attacking else "walk" if moving else "work" if act is not None and act.name == "search" else "idle"
+            if moving:
+                sprites.append((hv[1] - 0.01, "az.fx.dust_kick", hv[0] + (0.6 if self.facing.get("hero") else -0.6),
+                                hv[1], False, self.now))
             sprites.append((hv[1] + 0.01, f"az.person.hero.{anim}", hv[0], hv[1], self.facing.get("hero", False), self.now))
             self.plates.append((hv[0], hv[1], self.bank.art(f"az.person.hero.{anim}").size[1],
                                 f"{sim.hero.name} [{sim.hero.level}]", hud.CYAN))
@@ -623,6 +651,11 @@ class AzApp:
                     by = int(oy + (v[1] - y0) * px + px - 1 - 16 * z - 22)
                     pygame.draw.rect(canvas, (20, 10, 10), (bx, by, 28, 4))
                     pygame.draw.rect(canvas, (220, 60, 60), (bx, by, int(28 * c.hp / c.max_hp), 4))
+        for fx_x, fx_y, text, color, born in self.floaters:
+            age = self.now - born
+            surf = txt.render(text, "bold", 16 + 2 * z, color, shadow=(0, 0, 0))
+            canvas.blit(surf, (int(ox + (fx_x - x0) * px + px // 2 - surf.get_width() // 2),
+                               int(oy + (fx_y - y0) * px - 20 * z - age * 40 * z // 2)))
         if sim.thought and self.vis.get("hero"):
             hv = self.vis["hero"]
             lines = txt.wrap(txt.clean(sim.thought), "text", 14, 280)[:3]

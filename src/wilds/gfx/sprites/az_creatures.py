@@ -82,12 +82,33 @@ def _ol(text: str) -> Grid:
     return outline_grid(grid(text), "k")
 
 
+def _shadow(g: Grid, x0: int, x1: int, y: int, rows: int = 2) -> Grid:
+    """A short soft ground shadow ('S', translucent ink) under a sprite, painted only on
+    transparent pixels: ``rows`` rows from ``y`` down, spanning x0..x1 (ends rounded)."""
+    out = [list(r) for r in g]
+    for k in range(rows):
+        inset = (rows - 1 - k) if k < rows - 1 else 0
+        yy = y + k
+        if not 0 <= yy < len(g):
+            continue
+        for x in range(x0 + inset + (k == rows - 1), x1 - inset - (k == rows - 1) + 1):
+            if 0 <= x < len(g[0]) and out[yy][x] == ".":
+                out[yy][x] = "S"
+    return tuple("".join(r) for r in out)
+
+
+def _fallen(body: Grid, legs: tuple[Leg, ...], x0: int, x1: int) -> Grid:
+    """A dead beast on its side: legs stiff out toward the viewer, a soft shadow beneath."""
+    w, h = len(body[0]), len(body)
+    return _shadow(_pose(w, h, body, legs), x0, x1, h - 2)
+
+
 def _reg(name: str, frames, legend: dict, fps: float = 0.0, note: str = "") -> None:
-    register(f"az.creature.{name}", art(*frames, legend=legend, fps=fps, note=note))
+    register(f"az.creature.{name}", art(*frames, legend={"S": "ink:60", **legend}, fps=fps, note=note))
 
 
 # ==========================================================================================
-# Felines: cougar (tawny tan), mountain lion (dusky grey-brown), lion (golden, dark mane).
+# Felines: cougar (sandy tan), mountain lion (red-brown puma), lion (golden, dark mane).
 # One lean long-tailed cat body; the lion adds a mane and a tail tuft.
 # ==========================================================================================
 
@@ -147,6 +168,7 @@ CAT_LUNGE = grid("""
     ................
     ................
 """)
+# fallen on its side: back to the sky, legs stiff toward the viewer, head down on the ground
 CAT_DEAD = grid("""
     ................
     ................
@@ -157,50 +179,51 @@ CAT_DEAD = grid("""
     ................
     ................
     ................
+    ...BBBBBBB......
+    ..233333333..tt.
+    .23333333333444.
+    t2333333333x33n.
+    .t.2222222.bbb..
     ................
-    ...........43...
-    ..4444444443343.
-    .23333333333k3n.
-    t2.BBBBBBBB2bbb.
-    ...3.3....3.3...
     ................
 """)
+# rolled onto its side, back to the viewer, legs stiff out over the belly
+CAT_DEAD_LEGS = (L("2", (4, 9), (2, 6), paw=0), L("2", (10, 9), (11, 6), paw=0),
+                 L("3", (5, 9), (3, 6), (3, 5), paw=0), L("3", (9, 9), (10, 6), (10, 5), paw=0))
 
 
 def _cat_legs(off: tuple[int, int, int, int], lift: tuple[bool, ...] = (False,) * 4,
               hy: int = 10) -> tuple[Leg, ...]:
-    """Far hind, far fore, near hind, near fore."""
-    return (hind("2", 6, hy, off[0], lift[0]), fore("2", 9, hy, off[1], lift[1]),
-            hind("3", 4, hy, off[2], lift[2]), fore("3", 11, hy, off[3], lift[3]))
+    """Far hind, far fore, near hind, near fore: each pair side by side, so a standing cat
+    shows two clean 2px legs and a walking one splits them into a clear stride."""
+    return (hind("2", 5, hy, off[0], lift[0], paw=0), fore("2", 9, hy, off[1], lift[1], paw=0),
+            hind("3", 4, hy, off[2], lift[2]), fore("3", 10, hy, off[3], lift[3]))
 
 
 _F, _T = False, True
+# walk: near pair spread / far pair gathered, then the reverse; lifted legs on the passing frames
+WALK = ((1, -1, -2, 2), (0, 0, 0, 0), (-2, 2, 1, -1), (0, 0, 0, 0))
+WALK_LIFT = ((_F,) * 4, (_F, _T, _T, _F), (_F,) * 4, (_T, _F, _F, _T))
 
 
 def _cat_set(body: Grid, body_b: Grid, lunge: Grid, dead: Grid) -> dict[str, list[Grid]]:
     return {
         "idle": [_pose(16, 16, body, _cat_legs((0, 0, 0, 0))),
                  _pose(16, 16, body_b, _cat_legs((0, 0, 0, 0)))],
-        "move": [
-            # diagonal pairs (near fore + far hind, far fore + near hind) swing together;
-            # on the passing frames one pair is lifted and the body rides 1px higher
-            _pose(16, 16, body, _cat_legs((-2, -1, 1, 2))),
-            _pose(16, 16, body, _cat_legs((0, 0, 0, 0), (_F, _T, _T, _F), hy=9), dy=-1),
-            _pose(16, 16, body, _cat_legs((1, 2, -2, -1))),
-            _pose(16, 16, body, _cat_legs((0, 0, 0, 0), (_T, _F, _F, _T), hy=9), dy=-1),
-        ],
+        "move": [_pose(16, 16, body, _cat_legs(off, lift, hy=10 - (k % 2)), dy=-(k % 2))
+                 for k, (off, lift) in enumerate(zip(WALK, WALK_LIFT))],
         "attack": [
             # coiled low, weight on the haunches
-            _pose(16, 16, body_b, (L("2", (5, 11), (6, 13), (6, 14)), L("2", (8, 11), (9, 14)),
-                                   L("3", (3, 11), (2, 13), (3, 14)), L("3", (10, 11), (11, 14))),
+            _pose(16, 16, body_b, (L("2", (4, 11), (5, 14), paw=0), L("2", (8, 11), (9, 14), paw=0),
+                                   L("3", (3, 11), (2, 13), (3, 14)), L("3", (9, 11), (10, 14))),
                   dx=-1, dy=1),
             # the pounce: forepaws thrown out claws first, hind legs kicking off
-            _pose(16, 16, lunge, (L("2", (6, 9), (4, 12), (3, 14), paw=0),
+            _pose(16, 16, lunge, (L("2", (5, 9), (3, 12), (2, 14), paw=0),
                                   L("2", (9, 9), (11, 11), (12, 12), paw=0),
                                   L("3", (4, 9), (2, 11), (1, 13), paw=0),
-                                  L("3", (11, 9), (13, 10), (14, 11), paw=0))),
+                                  L("3", (10, 9), (12, 10), (14, 11), paw=0))),
         ],
-        "dead": [outline_grid(dead, "k")],
+        "dead": [_fallen(dead, CAT_DEAD_LEGS, 2, 13)],
     }
 
 
@@ -215,26 +238,26 @@ MANE = grid("""
     ...M..
 """)
 MANE_DEAD = grid("""
-    ..NN
-    .NNN
-    MNNN
-    .MNN
+    .NN
+    NNN
+    MNN
+    .MN
 """)
 
 
 def _cats() -> None:
     cougar = {"1": "sand1", "2": "sand2", "3": "sand3", "4": "sand4", "b": "bone4", "B": "bone3",
-              "t": "sand0", "n": "skin2", "m": "red1", "e": "ink2"}
-    mountain = {**cougar, "1": "bone0", "2": "bone1", "3": "bone2", "4": "bone3", "B": "bone3",
-                "b": "bone4", "t": "leather2"}
+              "t": "sand0", "n": "skin2", "m": "red1", "e": "ink2", "x": "ink2"}
+    mountain = {**cougar, "1": "rust0", "2": "rust2", "3": "rust3", "4": "rust4", "B": "sand3",
+                "b": "sand4", "t": "leather1"}
     lion = {**cougar, "1": "tent0", "2": "tent1", "3": "tent2", "4": "tent3", "b": "tent4",
             "B": "tent3", "t": "rust1", "M": "rust1", "N": "rust2"}
     cat = _cat_set(CAT_BODY, CAT_BODY_B, CAT_LUNGE, CAT_DEAD)
     maned = _cat_set(overlay(CAT_BODY, MANE, 7, 4), overlay(CAT_BODY_B, MANE, 7, 4),
-                     overlay(CAT_LUNGE, MANE, 7, 3), overlay(CAT_DEAD, MANE_DEAD, 8, 10))
+                     overlay(CAT_LUNGE, MANE, 7, 3), overlay(CAT_DEAD, MANE_DEAD, 9, 10))
     for name, legend, frames, what in (
             ("cougar", cougar, cat, "tawny cougar"),
-            ("mountain_lion", mountain, cat, "dusky grey-brown mountain lion"),
+            ("mountain_lion", mountain, cat, "red-brown puma with dark ear and tail tips"),
             ("lion", lion, maned, "golden savannah lion with a dark mane")):
         _reg(f"{name}.idle", frames["idle"], legend, 2, f"{what}, tail flick")
         _reg(f"{name}.move", frames["move"], legend, 8, f"{what} prowl")
@@ -316,50 +339,48 @@ WOLF_DEAD = grid("""
     ................
     ................
     ................
+    ...BBBBBBB......
+    ..233333333..tt.
+    .23333333333444.
+    33233333333x33n.
+    t2..2222222bbb..
     ................
-    ...........3....
-    ..444444443433..
-    t33333333333e3n.
-    .2..BBBBBB2bbbb.
-    ....3.3..3.3....
     ................
 """)
+WOLF_DEAD_LEGS = (L("2", (4, 9), (2, 5), paw=0), L("2", (10, 9), (12, 5), paw=0),
+                  L("3", (5, 9), (3, 5), (3, 4), paw=0), L("3", (9, 9), (11, 5), (11, 4), paw=0))
 
 
 def _wolf_legs(off: tuple[int, int, int, int], lift: tuple[bool, ...] = (False,) * 4,
                hy: int = 9) -> tuple[Leg, ...]:
-    """Far hind, far fore, near hind, near fore."""
-    return (hind("2", 6, hy, off[0], lift[0]), fore("2", 8, hy, off[1], lift[1]),
-            hind("3", 4, hy, off[2], lift[2]), fore("3", 10, hy, off[3], lift[3]))
+    """Far hind, far fore, near hind, near fore, each pair side by side."""
+    return (hind("2", 5, hy, off[0], lift[0], paw=0), fore("2", 8, hy, off[1], lift[1], paw=0),
+            hind("3", 4, hy, off[2], lift[2]), fore("3", 9, hy, off[3], lift[3]))
 
 
 WOLF = {
     "idle": [_pose(16, 16, WOLF_BODY, _wolf_legs((0, 0, 0, 0))),
              _pose(16, 16, WOLF_BODY_B, _wolf_legs((0, 0, 0, 0)))],
-    "move": [
-        _pose(16, 16, WOLF_BODY, _wolf_legs((-2, -1, 1, 2))),
-        _pose(16, 16, WOLF_BODY, _wolf_legs((0, 0, 0, 0), (_F, _T, _T, _F), hy=8), dy=-1),
-        _pose(16, 16, WOLF_BODY, _wolf_legs((1, 2, -2, -1))),
-        _pose(16, 16, WOLF_BODY, _wolf_legs((0, 0, 0, 0), (_T, _F, _F, _T), hy=8), dy=-1),
-    ],
+    "move": [_pose(16, 16, WOLF_BODY, _wolf_legs(off, lift, hy=9 - (k % 2)), dy=-(k % 2))
+             for k, (off, lift) in enumerate(zip(WALK, WALK_LIFT))],
     "attack": [
         # hackles up, head low, braced to spring
-        _pose(16, 16, WOLF_BODY_B, (L("2", (5, 11), (6, 13), (6, 14)), L("2", (7, 11), (8, 14)),
-                                    L("3", (3, 11), (2, 13), (3, 14)), L("3", (9, 11), (10, 14))),
+        _pose(16, 16, WOLF_BODY_B, (L("2", (4, 11), (5, 14), paw=0), L("2", (7, 11), (8, 14), paw=0),
+                                    L("3", (3, 11), (2, 13), (3, 14)), L("3", (8, 11), (9, 14))),
               dx=-1, dy=2),
         # the lunge: forelegs reaching, hind legs driving off the ground
-        _pose(16, 16, WOLF_LUNGE, (L("2", (7, 10), (5, 12), (4, 14), paw=1),
+        _pose(16, 16, WOLF_LUNGE, (L("2", (6, 10), (4, 12), (3, 14), paw=0),
                                    L("2", (9, 10), (11, 12), (12, 13), paw=0),
                                    L("3", (5, 10), (3, 12), (2, 14), paw=1),
                                    L("3", (10, 10), (12, 11), (13, 12), paw=0))),
     ],
-    "dead": [outline_grid(WOLF_DEAD, "k")],
+    "dead": [_fallen(WOLF_DEAD, WOLF_DEAD_LEGS, 2, 13)],
 }
 
 
 def _wolves() -> None:
     wolf = {"1": "azc_fur1", "2": "azc_fur2", "3": "azc_fur3", "4": "azc_fur4", "b": "azc_fur5",
-            "B": "azc_fur4", "t": "azc_fur1", "n": "ink2", "m": "blush", "e": "ink2"}
+            "B": "azc_fur4", "t": "azc_fur1", "n": "ink2", "m": "blush", "e": "ink2", "x": "ink2"}
     timber = {**wolf, "1": "grey0", "2": "grey1", "3": "grey2", "4": "grey3", "b": "grey4",
               "B": "grey3", "t": "grey0"}
     for name, legend, what, attack in (("wolf", wolf, "prairie wolf", True),
@@ -810,39 +831,66 @@ BIRD_FLY = grid("""
     ................
     ................
     ..........rrr...
-    ..........rreBB.
-    .........RRrr.B.
-    .TT44444RRR.....
-    .TT3333333......
+    .........RrreBB.
+    .TT4444RRRr..B..
+    .TT33333333.....
     ..T222222.......
-    ....ff..........
+    ................
+    ................
     ................
     ................
     ................
     ................
 """)
-WING_UP = grid("""
+# wing poses: near wing (W, pale feather edge V) over the body, far wing (X) behind it
+NEAR_UP = grid("""
     V.V.V....
     VWVWV....
-    .VWWWV...
+    .VWWWW...
     ..VWWWW..
     ...VWWWW.
-    ....WWWWW
+    ....VWWWW
     ......WWW
 """)
-WING_MID = grid("""
-    ...VWWWWWW
-    VVVWWWWWWW
-    .VVWWWWWW.
-    ...VVVV...
+FAR_UP = grid("""
+    ..X.X.
+    .XXXX.
+    ..XXXX
+    ...XXX
+    ....XX
 """)
-WING_DOWN = grid("""
-    ......WWW
-    ....WWWWW
+FAR_SPREAD = grid("""
+    XX......
+    XXXX....
+    .XXXXX..
+    ..XXXXXX
+    ....XXXX
+""")
+NEAR_SPREAD = grid("""
+    ....VWWWW
     ...VWWWW.
-    ..VWWWV..
-    .VWVWV...
-    .V.V.V...
+    ..VWWWW..
+    .VWWWV...
+    VWVWV....
+    V.V.V....
+""")
+NEAR_DOWN = grid("""
+    ...VWWWW
+    ...VWWWW
+    ..VWWWV.
+    ..VWWV..
+    .VWVV...
+    .V.V....
+""")
+FAR_DOWN = grid("""
+    XXX.
+    XXX.
+    .XX.
+    .X..
+""")
+TALONS = grid("""
+    f..
+    .ff
 """)
 BIRD_PERCH = grid("""
     ................
@@ -900,26 +948,25 @@ BIRD_DEAD = grid("""
 """)
 
 
-def _bird(body: Grid, wings: tuple[tuple[Grid, int, int], ...] = (), dx: int = 0, dy: int = 0,
-          feet: tuple[int, ...] = (), shadow: bool = False) -> Grid:
-    """Far wing (dark) behind the body, near wing over it; perched birds stand on 'f' legs."""
+def _bird(body: Grid, near: tuple[Grid, int, int] | None = None, far: tuple[Grid, int, int] | None = None,
+          dx: int = 0, dy: int = 0, feet: tuple[int, ...] = (), talons: bool = False,
+          shadow: bool = False) -> Grid:
+    """Far wing behind the body, near wing over it (both placed relative to the body's
+    (dx, dy)); perched birds stand on 'f' legs; flying birds cast a small ground shadow."""
     c = Canvas(16, 16)
-    for wing, x, y in wings:
-        c.blit(tuple(r.replace("W", "X").replace("V", "X") for r in wing), x + dx + 3, y + dy - 1)
+    if far:
+        c.blit(far[0], far[1] + dx, far[2] + dy)
     for fx in feet:
         c.set(fx, 13, "f")
         c.set(fx, 14, "f")
         c.set(fx + 1, 14, "f")
+    if talons:
+        c.blit(TALONS, 10 + dx, 9 + dy)
     c.blit(shift(body, dx, dy))
-    for wing, x, y in wings:
-        c.blit(wing, x + dx, y + dy)
+    if near:
+        c.blit(near[0], near[1] + dx, near[2] + dy)
     g = outline_grid(c.grid(), "k")
-    if shadow:
-        g = overlay(g, grid("""
-            .SSSSSS.
-            SSSSSSSS
-        """), 3, 14)
-    return g
+    return _shadow(g, 5, 11, 14) if shadow else g
 
 
 def _birds() -> None:
@@ -929,20 +976,21 @@ def _birds() -> None:
     eagle = {**vulture, "2": "azc_fur1", "3": "azc_fur2", "4": "azc_fur3", "W": "azc_fur2",
              "V": "azc_fur4", "X": "azc_fur1", "T": "white", "R": "white", "r": "bone4",
              "B": "gold2", "f": "gold1", "x": "bone2"}
-    up, mid, down = (WING_UP, 0, 0), (WING_MID, 0, 7), (WING_DOWN, 0, 7)
+    up = {"near": (NEAR_UP, 0, 0), "far": (FAR_UP, 6, 0)}
+    spread = {"near": (NEAR_SPREAD, 0, 8), "far": (FAR_SPREAD, 2, 2)}
+    down = {"near": (NEAR_DOWN, 1, 8), "far": (FAR_DOWN, 8, 9)}
     idle = [_bird(BIRD_PERCH, feet=(5, 8)), _bird(BIRD_PERCH_B, feet=(5, 8))]
-    move = [_bird(BIRD_FLY, (up,), dy=-1, shadow=True), _bird(BIRD_FLY, (mid,), dy=-1, shadow=True),
-            _bird(BIRD_FLY, (down,), dy=-2, shadow=True), _bird(BIRD_FLY, (mid,), dy=-2, shadow=True)]
-    attack = [  # wings thrown up and back, then the dive: talons and beak first
-        _bird(BIRD_FLY, (up,), dx=-1, dy=-2, shadow=True),
-        _bird(BIRD_FLY, (down,), dx=1, dy=0, shadow=True),
+    move = [  # wings up, spread in a glide (far wing up, near wing down), down-stroke, spread
+        _bird(BIRD_FLY, **up, dy=0, shadow=True),
+        _bird(BIRD_FLY, **spread, dy=-1, shadow=True),
+        _bird(BIRD_FLY, **down, dy=-2, shadow=True),
+        _bird(BIRD_FLY, **spread, dy=-1, shadow=True),
     ]
-    attack[1] = overlay(attack[1], grid("""
-        k.k.
-        fkfk
-        .k.k
-    """), 6, 11)
-    dead = [outline_grid(BIRD_DEAD, "k")]
+    attack = [  # wings thrown up and back, then the dive: talons and beak first
+        _bird(BIRD_FLY, **up, dx=-1, dy=-1, shadow=True),
+        _bird(BIRD_FLY, **spread, dx=1, dy=1, talons=True, shadow=True),
+    ]
+    dead = [_shadow(outline_grid(BIRD_DEAD, "k"), 2, 13, 14)]
     _reg("vulture.idle", idle, vulture, 2, "swoop (vulture) perched, head turn")
     _reg("vulture.move", move, vulture, 8, "swoop flapping flight")
     _reg("vulture.attack", attack, vulture, 8, "swoop: rise, dive with talons")

@@ -25,6 +25,7 @@ from __future__ import annotations
 import math
 import random
 
+from ..palette import _ramp
 from ..pixelart import art, grid, pad, swap
 from ..procgen import Canvas, bayer
 from ..registry import register
@@ -225,8 +226,9 @@ register("az.fx.earth_spirit", art(*_earth_frames(), legend=EARTH, fps=6,
 
 
 # --- quest markers ----------------------------------------------------------------------
-# The quest giver's bold golden "!" and the turn-in "?": ink outline, gold lit
-# from the top-left, a white glint that runs down the glyph on the rising frame.
+# The quest giver's bold golden "!" and the silver-gilt turn-in "?" (so the two
+# read apart at a glance): ink outline, lit from the top-left, a white glint
+# on the rising frame.
 # They bob 1 px (up, down, down) at 3 fps; anchor = bottom centre, put it just
 # above the head (a 16x24 tauren: the anchor on its row -1).
 _BANG = """
@@ -271,42 +273,54 @@ def _marker_frames(glyph: str, glint: list[tuple[int, int]]) -> list:
 
 
 MARKER = {"h": "gold3", "y": "gold2", "s": "gold1", "w": "white"}
+# the turn-in "?" is silver-gilt: a silver body with a gold glint
+TURNIN = {"h": "chrome3", "y": "chrome2", "s": "chrome1", "w": "gold3"}
 register("az.fx.quest_marker", art(*_marker_frames(_BANG, [(2, 1), (3, 1), (2, 2)]), legend=MARKER, fps=3,
                                    note="quest available: bold golden '!' bobbing (loop); anchor = "
                                         "bottom centre, 1-2 px above the NPC's head"))
-register("az.fx.quest_turnin", art(*_marker_frames(_QUERY, [(2, 1), (3, 1), (1, 2)]), legend=MARKER, fps=3,
-                                   note="quest ready to turn in: bold golden '?' bobbing (loop); anchor "
+register("az.fx.quest_turnin", art(*_marker_frames(_QUERY, [(2, 1), (3, 1), (1, 2)]), legend=TURNIN, fps=3,
+                                   note="quest ready to turn in: bold silver-gilt '?' bobbing (loop); anchor "
                                         "= bottom centre, 1-2 px above the NPC's head"))
 
 
 # --- wind over the plains ----------------------------------------------------------------
-# Two thin gusts blow left to right half a cycle apart; each fades in, runs,
-# curls up at its head and fades out, so the loop never pops.
+# Two soft gusts blow left to right half a cycle apart (different rows and
+# lengths, so no two frames repeat). Each is a bright core line with a soft lit
+# fringe above and a fainter one below, tapering to a thin tail; it fades in,
+# runs, curls up at its head and fades out, so the loop never pops.
 def _wind_frames() -> list:
     out = []
     for f in range(4):
         c = Canvas(16, 8)
-        for k, (base, length) in enumerate(((2, 7), (5, 5))):
+        for k, (base, length) in enumerate(((2, 10), (5, 8))):
             ph = (f / 4 + k / 2) % 1.0
-            head = round(-1 + ph * 18)
-            fade = "1" if ph < 0.2 or ph > 0.8 else "2" if ph < 0.4 or ph > 0.6 else "3"
+            tier = 0 if 0.3 <= ph <= 0.7 else 1 if 0.1 <= ph <= 0.9 else 2
+            head = round(-2 + ph * 20)
             for i in range(length):
                 x = head - i
-                y = base + (1 if (x + k) % 8 >= 4 else 0)
-                t = i / (length - 1)
-                ch = fade if t < 0.35 else chr(ord(fade) - 1) if fade != "1" and t < 0.7 else "0"
-                if 0 <= x < 16:
-                    c.set(x, y, ch)
-            if ph >= 0.45 and 0 <= head + 1 < 16:  # the curl at the head
-                y = base + (1 if (head + k) % 8 >= 4 else 0)
-                c.set(head + 1, y - 1, fade)
+                if not 0 <= x < 16:
+                    continue
+                t = i / (length - 1)  # 0 at the head .. 1 at the tail
+                y = base + (1 if t > 0.6 else 0)  # the tail trails a row lower
+                lv = min(2, tier + (1 if t > 0.75 else 0))
+                c.set(x, y, "ABC"[lv])
+                if 0.15 < t < 0.6:  # the body of the gust is two rows thick
+                    c.set(x, y + 1, "ABC"[min(2, lv + 1)])
+                if 0.05 < t < 0.8:
+                    c.set(x, y - 1, "abc"[min(2, lv + (1 if t > 0.5 else 0))])
+                if 0.25 < t < 0.55:
+                    c.set(x, y + 2, "c")
+            if ph >= 0.4 and 0 <= head + 1 < 16:  # the curl at the head
+                c.set(head + 1, base - 1, "ABC"[tier])
+                c.set(head, base - 1, "abc"[tier])
         out.append(c.grid())
     return out
 
 
-WIND = {"3": "white:200", "2": "white:140", "1": "white:90", "0": "white:50"}
+WIND = {"A": "white:240", "B": "bone4:200", "C": "bone4:140",
+        "a": "bone4:150", "b": "bone4:110", "c": "bone4:70"}
 register("az.fx.wind", art(*_wind_frames(), legend=WIND, fps=6,
-                           note="wind gusts streaking right over the plains (loop)"))
+                           note="soft wind gusts streaking right over the plains (loop)"))
 
 
 # --- swaying grass ---------------------------------------------------------------------
@@ -329,13 +343,18 @@ def _grass_frames() -> list:
                 for d in range(h):  # d = 0 at the root
                     t = d / max(1, h - 1)
                     dx = round(lean * t * t * (h / 7))
-                    ch = "1" if t < 0.3 else "2" if t < 0.6 else "3" if d < h - 1 else "4"
+                    tip = "5" if h >= 6 else "4"  # the tallest blades are sun-bleached straw
+                    ch = "1" if t < 0.3 else "2" if t < 0.6 else "3" if d < h - 1 else tip
                     c.set(bx + dx, 7 - d, ch)
         out.append(c.grid())
     return out
 
 
-GRASS = {"1": "hound1", "2": "hound2", "3": "hound3", "4": "sand4"}
+# Copies of the terrain module's prairie ramps (azt_grass / azt_straw) so the
+# overlay matches the ground without importing another sprite module.
+_ramp("azf_grass", "#1e3321", "#2f4d27", "#4a6a2b", "#6a8932", "#8fa843", "#bcc463")
+_ramp("azf_straw", "#3a2f1b", "#5b4924", "#7f672e", "#a5893d", "#c8ac58", "#e5d18a")
+GRASS = {"1": "azf_grass2", "2": "azf_grass3", "3": "azf_grass4", "4": "azf_grass5", "5": "azf_straw5"}
 register("az.fx.grass_sway", art(*_grass_frames(), legend=GRASS, fps=5,
                                  note="prairie grass tufts swaying in the wind (loop); lay it on the "
                                       "tile's bottom edge"))

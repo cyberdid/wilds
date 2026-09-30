@@ -42,6 +42,10 @@ TB = {
     "x": "glowcyan", "y": "water4", "Y": "water5", "u": "water3", "U": "water2",
     "s": "white:70", "S": "glowcyan:90",
     "z": "ink:96",
+    # clay (pots, braziers), flames, soft glows
+    "A": "tent0", "B": "tent1", "C": "tent2", "D": "tent3", "E": "tent4",
+    "Q": "fire2", "W": "fire5", "l": "fire1",
+    "X": "water5:190", "H": "water5:120", "Z": "glowcyan:210",
 }
 
 
@@ -81,115 +85,299 @@ def _outlined(c: Canvas, draw, *args) -> None:
 
 
 # --- the platform tileset ------------------------------------------------------------------
-# Planks run east-west, 3 px board + 1 px gap, so every tile (floor, edge) shares the same
-# rows and tiles seamlessly in both directions. Butt joints stay inside
-# the tile; hide mats and pegs never touch the border.
+# Boards run east-west in three rows of uneven height (gaps at y = 0, 5, 10), identical in
+# every floor, edge and inlay tile, so they join in both directions whatever variant the
+# renderer picks. What breaks the grid:
+# - 0-2 butt joints per board per tile, anywhere (a joint on column 0 is allowed), so
+#   boards run 5 to 40+ px long;
+# - only a board piece closed by joints on both sides may be darker (worn) or lighter
+#   (new); a piece touching the tile border keeps the base tone, so it continues
+#   seamlessly into any neighbour;
+# - grain is the tile's own noise in the middle, blended into one shared profile on the
+#   two border columns;
+# - knots, lashings, pegs and hide patches are rare, small, low-contrast and in a
+#   different place in each variant.
 
-PLANK = 4
+BOARDS = ((1, 4), (6, 9), (11, 15))   # (top, bottom) row of each board; the rest are gaps
+_SHARED = fbm(T, T, 4242, 2, 4)
 
 
-def _plank_rows(c: Canvas, seed: int, rows: range) -> None:
+def _grain(seed: int) -> list[list[float]]:
+    """Grain streaking along the boards, forced to the shared profile at the borders."""
     rng = random.Random(seed)
-    grain = fbm(T, T, seed, 2, 4)
-    for p in range(T // PLANK):
-        y0 = p * PLANK
-        if y0 not in rows:
-            continue
-        # one butt joint per board per tile, never on the tile border
-        joint = (rng.randrange(2, 14) + p * 5) % 12 + 2
+    own = fbm(T, T, seed, 2, 4)
+    streak = [rng.random() for _ in range(T)]
+    out = []
+    for y in range(T):
+        row = []
         for x in range(T):
-            for r in range(PLANK):
-                y = y0 + r
-                if y not in rows:
-                    continue
+            w = max(0.0, 1.0 - min(x, T - 1 - x) / 3.0)
+            v = 0.6 * own[y][x] + 0.4 * streak[y]
+            row.append(v * (1 - w) + _SHARED[y][x] * w)
+        out.append(row)
+    return out
+
+
+def _boards(c: Canvas, seed: int, boards=BOARDS, worn: int = 1) -> list[tuple[int, int, int]]:
+    """Paint the boards; return the joints as (board index, x, tone of the piece right of it)."""
+    rng = random.Random(seed)
+    g = _grain(seed)
+    joints_out = []
+    for y in range(T):  # gaps between boards
+        if not any(a <= y <= b for a, b in boards):
+            for x in range(T):
+                c.set(x, y, "0" if bayer(x, y) < 0.8 else "1")
+    for bi, (a, b) in enumerate(boards):
+        n = rng.choices((0, 1, 2), (3, 5, 3))[0]
+        joints: list[int] = []
+        for _ in range(n):
+            for _try in range(12):
+                j = rng.randrange(0, T - 1)
+                if all(abs(j - k) >= 5 for k in joints):
+                    joints.append(j)
+                    break
+        joints.sort()
+        # tones of the pieces: only closed pieces (joint on both sides) may differ
+        tone = [0] * T
+        for k in range(len(joints) - 1):
+            t = rng.choice((-1, -1, 1, 0)) if worn else 0
+            for x in range(joints[k] + 1, joints[k + 1]):
+                tone[x] = t
+        for y in range(a, b + 1):
+            r = y - a
+            for x in range(T):
+                gv = g[y][x] + (bayer(x, y) - 0.5) * 0.22
+                lvl = 2 + tone[x]
                 if r == 0:
-                    ch = "1"
+                    lvl += 1 if gv > 0.4 else 0
+                elif y == b:
+                    lvl -= 1 if gv < 0.5 else 0
                 else:
-                    g = grain[y][x] + (bayer(x, y) - 0.5) * 0.25
-                    if r == 1:
-                        lvl = 3 if g > 0.45 else 2
-                    elif r == 2:
-                        lvl = 3 if g > 0.85 else 2
-                    else:
-                        lvl = 2 if g > 0.3 else 1
-                    ch = str(lvl)
-                c.set(x, y, ch)
-        for r in (1, 2, 3):  # butt joint: a dark seam with a peg beside it
-            c.set(joint, y0 + r, "1")
-        c.set(joint - 1, y0 + 2, "0")
+                    lvl += 1 if gv > 0.82 else -1 if gv < 0.12 else 0
+                c.set(x, y, str(max(1, min(4, lvl))))
+        for j in joints:  # the butt joint: a dark seam, a lit end on the next board
+            c.vline(j, a, b, "1")
+            c.set(j, b, "0")
+            if j + 1 < T:
+                c.set(j + 1, a, str(max(1, min(4, 3 + tone[j + 1]))))
+            joints_out.append((bi, j, tone[min(T - 1, j + 1)]))
+    return joints_out
 
 
-def _hide_mat(c: Canvas, x: int, y: int, w: int, h: int, paint: str | None) -> None:
-    """A stretched hide lashed onto the planks: lit top-left, stitched edge, lacing pegs."""
-    for yy in range(y, y + h):
-        for xx in range(x, x + w):
-            edge = yy in (y, y + h - 1) or xx in (x, x + w - 1)
-            if edge:
-                ch = "c" if (yy == y or xx == x) else "a"
-            else:
-                ch = "b" if (xx + yy) % 4 else "c"
-            c.set(xx, yy, ch)
-    for xx, yy in ((x - 1, y), (x + w, y), (x - 1, y + h - 1), (x + w, y + h - 1)):
-        c.set(xx, yy, "0")  # corner pegs
-    if paint == "sun":
-        cx, cy = x + w // 2, y + h // 2
-        _stamp(c, cx - 1, cy - 1, [".r.", "r.r", ".r."])
-    elif paint == "zig":
-        for i in range(1, w - 1):
-            c.set(x + i, y + 1 + (i % 2), "t")
+def _pegs(c: Canvas, joints, rng: random.Random, boards=BOARDS) -> None:
+    """Wooden pegs holding a board end: a dark dot beside some joints."""
+    for bi, j, _t in joints:
+        a, b = boards[bi]
+        if rng.random() < 0.6 and 1 <= j - 1 <= T - 2:
+            c.set(j - 1, (a + b) // 2, "0")
+
+
+def _knot(c: Canvas, x: int, y: int) -> None:
+    _stamp(c, x, y, ["12", "01"])
+
+
+def _lashing(c: Canvas, x: int, gap_y: int) -> None:
+    """Rope binding across a gap: two turns of rope, lit on top."""
+    _stamp(c, x, gap_y - 1, ["ba", "cb", "ba"])
+
+
+def _patch(c: Canvas, x: int, y: int) -> None:
+    """A small hide patch nailed over a worn spot, low contrast, pegged at the corners."""
+    _stamp(c, x, y, ["0bbbb0", ".bccb.", "0abba0"])
+
+
+def _crack(c: Canvas, x: int, y: int, n: int) -> None:
+    for i in range(n):
+        c.set(x + i, y + (1 if i % 3 == 2 else 0), "1")
+
+
+def _floor(i: int) -> Canvas:
+    seed = 1000 + i * 37
+    rng = random.Random(seed + 1)
+    c = Canvas(T, T)
+    joints = _boards(c, seed)
+    _pegs(c, joints, rng)
+    extras = (
+        [], ["knot"], ["lash"], ["patch"], ["knot", "crack"], ["lash"], [], ["crack"],
+    )[i]
+    for e in extras:
+        if e == "knot":
+            b = BOARDS[rng.randrange(3)]
+            _knot(c, rng.randrange(3, 11), b[0] + 1)
+        elif e == "lash":
+            _lashing(c, rng.randrange(3, 12), rng.choice((5, 10)))
+        elif e == "patch":
+            _patch(c, rng.randrange(2, 8), rng.choice((6, 11)))
+        elif e == "crack":
+            b = BOARDS[rng.randrange(3)]
+            _crack(c, rng.randrange(2, 7), b[0] + 1, rng.randrange(4, 7))
+    _balance(c, seed)
+    return c
+
+
+FLOOR_LUMA = 74.0
+
+
+def _balance(c: Canvas, seed: int) -> None:
+    """Nudge interior grain pixels one step so every floor variant has the same mean
+    brightness (the border columns are never touched)."""
+    rng = random.Random(seed + 99)
+    cells = [(x, y) for y in range(T) for x in range(2, T - 2)]
+    rng.shuffle(cells)
+    for x, y in cells:
+        d = _luma(c) - FLOOR_LUMA
+        if abs(d) < 0.3:
+            return
+        ch = c.get(x, y)
+        if d < 0 and ch in "12":
+            c.set(x, y, str(int(ch) + 1))
+        elif d > 0 and ch in "34":
+            c.set(x, y, str(int(ch) - 1))
+
+
+def _luma(c: Canvas) -> float:
+    from ..palette import rgb
+    tot = 0.0
+    for row in c.px:
+        for ch in row:
+            r, g, b = rgb(TB[ch].partition(":")[0])
+            tot += 0.3 * r + 0.59 * g + 0.11 * b
+    return tot / (c.w * c.h)
 
 
 def _platform() -> None:
-    """Four boards-and-joints layouts; one in four has a small hide lashed onto the deck,
-    one a knot hole, so the floor stays calm when the variants repeat."""
-    for i in range(4):
-        c = Canvas(T, T)
-        _plank_rows(c, 1000 + i * 7, range(T))
-        if i == 3:
-            _hide_mat(c, 5, 5, 6, 5, "sun")
-        elif i == 2:  # a knot in a board
-            _stamp(c, 9, 9, ["10", ".1"])
-        register(f"az.tb.platform@{i}", art(c.grid(), legend=TB, note="plank-and-hide platform floor"))
+    """Eight plank-and-hide floor tiles (see the tileset notes above)."""
+    for i in range(8):
+        register(f"az.tb.platform@{i}", art(_floor(i).grid(), legend=TB, note="plank-and-hide platform floor"))
+
+
+# painted inlay motifs (plazas): each is centred and joins its neighbours through a thin
+# painted line crossing the middle of every border, the same in all three variants
+INLAYS = (
+    [  # 0: turquoise diamond in a red frame
+        ".......RR.......",
+        ".......Rr.......",
+        ".......qR.......",
+        "......RTtr......",
+        ".....RTTttr.....",
+        "....RTTeettr....",
+        "...RTTeeeettr...",
+        "RRqRTTeeRettrRRr",
+        "RRqRTTeRReetrRRr",
+        "...RTTeeeettr...",
+        "....RTTeettr....",
+        ".....RTTttr.....",
+        "......RTtr......",
+        ".......qR.......",
+        ".......Rr.......",
+        ".......Rr.......",
+    ],
+    [  # 1: the red sun with rays
+        ".......RR.......",
+        ".......Rr.......",
+        "..q....Rr....r..",
+        "...q........r...",
+        "......RRRr......",
+        ".....RqRRRr.....",
+        "....RqeeeeRr....",
+        "RRr.RReTTeRr.RRr",
+        "RRr.RqeTteRr.RRr",
+        "....RqeeeeRr....",
+        ".....RRRRRr.....",
+        "......RRrr......",
+        "...q........r...",
+        "..q....Rr....r..",
+        ".......Rr.......",
+        ".......Rr.......",
+    ],
+    [  # 2: thunderbird zigzag on a red band
+        ".......RR.......",
+        ".......Rr.......",
+        "..T...TRrT...T..",
+        ".TtT.TtTtTt.TtT.",
+        "TtetTtetTtetTtet",
+        "................",
+        "qRRRRRRRRRRRRRRr",
+        "RRReRRReRRReRRRr",
+        "RReeeReeeReeeRRr",
+        "rrrrrrrrrrrrrrrr",
+        "................",
+        "TtetTtetTtetTtet",
+        ".TtT.TtTtTt.TtT.",
+        "..T...TRrT...T..",
+        ".......Rr.......",
+        ".......Rr.......",
+    ],
+)
+
+
+def _inlay() -> None:
+    """Floor tiles with a painted tribal pattern for plazas: paint laid over the boards
+    (the gaps stay dark, a few worn flecks show the wood through)."""
+    for i, motif in enumerate(INLAYS):
+        c = _floor((1, 6, 7)[i])
+        for y, row in enumerate(motif):
+            for x, ch in enumerate(row):
+                if ch == "." or bayer(x, y) > 0.92:
+                    continue
+                if c.get(x, y) in "01":  # paint sinks darker into the seams
+                    ch = {"R": "r", "q": "R", "T": "t", "e": "d"}.get(ch, ch)
+                c.set(x, y, ch)
+        register(f"az.tb.platform.inlay@{i}", art(c.grid(), legend=TB, note="painted tribal floor inlay"))
 
 
 def _drop(c: Canvas, y0: int, seed: int) -> None:
-    """Below the rim: the mesa's rock face falling away into the dark."""
-    f = fbm(T, T, seed, 2, 4)
+    """Below the rim: the mesa's rock face falling away into the dark. The border
+    columns follow a shared profile so any two edge variants join."""
+    own = fbm(T, T, seed, 2, 4)
     for y in range(y0, T):
         depth = (y - y0) / max(1, T - 1 - y0)
         for x in range(T):
-            v = f[y][x] * 0.5 + (1 - depth) * 0.9 + (bayer(x, y) - 0.5) * 0.35
-            c.set(x, y, "m" if v > 0.95 else "V" if v > 0.45 else "v")
+            w = max(0.0, 1.0 - min(x, T - 1 - x) / 3.0)
+            f = own[y][x] * (1 - w) + _SHARED[y][x] * w
+            v = f * 0.55 + (1 - depth) * 0.95 + (bayer(x, y) - 0.5) * 0.35
+            c.set(x, y, "M" if v > 1.2 else "m" if v > 0.9 else "V" if v > 0.45 else "v")
 
 
 def _platform_edge() -> None:
-    """South rim: two plank rows, the round rim log lashed with rope, joist ends
-    under it, and the rock face dropping into the dark."""
-    extras = [None, "charm", None, "rope"]
-    for i in range(4):
+    """South rim: one board row, the round rim log lashed with rope, joist ends under
+    it and the rock face dropping into the dark; six variants with different lashings,
+    a hanging charm, a loose rope, a board end jutting out, a hide strip."""
+    extras = [None, "charm", "rope", "jut", None, "hide"]
+    for i in range(6):
         seed = 1100 + i * 5
         rng = random.Random(seed)
         c = Canvas(T, T)
-        _plank_rows(c, 1000 + i * 7, range(0, 7))
         _drop(c, 10, seed)
-        for x in range(T):  # the rim log, lit on its top
-            c.set(x, 6, "4")
-            c.set(x, 7, "3")
-            c.set(x, 8, "2")
-            c.set(x, 9, "0")
+        joints = _boards(c, 1500 + i * 13, boards=((1, 4),))
+        _pegs(c, joints, rng, boards=((1, 4),))
         for x in range(T):
-            if bayer(x, 6) < 0.25:
-                c.set(x, 6, "5")
-        lash = rng.randrange(2, 6)
-        for lx in (lash, lash + 8):  # rope lashings every 8 px
-            _stamp(c, lx, 6, ["j.", "ij", ".h", "h."])
-            # a joist end under the rim
-            _stamp(c, lx + 3, 10, ["32", "10"])
-        if extras[i] == "charm":  # a bone-and-feather charm hanging off the rim
+            c.set(x, 5, "0")
+        for x in range(T):  # the rim log, lit on its top
+            c.set(x, 6, "5" if bayer(x, 6) < 0.25 else "4")
+            c.set(x, 7, "3")
+            c.set(x, 8, "2" if bayer(x, 8) < 0.7 else "3")
+            c.set(x, 9, "0")
+        lashes = [rng.randrange(1, 6)]
+        if rng.random() < 0.7:
+            lashes.append(lashes[0] + rng.randrange(6, 9))
+        for lx in lashes:  # rope lashings and the joist end they hold
+            _stamp(c, lx, 6, ["d.", "cd", ".b", "b."])
+            if lx + 3 < T - 1:
+                _stamp(c, lx + 2, 10, ["32", "10"])
+        e = extras[i]
+        if e == "charm":  # a bone-and-feather charm hanging off the rim
             _stamp(c, 11, 10, [".h", ".j", "jJ", "Ji", "R.", "r."])
-        elif extras[i] == "rope":  # a loose rope end over the edge
-            _stamp(c, 5, 10, ["j", "i", "j", "i", "h"])
+        elif e == "rope":  # a loose rope end over the edge
+            _stamp(c, 9, 10, ["c", "b", "c", "b", "a"])
+        elif e == "jut":  # a board end sticking out past the rim
+            _stamp(c, 7, 6, ["443", "332", "221", "110"])
+        elif e == "hide":  # a strip of hide hung over the edge to dry
+            _stamp(c, 5, 9, ["bccb", "bdcb", "bccb", "bcca", ".bb."])
         register(f"az.tb.platform.edge@{i}", art(c.grid(), legend=TB, note="platform edge over the drop"))
+
+
+PLANK = 4  # bridge slats: 3 px slat + 1 px gap
 
 
 def _bridge() -> None:
@@ -729,56 +917,67 @@ def _tent_rows() -> None:
 
 
 def _spirit_pool() -> None:
-    """The Pools of Vision: a misty, luminous pool in a rock basin under Spirit Rise,
-    two rune stones at its sides; ripples spread and the mist rises and sways."""
+    """The Pools of Vision: a luminous pool in a grotto under Spirit Rise. Dark rock with
+    stalagmites closes around the back, lit cyan from below by the water; the pool glows
+    brightest at its heart, ripples spread from it, and glowing mist rises and drifts."""
     W, H = 32, 24
     frames = []
+    cx, cy, rx, ry = 16.0, 17.0, 14.5, 5.5
+    spikes = {3: 3, 4: 5, 5: 3, 9: 3, 10: 4, 22: 3, 23: 5, 27: 4, 28: 6, 29: 3}
+    rock = fbm(W, H, 61, 2, 4)
     for f in range(3):
         c = Canvas(W, H)
-        cx, cy = 16.0, 15.5
-        rim = fbm(64, 1, 31, 2, 4)[0]
-        # a standing spirit stone behind the basin, a carved rune glowing in it
-        _stamp(c, 3, 1, ["..pp.", ".pPOo", "pPPOo", "pPxOo", "pxPxo", "pPxOo", "pPPOo", "pPOOo",
-                         "oPOoo", "oOOoo", "oOOoo"])
-        _stamp(c, 25, 5, [".pO.", "pPOo", "pxOo", "xPxo", "pxOo", "oOOo", "oOoo"])
+        # the grotto: high at the sides, low over the middle, stalagmites on the rim
+        for x in range(W):
+            top = 3 + round(6 * math.sin(math.pi * x / (W - 1))) - spikes.get(x, 0)
+            for y in range(max(0, top), 16):
+                v = rock[y][x] + (bayer(x, y) - 0.5) * 0.3
+                lit_edge = y <= top + 1 and x < 16
+                glow = max(0.0, (y - 5) / 8) * max(0.0, 1 - abs(x + 0.5 - cx) / 18)
+                mouth = ((x + 0.5 - cx) / 5.5) ** 2 + ((y + 0.5 - 13.5) / 5.5) ** 2
+                if mouth < 1.0:  # the tunnel running back into the mesa
+                    ch = "v" if mouth < 0.55 else "V" if mouth < 0.8 or v < 0.5 else "U"
+                elif glow > 0.5:
+                    ch = "u" if v > 0.55 else "U"
+                elif glow > 0.2:
+                    ch = "U" if v > 0.45 else "o"
+                elif lit_edge:
+                    ch = "p" if v > 0.4 else "O"
+                else:
+                    ch = "O" if v > 0.62 else "o"
+                c.set(x, y, ch)
+        # the pool: dark at the edge, brightening to a glowing heart; one ripple ring
         for y in range(H):
             for x in range(W):
-                nx, ny = (x + 0.5 - cx) / 15.5, (y + 0.5 - cy) / 7.5
+                nx, ny = (x + 0.5 - cx) / rx, (y + 0.5 - cy) / ry
                 d = nx * nx + ny * ny
-                ang = (math.atan2(ny, nx) / (2 * math.pi)) % 1.0
-                if d > 0.86 + 0.14 * rim[int(ang * 64) % 64]:
+                if d > 1.0:
+                    if d <= 1.25 and ny > 0.2:  # a low lip of wet pebbles at the front
+                        c.set(x, y, "O" if bayer(x, y) < 0.5 else "o")
                     continue
-                v = -nx * 0.5 - ny * 0.7 + (bayer(x, y) - 0.5) * 0.5 + rim[(int(ang * 64) + 17) % 64] * 0.3
-                c.set(x, y, "P" if v > 0.6 else "p" if v > 0.2 else "O" if v > -0.3 else "o")
-                wx, wy = (x + 0.5 - cx) / 12.5, (y + 0.5 - cy + 0.5) / 5.0
-                w = wx * wx + wy * wy
-                if w <= 1:
-                    # deep and dark under the far rim, glowing toward the middle
-                    ch = "U" if wy < -0.6 else "u" if w > 0.6 else "y"
-                    ring = (w * 3 - f / 3) % 1.0
-                    if ring < 0.16 and w < 0.9 and wy > -0.6:
-                        ch = "Y"
-                    if w < 0.1:
-                        ch = "Y"
-                    c.set(x, y, ch)
-        for (x, y) in ((13, 15), (19, 16), (16, 14), (10, 16)):
-            if (x + y + f) % 3:
+                ch = "U" if d > 0.8 else "u" if d > 0.5 else "y" if d > 0.22 else "Y"
+                ring = (math.sqrt(d) * 2.0 - f / 3.0) % 1.0
+                if ring < 0.14 and 0.08 < d < 0.8:
+                    ch = {"U": "u", "u": "y", "y": "Y", "Y": "x"}[ch]
+                if d < 0.05:
+                    ch = "x"
+                c.set(x, y, ch)
+        for (x, y) in ((12, 16), (20, 18), (17, 15), (9, 18), (23, 16)):
+            if (x + y + f) % 3 == 0:
                 c.set(x, y, "x")
         g = _finish(c)
-        # mist: soft translucent wisps rising off the water, drawn after the outline;
-        # each puff climbs 2 px per frame along a swaying path, 3 frames = one loop
-        for k, bx in enumerate((9, 16, 22)):
-            for j in range(3):
-                y = 11 - ((j * 4 + f * 4 + k * 2) % 12)
-                x = bx + round(1.2 * math.sin((y + k * 3) * 0.6))
-                puff = [".s.", "sSs", ".s."] if y > 6 else [".s.", "s.s", ".s."]
-                for pj, row in enumerate(puff):
-                    for pi, ch in enumerate(row):
-                        px, py = x - 1 + pi, y - 1 + pj
-                        if ch != "." and 0 <= py < H and g.get(px, py) in ".z":
-                            g.set(px, py, ch)
+        # luminous mist, drawn over everything after the outline: streaks lying on the
+        # water sway back and forth, neighbours in opposite directions
+        for k, (y, x0, n) in enumerate(((10, 7, 6), (12, 17, 7), (13, 4, 5), (14, 20, 6), (11, 12, 4),
+                                        (15, 10, 5))):
+            xs = x0 + round(1.2 * math.sin(2 * math.pi * f / 3)) * (1 if k % 2 == 0 else -1)
+            for i in range(n):
+                x = xs + i
+                if 1 <= x < W - 1:
+                    g.set(x, y, "H" if i in (0, n - 1) else "X" if (i + k) % 3 else "Z")
         frames.append(g.grid())
-    register("az.tb.spirit_pool", art(*frames, legend=TB, fps=3, note="Pools of Vision: misty luminous pool"))
+    register("az.tb.spirit_pool", art(*frames, legend=TB, fps=3,
+                                      note="Pools of Vision: glowing grotto pool with luminous mist"))
 
 
 # --- the rope elevator ------------------------------------------------------------------------------
@@ -877,6 +1076,7 @@ def _support_pillars() -> None:
 
 
 _platform()
+_inlay()
 _platform_edge()
 _bridge()
 _rope_rail()

@@ -38,7 +38,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from ..palette import _ramp
-from ..pixelart import TRANSPARENT, Grid, art, blank, grid, outline_grid, overlay, size_of, swap
+from ..pixelart import TRANSPARENT, Grid, art, blank, grid, outline_grid, overlay, swap
 from ..registry import register
 
 # --- colours ---------------------------------------------------------------------------
@@ -242,10 +242,10 @@ class Rig:
     satchel: Part  # drawn behind the near arm: bag on the hip plus the strap
     closed_eye: str = "S"
     sleeve: str = "short"
-    wear: tuple[Part, ...] = ()  # drawn over the torso (necklaces, trims)
+    wear: tuple[Part, ...] = ()  # drawn over the torso (necklaces, trims, badges)
+    civ_gear: tuple[Part, ...] = ()  # drawn over the head of the civilian (hats)
+    mer_gear: tuple[Part, ...] = ()  # drawn over the head of the merchant
     glow: tuple[Part, ...] = ()  # drawn after the outline (glowing eyes)
-    dead_cut: tuple[int, ...] = ()  # rows dropped (standing frame) so a tall dead body fits
-    dead: Part | None = None  # hand-drawn body lying on its back, when rotating will not do
 
 
 def compose(size: tuple[int, int], parts: list[Part], post: list[Part] = (), outline: bool = True) -> Grid:
@@ -275,6 +275,7 @@ def figure(rig: Rig, merchant: bool, legs_pose: str = "stand", arm_pose: str = "
         parts += [rig.apron.at(dx, dy), rig.satchel.at(dx, dy)]
     hx, hy = head
     parts.append(rig.head.at(dx + hx, dy + hy))
+    parts += [p.at(dx + hx, dy + hy) for p in (rig.mer_gear if merchant else rig.civ_gear)]
     if mouth:
         parts.append(Part(("m",), rig.mouth[0] + dx + hx, rig.mouth[1] + dy + hy))
     parts.append(Part(swap(arm(rig.arm, arm_pose, w, h).rows, amap)).at(dx, dy))
@@ -286,33 +287,13 @@ def figure(rig: Rig, merchant: bool, legs_pose: str = "stand", arm_pose: str = "
     return g
 
 
-def rot_ccw(g: Grid) -> Grid:
-    """Rotate 90 degrees counter-clockwise: an upright figure facing right ends up
-    lying on its back, head to the left, face up."""
-    w, h = size_of(g)
-    return tuple("".join(g[y][w - 1 - x] for y in range(h)) for x in range(w))
-
-
-def trim(g: Grid) -> Grid:
-    w, h = size_of(g)
-    ys = [y for y in range(h) if any(ch != TRANSPARENT for ch in g[y])]
-    xs = [x for x in range(w) if any(g[y][x] != TRANSPARENT for y in range(h))]
-    return tuple(row[xs[0]:xs[-1] + 1] for row in g[ys[0]:ys[-1] + 1])
-
-
-def dead_frame(rig: Rig) -> Grid:
-    """The body lying on its back: the standing figure (no outline) rotated, eyes shut."""
-    w, h = rig.size
-    if rig.dead is not None:
-        return compose(rig.size, [rig.dead])
-    g = figure(rig, False, shut=True, outline=False)
-    g = tuple(row for y, row in enumerate(g) if y not in rig.dead_cut)
-    body = trim(rot_ccw(g))
-    bw, bh = size_of(body)
-    if bw > w - 2:
-        raise ValueError(f"{rig.race} dead body is {bw} px long, canvas {w}")
-    out = overlay(blank(w, h), body, (w - bw) // 2, h - 1 - bh)
-    return outline_grid(out, "k")
+def fallen(size: tuple[int, int], text: str) -> Grid:
+    """A hand-drawn body fallen on its side (head to the right, where it fell), rows padded
+    to the canvas width and set on the ground row, then outlined."""
+    w, h = size
+    rows = [r.strip() for r in text.strip().splitlines()]
+    body = tuple(r + TRANSPARENT * (w - len(r)) for r in rows)
+    return outline_grid(overlay(blank(w, h), body, 0, h - 1 - len(body)), "k")
 
 
 @dataclass(frozen=True)
@@ -351,8 +332,85 @@ def register_race(body: str, race: Race) -> None:
     leg = {**BASE, **race.civilian, **race.skin}
     hurt = figure(rig, False, "hurt", "clutch", dx=-1, dy=1, head=(-1, 0), mouth=True, shut=True)
     register(f"az.person.{body}.hurt", art(hurt, legend=leg, note=f"{race.note}, recoiling from a blow"))
-    register(f"az.person.{body}.dead", art(dead_frame(rig), legend=leg, note=f"{race.note}, dead"))
+    register(f"az.person.{body}.dead", art(fallen(rig.size, DEAD[body]), legend=leg,
+                                           note=f"{race.note}, fallen on its side"))
 
+
+# Fallen bodies, hand-drawn: each lies on its side where it fell, head to the right
+# (the way it was facing), back up, face turned to the viewer, the near arm flung
+# out on the ground and the near knee bent. Race marks stay readable: the goblin's
+# ear, the troll's mohawk and tusks, the dwarf's beard, the pandaren's black limbs.
+DEAD = {
+    "human": """
+        ...........jhh
+        ......yyyyjhhhh
+        ..PPPPyyytSshhh
+        .BpppoattTSqSqh
+        .bb...TTddddsSq
+        """,
+    "blood_elf": """
+        ..........q
+        ......yyyyqjhh
+        ..PPPPyyyyjhhhh
+        .BpppoiyyTSqSqh
+        .bb...TTdddsSqh
+        """,
+    "forsaken": """
+        ...........hhh
+        ......yyyThhhhh
+        ..P.PPyyytSshhh
+        .bp.ppaytTSqSSh
+        ..b..tT.ddSvvS
+        """,
+    "dwarf": """
+        ..........jhhh
+        .....yyyyyjhhhh
+        ..PPPyyyyySshhh
+        .BppoatttTSqSnh
+        .bb...TTddjjhhn
+        """,
+    "goblin": """
+        ..........qq
+        ...........qs
+        ......yyt.sqAg
+        ..PPPyyyTsqqqq
+        .BppoaiaTSqSqss
+        .bb...dd..SvvSs
+        """,
+    "orc": """
+        ...........jh
+        ......yyyyshhh
+        ..PPPPyyyySqhhs
+        .BppppaiaTSqSqs
+        .bboop.TTTSsvsv
+        ...bb..dddddSS
+        """,
+    "pandaren": """
+        ...........fF
+        ......Fyyyqqqqf
+        ..PPPPFyyyqqqqq
+        .BppppaiaFsqFqq
+        .bboop.yyFSqqqF
+        ...bb..DdddSsS
+        """,
+    "troll": """
+        ............hh
+        ...........jhhh
+        .....yyyytqhhh
+        .PPPPyyyyySqqq
+        BppppaiaaTSqSqqv
+        bb.oop.yyTSsssv
+        ...bb.dddd.SS
+        """,
+    "earthen": """
+        ...........sqq
+        .....yyyyysqqqq
+        ..PPPyyyyyySqqq
+        .BppoaaiaaTSqeq
+        .bb..TTTdddhjjq
+        ........DdhhhH
+        """,
+}
 
 # --- human (16x16): a Stormwind peasant, tan skin, brown hair ------------------------------
 
@@ -427,29 +485,30 @@ GOBLIN = Rig(
         ........uuU.....
         ........uuU.....
         """),
-    satchel=part(9, """
-        .........C......
+    satchel=part(8, """
+        ...W.W..........
+        ....W....C......
         ....cC..........
         ....CC..........
         """),
-    # flat on its back, ears flopped on the ground, nose to the sky
-    dead=part(10, """
-        .....ss.........
-        ....sqqs........
-        .qq.sqSqsxdd.bB.
-        ..qgqqqqsyyyTpb.
-        ...SsvvSSaaaApP.
-        """),
+    # Venture Co. badge on the jacket; the worker's hard hat with its lamp
+    wear=(Part(("i",), 10, 10),),
+    civ_gear=(part(2, """
+        ......zzZ.......
+        .....zzzzZl.....
+        ....ZZZZZZZZ....
+        """),),
 )
 
 register_race("goblin", Race(
     GOBLIN,
     skin={"q": "azo_gob3", "s": "azo_gob2", "S": "azo_gob1", "d": "azo_gob2", "D": "azo_gob1",
-          "v": "bone4", "g": "glass4"},
+          "v": "bone4", "g": "glass4", "z": "hazard", "Z": "hazard_dark", "l": "win_warm",
+          "W": "grey3"},
     civilian={"y": "red3", "t": "red2", "T": "red1", "x": "red3", "r": "red2", "R": "red1",
               "i": "gold2", "a": "leather3", "A": "leather2",
               "o": "tent1", "p": "tent1", "P": "tent0", "b": "leather2", "B": "leather1"},
-    note="goblin of the Venture Co., goggles on the brow",
+    note="goblin of the Venture Co.: hard hat and lamp, or goggles and a wrench in the satchel",
 ))
 
 
@@ -538,7 +597,7 @@ DWARF = Rig(
 register_race("dwarf", Race(
     DWARF,
     skin={"q": "skin4", "s": "skin3", "S": "skin2", "d": "skin3", "D": "skin2", "n": "blush",
-          "j": "rust3", "h": "rust2", "H": "rust1"},
+          "j": "hair_copper", "h": "hair_red", "H": "rust1"},
     civilian={"y": "denim3", "t": "denim2", "T": "denim1", "x": "denim3", "r": "denim2", "R": "denim1",
               "i": "gold2", "a": "leather3", "A": "leather2",
               "o": "sand2", "p": "sand2", "P": "sand1", "b": "leather2", "B": "leather1"},
@@ -551,25 +610,24 @@ register_race("dwarf", Race(
 ORC = Rig(
     "orc", (16, 20),
     head=part(1, """
-        .......hh.......
         ......jhh.......
-        ......hhhqqqs...
-        .....hhsSSeSqq..
-        ......hsSsqqqvs.
-        .......SsssssvS.
-        ........SSsssS..
+        .....hhhqqqqs...
+        ....hhsqSSeSqq..
+        ....HhSsqqqqqvs.
+        ......SSssssSvS.
+        .......SSSSSSS..
         """),
     torso=part(6, """
-        ...yyyyyyt......
+        ...yyyyyt.......
         ..yyyyyytttT....
-        ..yyyyyytqqS....
-        ...yyyyytqqS....
-        ...yyyyytqsS....
-        ...aaaaaiaaA....
+        ..yyyyyttttT....
+        ..tyyyyttttT....
+        ...ttttttTTT....
+        ...AaaaaiaaA....
         """),
     legs=LegSpec(x=4, y=12, ground=18, w=3, gap=0, foot=1, stride=2),
     arm=ArmSpec(x=5, y=7, length=5, w=2),
-    eye=(10, 4), mouth=(12, 6),
+    eye=(10, 3), mouth=(12, 5),
     sleeve="bare",
     apron=part(8, """
         ........uuU.....
@@ -586,7 +644,6 @@ ORC = Rig(
         .cCC............
         .cCC............
         """),
-    dead_cut=(2, 9, 13, 15),
 )
 
 register_race("orc", Race(
@@ -608,16 +665,16 @@ PANDAREN = Rig(
         .....sqqqqq.....
         ....sqqqqqqqq...
         ...sqqqqqFFqq...
-        ...sqqqqqFeqqqF.
-        ...Ssqqqqqqqqq..
-        ....SssqqqqsS...
+        ...ssqqqqFeqqqF.
+        ...Sssqqqsqqqs..
+        ....SSsssssS....
         """),
     torso=part(8, """
         ....FFFyyt......
-        ...FFFyyyttqq...
-        ...Ffyyyyttqqs..
-        ...Faaaaiaaqqs..
-        ....yyyyttsss...
+        ...FFfyyyttqq...
+        ...FfyyyyttqsS..
+        ...FAaaaiaaAsS..
+        ....ttttTTSSS...
         """),
     legs=LegSpec(x=5, y=13, ground=18, w=2, gap=1, foot=1, stride=2),
     arm=ArmSpec(x=5, y=8, length=5, w=2),
@@ -637,7 +694,6 @@ PANDAREN = Rig(
         ..cCC...........
         """),
     closed_eye="F",
-    dead_cut=(3, 10, 14, 16),
 )
 
 register_race("pandaren", Race(
@@ -696,16 +752,6 @@ TROLL = Rig(
         .cCC............
         .cCC............
         """),
-    # flat on its back, tusks to the sky, mohawk splayed on the ground
-    dead=part(16, """
-        .....v..........
-        ...sqv..........
-        ..sqSqs.d.......
-        .hsqqqsyddaooob.
-        .hSsssSyytappPb.
-        .hhSSSStttaPPPB.
-        .hh...TTTT......
-        """),
 )
 
 register_race("troll", Race(
@@ -725,9 +771,9 @@ EARTHEN = Rig(
     "earthen", (16, 20),
     head=part(3, """
         ......sqqqs.....
-        .....sqqqqqqs...
+        .....sqqSqqqs...
         .....SsSqqeqq...
-        .....SsSsqqqqq..
+        .....SsSsqSqqq..
         ......Shjjjhhj..
         .......hjhhhhH..
         ........hhhhH...
@@ -737,9 +783,9 @@ EARTHEN = Rig(
         .....yyyyt......
         ....yyyyyttT....
         ...yyyyyytttT...
-        ...yyyyyytttT...
-        ...aaaaaiaaaA...
-        ....yyyytttT....
+        ...tyyyyttttT...
+        ...AaaaaiaaaA...
+        ....ttttTTTT....
         """),
     legs=LegSpec(x=5, y=14, ground=18, w=2, gap=1, foot=1, stride=1),
     arm=ArmSpec(x=5, y=9, length=4, w=2),
@@ -761,13 +807,12 @@ EARTHEN = Rig(
         ..cCC...........
         """),
     glow=(Part(("e",), 10, 5),),
-    dead_cut=(10, 16),
 )
 
 register_race("earthen", Race(
     EARTHEN,
     skin={"q": "azo_stn4", "s": "azo_stn3", "S": "azo_stn2", "d": "azo_stn3", "D": "azo_stn2",
-          "j": "rock4", "h": "rock3", "H": "rock2", "e": "glowcyan", "g": "cryst2", "G": "cryst1"},
+          "j": "rock3", "h": "rock2", "H": "rock1", "e": "glowcyan", "g": "cryst2", "G": "cryst1"},
     civilian={"y": "rust4", "t": "rust3", "T": "rust2", "x": "rust4", "r": "rust3", "R": "rust2",
               "i": "gold2", "a": "gold1", "A": "gold0",
               "o": "grey3", "p": "grey2", "P": "grey1", "b": "leather2", "B": "leather1"},

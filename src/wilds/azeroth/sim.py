@@ -111,6 +111,7 @@ class ZoneSim:
         self.metrics = Metrics()
         self._invalid_streak = 0
         self._next_reflection = REFLECT_EVERY
+        self.fx: list[tuple[str, Pos, str]] = []  # (kind, tile, text) for the client's effects, drained by it
         self._alerted: set[int] = set()
         self.unreachable: set[str] = set()  # landmarks the hero found no way to
         self.legacy_path = None
@@ -235,6 +236,7 @@ class ZoneSim:
         dmg = max(1, hero.attack + self.rng.randint(-1, 2))
         c.hp -= dmg
         c.target_hero = True
+        self.fx.append(("hit", c.pos, str(dmg)))
         if c.hp > 0:
             w.log(f"Б'єш {c.title}: -{dmg}, лишилось {c.hp}", "info")
             return False
@@ -261,6 +263,7 @@ class ZoneSim:
             hero.max_hp += 12
             hero.hp = hero.max_hp
             self.world.log(f"Новий рівень: {hero.level}!", "victory" if hero.level >= GOAL_LEVEL else "good")
+            self.fx.append(("levelup", hero.pos, str(hero.level)))
             self.pending_reflection = self.pending_reflection or self.world.tick
 
     def _check_ready(self, aq: ActiveQuest) -> None:
@@ -403,6 +406,7 @@ class ZoneSim:
         if action is None or self.over:
             return
         hero.hurt_this_tick = 0.0
+        del self.fx[:-200]  # nobody is watching (headless): keep only the latest
         status = action.step(self)
         action.ticks += 1
         w.tick += 1
@@ -483,6 +487,7 @@ class ZoneSim:
                     dmg = max(1, c.damage + self.rng.randint(-1, 1))
                     hero.hp -= dmg
                     hero.hurt_this_tick += dmg
+                    self.fx.append(("hurt", hero.pos, str(dmg)))
                     w.log(f"{c.title} б'є тебе: -{dmg}", "danger")
                 continue
             if cheb(c.pos, c.home) > 10:

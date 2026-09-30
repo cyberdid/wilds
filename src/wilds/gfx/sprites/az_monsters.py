@@ -12,12 +12,85 @@ from ..registry import register
 
 _named(azm_snout="#f09a98", azm_snout2="#c46a70")
 _ramp("azm_pig", "#4a2228", "#7e4038", "#b0674e", "#d6936c", "#f2c19a")
-_ramp("azm_ogre", "#3a261e", "#6b4a36", "#9a6e4c", "#c09468", "#e0bc8c")
+_ramp("azm_void", "#100d26", "#1f1f4e", "#2f397c", "#4a5cae", "#7690dc", "#aebff2")
+_ramp("azm_ogre", "#2e1c18", "#5a3a2c", "#8a5a3e", "#b98458", "#e6b884")
 
 
 def _ol(text: str) -> Grid:
     """Fill-only grid -> grid with the 1px ink outline baked in."""
     return outline_grid(grid(text), "k")
+
+
+# --- shaded forms (rock, bark, hide) ----------------------------------------------
+
+
+def _ell(cx: float, cy: float, rx: float, ry: float) -> set:
+    return {(x, y) for y in range(int(cy - ry) - 1, int(cy + ry) + 2)
+            for x in range(int(cx - rx) - 1, int(cx + rx) + 2)
+            if ((x + 0.5 - cx) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2 <= 1.0}
+
+
+def _box(x0: int, y0: int, x1: int, y1: int) -> set:
+    return {(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)}
+
+
+def _shade(c: Canvas, pts: set, light: str, main: str, dark: str) -> None:
+    """One form lit from the top-left: top/left rim light, bottom/right rim dark."""
+    for (x, y) in pts:
+        if not (0 <= x < c.w and 0 <= y < c.h):
+            continue
+        if (x, y - 1) not in pts or (x - 1, y) not in pts and (x - 1, y - 1) not in pts:
+            ch = light
+        elif (x, y + 1) not in pts or (x + 1, y) not in pts:
+            ch = dark
+        else:
+            ch = main
+        c.set(x, y, ch)
+
+
+def _shade4(c: Canvas, pts: set, hi: str, mid: str, lo: str, deep: str) -> None:
+    """Four-tone form shading with a core shadow: light rim top-left, mid body, the
+    right third of every row in shadow, the underside in deep shadow."""
+    rows: dict[int, list[int]] = {}
+    for (x, y) in pts:
+        rows.setdefault(y, []).append(x)
+    for (x, y) in pts:
+        if not (0 <= x < c.w and 0 <= y < c.h):
+            continue
+        xs = rows[y]
+        span = max(xs) - min(xs) + 1
+        if (x, y + 1) not in pts:
+            ch = deep
+        elif (x, y - 1) not in pts or (x - 1, y) not in pts:
+            ch = hi
+        elif x >= max(xs) - max(0, int(span * 0.3)):
+            ch = lo
+        else:
+            ch = mid
+        c.set(x, y, ch)
+
+
+def _stack(w: int, h: int, forms) -> Grid:
+    """Separately outlined shaded forms, back to front: (pts, light, main, dark) or
+    (pts, hi, mid, lo, deep) for four-tone shading."""
+    g = blank(w, h)
+    for pts, *tones in forms:
+        c = Canvas(w, h)
+        (_shade4 if len(tones) == 4 else _shade)(c, pts, *tones)
+        g = overlay(g, outline_grid(c.grid(), "k"))
+    return g
+
+
+def _seg(x0: float, y0: float, x1: float, y1: float, r0: float, r1: float | None = None) -> set:
+    """A thick tapered line: circles from (x0, y0) r0 to (x1, y1) r1."""
+    r1 = r0 if r1 is None else r1
+    n = max(2, int(math.hypot(x1 - x0, y1 - y0) * 2) + 1)
+    pts: set = set()
+    for i in range(n):
+        t = i / (n - 1)
+        r = r0 + (r1 - r0) * t
+        pts |= _ell(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, max(r, 0.55), max(r, 0.55))
+    return pts
 
 
 # --- quilboar -------------------------------------------------------------------
@@ -26,8 +99,9 @@ def _ol(text: str) -> Grid:
 # hide loincloth, a spiked club.
 
 QB = {"p": "azm_pig3", "P": "azm_pig2", "Q": "azm_pig1", "n": "azm_snout", "N": "azm_snout2", "q": "azm_pig1",
-      "m": "dust1", "M": "dust2", "s": "bone4", "S": "bone2", "t": "tusk", "e": "red1",
-      "l": "tent1", "L": "tent0", "h": "rock1", "o": "tent1", "O": "tent0", "x": "white:150"}
+      "m": "dust1", "M": "dust2", "s": "bone4", "S": "bone3", "t": "tusk", "e": "red1",
+      "l": "tent1", "L": "tent0", "h": "rock1", "o": "tent1", "O": "tent0", "G": "grey3", "g": "grey2",
+      "x": "white:150"}
 
 QB_UPPER = grid("""
     ................
@@ -35,11 +109,11 @@ QB_UPPER = grid("""
     ..Ms.Ms.s.......
     .sMm.MmsMmPp....
     .MmmMmmMmPPppp..
-    .QmmmmmmmPpeppn.
-    .QPmmmmmPPppppN.
-    .QPPmmmPPQqtt...
-    .QPPPPPPPP......
-    .QPPPPPPPP......
+    .PmmmmmmmPpeppn.
+    .pPmmmmmPPppppN.
+    .pPPmmmPPQqtt...
+    .pPPpPPPPP......
+    .PPPPPQPPP......
     ..QlllLlll......
     ..LlllLLL.......
 """)
@@ -91,28 +165,26 @@ QB_ARM_DOWN = grid("""
     ................
     ................
     ................
-    ........pp......
-    .......pppP.....
-    ........PPpp....
+    .......Kpp......
+    .......KppP.....
+    ........KPpp....
     ..........pp....
 """)
-QB_ARM_BACK = grid("""
+QB_ARM_UP = grid("""
+    ........sGGs....
+    ........GGgg....
+    .........sgs....
+    ..........o.....
+    .........pp.....
+    ........KpP.....
+    ........pP......
+    .......KpP......
+    .......Kpp......
+    .......KPP......
     ................
     ................
-    ................
-    ................
-    ................
-    ................
-    ................
-    ................
-    ......ppp.......
-    ....ppPP........
-    ..ppp...........
-    ..o.............
-    .SOS............
-    ..S.............
 """)
-QB_ARM_SWING = grid("""
+QB_ARM_CHOP = grid("""
     ................
     ................
     ................
@@ -121,20 +193,30 @@ QB_ARM_SWING = grid("""
     ................
     ................
     ................
-    ........pp...S..
-    .......ppppoOOS.
-    .............S..
-    ................
+    .......Kppp.....
+    ........KPppp...
+    ...........ppo..
+    .............o..
 """)
 QB_CLUB = grid("""
-    .............S..
-    ...........oOOS.
-    .............S..
+    ............sG..
+    ...........oGgs.
+    ............sg..
+""")
+QB_CHOP_HEAD = grid("""
+    ............sGs.
+    ............Ggg.
+    .............s..
 """)
 QB_SMEAR = grid("""
-    ................
-    ..........x.....
-    ...........xx...
+    ............x...
+    .............x..
+    ..............x.
+    ..............x.
+    ...............x
+    ...............x
+    ...............x
+    ..............x.
 """)
 QB_DEAD = _ol("""
     ................
@@ -151,31 +233,31 @@ QB_DEAD = _ol("""
     ..hQPPPPPmPpkpn.
     .hhQlllPPPPpppN.
     ..QQLllQQPPqtt..
-    ........S.oOS...
+    ........s.oGs...
     ................
 """)
 
 
 def _qb(legs="stand", bob=0, arm="down", dx=0) -> Grid:
     g = overlay(blank(16, 16), QB_LEGS[legs], 0, 11)
-    up = overlay(QB_UPPER, {"back": QB_ARM_BACK[:12], "swing": QB_ARM_SWING}.get(arm, QB_ARM_DOWN))
+    up = overlay(QB_UPPER, {"up": QB_ARM_UP, "chop": QB_ARM_CHOP}.get(arm, QB_ARM_DOWN))
     g = overlay(g, up, dx, bob)
     if arm == "down":
         g = overlay(g, QB_CLUB, dx, 10 + bob)
-    elif arm == "back":
-        g = overlay(g, QB_ARM_BACK[12:], dx, 12 + bob)
+    elif arm == "chop":
+        g = overlay(g, QB_CHOP_HEAD, dx, 12 + bob)
     g = outline_grid(g, "k")
-    if arm == "swing":
-        g = overlay(g, QB_SMEAR, dx, 9 + bob)
+    if arm == "chop":
+        g = overlay(g, QB_SMEAR, dx, 1)
     return g
 
 
 QB_IDLE = [_qb(), _qb(bob=1)]
 QB_MOVE = [_qb("reach"), _qb("pass", bob=-1), _qb("reach2"), _qb("pass2", bob=-1)]
-QB_ATTACK = [_qb("stand", arm="back"), _qb("brace", bob=1, arm="swing")]
+QB_ATTACK = [_qb("stand", arm="up"), _qb("brace", bob=1, arm="chop")]
 register("az.creature.quilboar.idle", art(*QB_IDLE, legend=QB, fps=2, note="Bristleback quilboar, breathing"))
 register("az.creature.quilboar.move", art(*QB_MOVE, legend=QB, fps=8, note="quilboar trot"))
-register("az.creature.quilboar.attack", art(*QB_ATTACK, legend=QB, fps=8, note="quilboar: club swung back, upswing strike"))
+register("az.creature.quilboar.attack", art(*QB_ATTACK, legend=QB, fps=8, note="quilboar: club raised overhead, chopping blow"))
 register("az.creature.quilboar.dead", art(QB_DEAD, legend=QB, note="quilboar fallen on its side"))
 
 
@@ -267,8 +349,8 @@ GN_ARM_BACK = grid("""
     ................
     ................
     ................
-    ......FFgf......
-    OOoooooooofiI...
+    ....FFgg........
+    Oooofffooii.....
     ................
 """)
 GN_ARM_THRUST = grid("""
@@ -307,12 +389,15 @@ def _gn(legs="stand", bob=0, arm="hold", dx=0) -> Grid:
     g = overlay(blank(16, 16), GN_LEGS[legs], 0, 11)
     g = overlay(g, GN_UPPER, dx, bob)
     g = overlay(g, {"back": GN_ARM_BACK, "thrust": GN_ARM_THRUST}.get(arm, GN_ARM_HOLD), dx, bob)
-    return outline_grid(g, "k")
+    g = outline_grid(g, "k")
+    if arm == "thrust":   # glint of the strike at the spear point
+        g = overlay(g, grid(("x.", ".x", "..", ".x", "x.")), 14, 6 + bob)
+    return g
 
 
 GN_IDLE = [_gn(), _gn(bob=1)]
 GN_MOVE = [_gn("reach"), _gn("pass", bob=-1), _gn("reach2"), _gn("pass2", bob=-1)]
-GN_ATTACK = [_gn("stand", arm="back", dx=-1), _gn("brace", bob=1, arm="thrust", dx=1)]
+GN_ATTACK = [_gn("stand", bob=1, arm="back", dx=-1), _gn("brace", arm="thrust", dx=1)]
 register("az.creature.gnoll.idle", art(*GN_IDLE, legend=GN, fps=2, note="Palemane gnoll with a spear"))
 register("az.creature.gnoll.move", art(*GN_MOVE, legend=GN, fps=8, note="gnoll lope"))
 register("az.creature.gnoll.attack", art(*GN_ATTACK, legend=GN, fps=8, note="gnoll: draw back, spear thrust"))
@@ -476,196 +561,116 @@ register("az.creature.harpy.dead", art(HP_DEAD, legend=HP, note="harpy fallen, w
 
 
 # --- ogre -------------------------------------------------------------------------
-# Enforcer ogre: a hulking, hunched brute (two tiles tall) with olive-tan hide,
-# a small head with a topknot and tusks, iron shoulder plate, hide loincloth and
-# a studded wooden club.
+# Enforcer ogre: a hulking, hunched brute two tiles tall. Built from separately
+# outlined, four-tone forms so head, barrel torso, arms and legs read apart:
+# far limbs sink into shadow, near limbs catch the light. Tan hide, small head
+# with a topknot, heavy brow and tusks, an iron plate on the near shoulder, hide
+# loincloth, boots and a studded club.
 
-OG = {"o": "azm_ogre4", "O": "azm_ogre3", "Q": "azm_ogre2", "q": "azm_ogre1",
-      "b": "azm_ogre4", "e": "bone4", "K": "azm_ogre0", "t": "tusk", "h": "hair_black", "H": "leather2",
-      "a": "steel4", "A": "steel3", "z": "steel2",
-      "l": "tent1", "L": "tent0", "f": "leather2", "F": "leather1",
-      "c": "brute2", "C": "brute1", "n": "brute0", "i": "grey4", "x": "white:150"}
-
-OG_UPPER = grid("""
-    ................
-    ..........h.....
-    .........hH.....
-    ........oOOOo...
-    .......oOOOOOo..
-    .......QOKKKKO..
-    ...aAa.QOOOeOOn.
-    ..aAaaaQOtOOtO..
-    ..aazaAqQOOOOO..
-    ..QOOOOOqQQQQ...
-    .QOOOOOOOOOOO...
-    .QOOOOOObbbOOO..
-    .QOOOOObbbbbOO..
-    .qQOOOObbbbbOO..
-    .qQQOOOObbbOO...
-    ..lllLllllllL...
-    ..LlllLllllL....
-""")
-OG_LEGS = {
-    "stand": grid("""
-        ....QQO..OOO....
-        ....qQO..QOO....
-        ....qQQ..QOO....
-        ....qQQ..QQO....
-        ...ffff.fFFf....
-        ...FFFF.FFFF....
-    """),
-    "reach": grid("""
-        ...QQO....OOO...
-        ...qQO....QOO...
-        ..qQQ......QOO..
-        ..qQQ......QQO..
-        .ffff.....fFFf..
-        .FFFF.....FFFF..
-    """),
-    "pass": grid("""
-        .....QQOOO......
-        .....qQOQO......
-        ....qQQ.QO......
-        ....ffffQQO.....
-        ....FFFfFFf.....
-        ........FFFF....
-    """),
-    "reach2": grid("""
-        ...OOO....QQO...
-        ...QOO....qQO...
-        ..QOO......qQQ..
-        ..QQO......qQQ..
-        .fFFf.....ffff..
-        .FFFF.....FFFF..
-    """),
-    "pass2": grid("""
-        .....OOOQQ......
-        .....QOQqQ......
-        ....QOO.qQQ.....
-        ....QQO.ffff....
-        ....fFFfFFFF....
-        ....FFFF........
-    """),
-    "brace": grid("""
-        ...QQO.....OOO..
-        ...qQO.....QOO..
-        ..qQQ.......QOO.
-        ..qQQ.......QQO.
-        .ffff......fFFf.
-        .FFFF......FFFF.
-    """),
-}
-OG_ARM = {
-    "down": grid("""
-        ................
-        ................
-        ................
-        ................
-        ................
-        ................
-        ................
-        ................
-        ................
-        ........kOOO....
-        .......kOOOOO...
-        .......kQOOOO...
-        ........kQOOO...
-        ........kQOOO..i
-        .........kOOoci.
-        .........kooCcC.
-        ..........kQCci.
-        ...........iCcC.
-        ............icCi
-        .............nC.
-    """),
-    "up": grid("""
-        ..i.............
-        .cCci...........
-        .CccC...........
-        ..nCcc..........
-        ....CcO.........
-        .....OOO........
-        ......OOO.......
-        .......OO.......
-        .......OO.......
-        ........O.......
-    """),
-    "slam": grid("""
-        ................
-        ................
-        ................
-        ................
-        ................
-        ................
-        ................
-        ................
-        ................
-        .........OOO....
-        ........OOOOOO..
-        ........QQOOOO..
-        ............OOc.
-        ............Qcc.
-        .............Cc.
-        ............iCcC
-        .............cCc
-        .............nCi
-    """),
-}
-OG_SMEAR = grid("""
-    ..........x.....
-    ............x...
-    .............x..
-    ..............x.
-    ..............x.
-""")
-OG_DEAD = _ol("""
-    ................
-    ................
-    ................
-    ................
-    ................
-    ................
-    ................
-    ................
-    ................
-    ................
-    ................
-    ................
-    ................
-    ................
-    ................
-    ........aa......
-    ..ff...aAzaOOo..
-    .fFQQQOOOOOOOOoh
-    .FFqQQllObbOOkOH
-    ..FFQQLlObbbOtt.
-    ...ffQQllOOOOO..
-    ...FF.ccCcC.....
-    .....icCccCi....
-    ................
-""")
+OG = {"4": "azm_ogre4", "3": "azm_ogre3", "2": "azm_ogre2", "1": "azm_ogre1", "0": "azm_ogre0",
+      "e": "bone4", "t": "tusk", "h": "hair_black", "H": "leather2",
+      "a": "steel5", "A": "steel4", "z": "steel3", "Z": "steel2",
+      "l": "tent2", "L": "tent1", "n": "tent0", "f": "rust3", "F": "rust2", "G": "rust1",
+      "c": "bone2", "C": "bone1", "D": "bone0", "i": "grey4", "x": "white:160"}
 
 
-def _og(legs="stand", bob=0, arm="down", dx=0) -> Grid:
-    g = overlay(blank(16, 24), OG_LEGS[legs], 0, 17)
-    if arm == "up":
-        g = overlay(g, OG_ARM["up"], dx - 1, bob)
-    g = overlay(g, OG_UPPER, dx, bob)
-    if arm != "up":
-        g = overlay(g, OG_ARM[arm], dx, bob)
-    g = outline_grid(g, "k")
+def _og(legs: str = "stand", bob: int = 0, arm: str = "down", dx: int = 0) -> Grid:
+    b, o = bob, dx
+    step = {"stand": (0, 0), "reach": (-2, 2), "pass": (1, -1), "reach2": (2, -2), "pass2": (-1, 1),
+            "brace": (-2, 3)}[legs]
+    lift_far = 1 if legs == "pass" else 0
+    lift_near = 1 if legs == "pass2" else 0
+    fx, nx = 4 + step[0], 8 + step[1]
+    hx = 10.6 + o - (1 if arm == "up" else 0)
+    forms = [
+        # far leg + boot, far arm hanging behind (dark)
+        (_box(fx, 16 + b, fx + 2, 20 - lift_far), "2", "1", "1", "0"),
+        (_box(fx - 1, 21 - lift_far, fx + 2, 22 - lift_far), "F", "G", "G", "G"),
+        (_seg(3.5 + o, 9.5 + b, 2.4 + o, 14.5 + b, 1.5, 1.3), "2", "1", "1", "0"),
+        (_ell(2.6 + o, 16.0 + b, 1.6, 1.5), "2", "1", "1", "0"),
+        # barrel torso
+        (_ell(7.0 + o, 11.0 + b, 4.9, 5.2), "4", "3", "2", "1"),
+        # near leg + boot
+        (_box(nx, 16 + b, nx + 2, 20 - lift_near), "4", "3", "2", "1"),
+        (_box(nx - 1, 21 - lift_near, nx + 3, 22 - lift_near), "f", "F", "F", "G"),
+        # loincloth
+        (_box(3 + o, 15 + b, 10 + o, 16 + b) | _box(5 + o, 17 + b, 8 + o, 17 + b), "l", "L", "L", "n"),
+        # head
+        (_ell(hx, 5.6 + b, 2.8, 2.6), "4", "3", "2", "1"),
+    ]
+    if arm == "up":      # wind-up: the arm rises in front of the face, club cocked back over the head
+        forms += [
+            (_seg(13.2 + o, 2.0 + b, 8.0 + o, 0.3, 1.0, 1.5), "c", "C", "C", "D"),
+            (_ell(10.6 + o, 8.6 + b, 2.2, 1.6), "a", "A", "z", "Z"),
+            (_seg(11.5 + o, 9.2 + b, 13.4 + o, 6.2 + b, 1.5, 1.3), "4", "3", "2", "1"),
+            (_seg(13.4 + o, 6.2 + b, 13.6 + o, 3.6 + b, 1.3, 1.2), "4", "3", "3", "2"),
+            (_ell(13.6 + o, 2.8 + b, 1.5, 1.4), "4", "3", "2", "1"),
+        ]
+    elif arm == "slam":  # the blow: arm driven forward, club head on the ground
+        forms += [
+            (_ell(10.8 + o, 8.8 + b, 2.2, 1.6), "a", "A", "z", "Z"),
+            (_seg(12 + o, 9.8 + b, 13.6 + o, 12.5 + b, 1.5, 1.3), "4", "3", "2", "1"),
+            (_seg(14.0 + o, 16.2, 14.2 + o, 21.4, 1.2, 1.7), "c", "C", "C", "D"),
+            (_seg(13.6 + o, 12.5 + b, 13.9 + o, 14.8, 1.3, 1.2), "4", "3", "3", "2"),
+            (_ell(13.9 + o, 15.2, 1.5, 1.3), "4", "3", "2", "1"),
+        ]
+    else:                # hanging, club held forward-down
+        forms += [
+            (_ell(10.8 + o, 8.8 + b, 2.2, 1.6), "a", "A", "z", "Z"),
+            (_seg(12.2 + o, 10.0 + b, 13.0 + o, 13.4 + b, 1.5, 1.3), "4", "3", "2", "1"),
+            (_seg(13.4 + o, 17.4 + b, 14.2 + o, 21.2, 1.1, 1.6), "c", "C", "C", "D"),
+            (_seg(13.0 + o, 13.4 + b, 13.2 + o, 15.4 + b, 1.3, 1.2), "4", "3", "3", "2"),
+            (_ell(13.3 + o, 16.2 + b, 1.5, 1.3), "4", "3", "2", "1"),
+        ]
+    g = _stack(16, 24, forms)
+    # face, topknot, pecs and belly, club studs
+    fx0, fy = int(hx), 5 + b
+    marks = [(fx0 - 1, fy - 3, "h"), (fx0 - 1, fy - 4, "h"), (fx0, fy - 4, "H"),
+             (fx0, fy - 1, "0"), (fx0 + 1, fy - 1, "0"), (fx0 + 2, fy - 1, "1"),
+             (fx0 + 1, fy, "e"), (fx0 + 3, fy + 1, "2"), (fx0, fy + 2, "t"), (fx0 + 2, fy + 2, "t"),
+             (5 + o, 10 + b, "2"), (6 + o, 10 + b, "2"), (7 + o, 10 + b, "1"), (8 + o, 11 + b, "2"),
+             (6 + o, 12 + b, "4"), (7 + o, 13 + b, "4"), (8 + o, 13 + b, "3"), (7 + o, 14 + b, "1")]
+    if arm == "down":
+        marks += [(15 + o, 19, "i"), (13 + o, 19 + b, "i")]
+    elif arm == "slam":
+        marks += [(15 + o, 19, "i"), (13 + o, 20, "i")]
+    else:
+        marks += [(9 + o, 0, "i"), (11 + o, 0, "i")]
+    for (x, y, ch) in marks:
+        if 0 <= x < 16 and 0 <= y < 24:
+            g = overlay(g, grid(ch), x, y)
     if arm == "slam":
-        g = overlay(g, OG_SMEAR, 0, 9)
+        g = overlay(g, grid(("x..", "x..", ".x.", "..x", "..x")), 13, 1)
+    return g
+
+
+def _og_dead() -> Grid:
+    """Toppled face down: legs stretched out behind with the boot soles showing,
+    the humped back up, head on the ground, the club fallen from its hand."""
+    g = _stack(16, 24, [
+        (_seg(9.5, 17.2, 14.6, 16.2, 1.0, 1.5), "c", "C", "C", "D"),                  # club, fallen
+        (_seg(4.5, 21.0, 1.2, 21.2, 1.3, 1.2), "2", "1", "1", "0"),                    # far leg
+        (_box(0, 19, 1, 22), "F", "G", "G", "G"),
+        (_ell(6.6, 19.2, 4.4, 3.3), "4", "3", "2", "1"),                               # humped back
+        (_box(3, 20, 5, 22), "l", "L", "L", "n"),                                      # loincloth
+        (_ell(11.6, 20.8, 2.4, 1.9), "4", "3", "2", "1"),                              # head on the ground
+        (_ell(9.6, 17.6, 2.0, 1.4), "a", "A", "z", "Z"),                               # shoulder plate
+        (_seg(10.0, 19.4, 14.0, 21.8, 1.1, 1.0), "4", "3", "3", "2"),                 # arm flung ahead
+    ])
+    for (x, y, ch) in ((11, 20, "0"), (12, 20, "0"), (12, 21, "t"), (5, 17, "4"), (6, 17, "4"),
+                       (4, 18, "4"), (10, 18, "h")):
+        g = overlay(g, grid(ch), x, y)
     return g
 
 
 OG_IDLE = [_og(), _og(bob=1)]
 OG_MOVE = [_og("reach", bob=1), _og("pass"), _og("reach2", bob=1), _og("pass2")]
-OG_ATTACK = [_og("stand", bob=-1, arm="up", dx=-1), _og("brace", bob=2, arm="slam")]
+OG_ATTACK = [_og("stand", bob=-1, arm="up", dx=-1), _og("brace", bob=1, arm="slam")]
 register("az.creature.ogre.idle", art(*OG_IDLE, legend=OG, fps=1.5, note="ogre enforcer, heavy breathing"))
 register("az.creature.ogre.move", art(*OG_MOVE, legend=OG, fps=6, note="ogre stomp"))
-register("az.creature.ogre.attack", art(*OG_ATTACK, legend=OG, fps=6, note="ogre: club overhead, slam"))
-register("az.creature.ogre.dead", art(OG_DEAD, legend=OG, note="ogre fallen on its back"))
+register("az.creature.ogre.attack", art(*OG_ATTACK, legend=OG, fps=6,
+                                        note="ogre: arm cocks the club overhead, slams it down"))
+register("az.creature.ogre.dead", art(_og_dead(), legend=OG, note="ogre flat on its back, club dropped"))
 
 
 # --- restless spirits ---------------------------------------------------------------
@@ -991,49 +996,12 @@ register("az.creature.haunt.move", art(*(_spirit(HN_UPPER, t, b) for t, b in zip
 register("az.creature.haunt.dead", art(HN_DEAD, legend=HN, note="haunt: a fallen skull in fading smoke"))
 
 
-# --- shaded forms (rock, bark, hide) ----------------------------------------------
-
-
-def _ell(cx: float, cy: float, rx: float, ry: float) -> set:
-    return {(x, y) for y in range(int(cy - ry) - 1, int(cy + ry) + 2)
-            for x in range(int(cx - rx) - 1, int(cx + rx) + 2)
-            if ((x + 0.5 - cx) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2 <= 1.0}
-
-
-def _box(x0: int, y0: int, x1: int, y1: int) -> set:
-    return {(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)}
-
-
-def _shade(c: Canvas, pts: set, light: str, main: str, dark: str) -> None:
-    """One form lit from the top-left: top/left rim light, bottom/right rim dark."""
-    for (x, y) in pts:
-        if not (0 <= x < c.w and 0 <= y < c.h):
-            continue
-        if (x, y - 1) not in pts or (x - 1, y) not in pts and (x - 1, y - 1) not in pts:
-            ch = light
-        elif (x, y + 1) not in pts or (x + 1, y) not in pts:
-            ch = dark
-        else:
-            ch = main
-        c.set(x, y, ch)
-
-
 # --- earth elemental -----------------------------------------------------------------
 # Agitated earth spirit: a lumbering golem of Mulgore's red-brown stone, boulder
 # fists hovering at its sides, molten-gold eyes and a glowing crack in its chest.
 
 EE = {"4": "dust5", "3": "dust4", "2": "dust3", "1": "dust2", "0": "dust1",
       "e": "fire4", "g": "fire3", "G": "ore1"}
-
-
-def _stack(w: int, h: int, forms) -> Grid:
-    """Separately outlined shaded forms, back to front: (pts, light, main, dark)."""
-    g = blank(w, h)
-    for pts, light, main, dark in forms:
-        c = Canvas(w, h)
-        _shade(c, pts, light, main, dark)
-        g = overlay(g, outline_grid(c.grid(), "k"))
-    return g
 
 
 def _earth(bob: int = 0, step: int = 0, swing: int = 0, dead: bool = False) -> Grid:
@@ -1271,44 +1239,63 @@ register("az.creature.tentacle.dead", art(_tentacle(0, dead=True), legend=TN, no
 # violet feelers hanging where its mouth should be, a cluster of glowing eyes and
 # long taloned arms.
 
-NQ = {"3": "denim3", "2": "denim2", "1": "denim1", "0": "denim0",
-      "t": "spore3", "T": "spore2", "e": "glowcyan", "c": "bone3"}
+NQ = {"5": "azm_void5", "4": "azm_void4", "3": "azm_void3", "2": "azm_void2", "1": "azm_void1",
+      "0": "azm_void0", "t": "spore4", "T": "spore3", "u": "spore2", "e": "glowcyan", "c": "bone4",
+      "C": "bone2"}
 
 
 def _nraqi(bob: int = 0, step: int = 0, swing: int = 0) -> Grid:
+    """Hunched: a humped back and heavy shoulders over a narrow waist, head thrust
+    forward on a thick neck, feelers hanging from the face, long clawed arms."""
     b = bob
+    fx, nx = 4 - step, 8 + step
+    lf, ln = (1 if step > 0 else 0), (1 if step < 0 else 0)
     g = _stack(16, 24, [
-        (_ell(3.2 - swing * 0.5, 15.0 + b, 1.6, 2.6), "1", "0", "0"),              # far arm
-        (_box(4, 17 + b - (step > 0), 6, 22 - (step > 0)), "1", "0", "0"),        # far leg
-        (_ell(7.2, 12.8 + b, 4.9, 5.4), "3", "2", "1"),                           # torso + hump
-        (_box(8, 17 + b - (step < 0), 10, 22 - (step < 0)), "2", "1", "0"),       # near leg
-        (_ell(11.2, 7.0 + b, 2.7, 2.5), "3", "2", "1"),                           # head
-        (_ell(11.2 + swing * 0.5, 11.8 + b, 1.8, 2.2), "3", "2", "1"),            # near upper arm
-        (_ell(12.6 + swing, 15.2 + b, 1.5, 2.0), "3", "2", "1"),                  # near forearm
+        (_box(fx, 16 + b, fx + 1, 20 - lf) | _box(fx - 1, 21 - lf, fx + 1, 22 - lf), "2", "1", "1", "0"),
+        (_seg(4.0 - swing * 0.5, 9.5 + b, 2.6 - swing, 14.5 + b, 1.3, 1.0)
+         | _seg(2.6 - swing, 14.5 + b, 2.4 - swing, 17.0 + b, 1.0, 0.9), "2", "1", "1", "0"),
+        (_ell(7.2, 15.2 + b, 3.0, 2.0), "3", "2", "2", "1"),                               # hips
+        (_box(nx, 16 + b, nx + 1, 20 - ln) | _box(nx, 21 - ln, nx + 3, 22 - ln), "4", "3", "2", "1"),
+        (_ell(6.8, 10.2 + b, 4.4, 4.2), "5", "4", "3", "2"),                               # humped back
+        (_seg(9.0, 8.5 + b, 11.0, 6.5 + b, 1.6, 1.4), "4", "3", "3", "2"),                 # neck
+        (_ell(11.6, 5.6 + b, 2.5, 2.3), "5", "4", "3", "2"),                               # head
+        (_ell(10.2, 9.2 + b, 2.2, 1.8), "5", "4", "3", "2"),                               # near shoulder
+        (_seg(11.0, 10.2 + b, 12.4 + swing * 0.5, 13.4 + b, 1.3, 1.1), "5", "4", "3", "2"),
+        (_seg(12.4 + swing * 0.5, 13.4 + b, 13.2 + swing, 16.6 + b, 1.1, 1.0), "4", "3", "3", "2"),
     ])
-    extra = blank(16, 24)
-    feel = ((11, 9, "t"), (11, 10, "T"), (11, 11, "t"), (12, 9, "t"), (12, 10, "t"), (12, 11, "T"),
-            (12, 12, "t"), (13, 9, "t"), (13, 10, "T"), (14, 11, "t"), (10, 10, "T"), (10, 11, "t"))
-    for (x, y, ch) in feel:
-        extra = overlay(extra, grid(ch), x, y + b)
-    for (x, y) in ((11, 6), (13, 6), (12, 5), (10, 7)):
-        extra = overlay(extra, grid("e"), x, y + b)
-    fx = int(12.6 + swing)
-    extra = overlay(extra, grid(("c.c", ".c.")), fx - 1, 17 + b)
-    return outline_grid(overlay(g, extra), "k")
+    marks = [(12, 5, "e"), (13, 4, "e"), (11, 4, "e"), (13, 6, "e"),
+             (11, 7, "t"), (12, 7, "t"), (13, 7, "T"), (14, 7, "t"),
+             (11, 8, "T"), (12, 8, "u"), (14, 8, "T"), (12, 9, "T"), (14, 9, "u"), (13, 9, "u"),
+             (5, 7, "5"), (6, 7, "5"), (4, 8, "4"), (7, 12, "2"), (6, 13, "2")]
+    cx = int(13.2 + swing)
+    marks += [(cx - 1, 18, "c"), (cx + 1, 18, "c"), (cx, 18, "C"), (cx + 1, 17, "C")]
+    fcx = int(2.4 - swing)
+    marks += [(fcx, 18, "C"), (fcx + 1, 18, "C")]
+    for (x, y, ch) in marks:
+        g = overlay(g, grid(ch), x, y + b)
+    return outline_grid(g, "k")
 
 
-NQ_DEAD = _stack(16, 24, [
-    (_ell(5.0, 20.5, 4.6, 2.2), "3", "2", "1"),
-    (_ell(11.5, 20.8, 2.6, 2.0), "3", "2", "1"),
-    (_box(1, 21, 3, 22), "1", "0", "0"),
-])
-NQ_DEAD = overlay(NQ_DEAD, grid(("tT.", "TtT")), 13, 20)
+def _nraqi_dead() -> Grid:
+    """Face down: humped back up, arm flung forward with talons open, feelers
+    spilled in the grass, legs trailing behind."""
+    g = _stack(16, 24, [
+        (_seg(1.0, 21.8, 4.0, 21.0, 0.9) | _seg(1.5, 20.2, 4.0, 19.8, 0.8), "2", "1", "1", "0"),
+        (_ell(6.8, 19.8, 4.4, 2.8), "5", "4", "3", "2"),
+        (_ell(12.2, 21.0, 2.3, 1.8), "5", "4", "3", "2"),
+        (_seg(9.0, 21.8, 13.5, 22.2, 0.9), "4", "3", "3", "2"),
+    ])
+    for (x, y, ch) in ((14, 20, "t"), (14, 21, "T"), (15, 21, "u"), (15, 22, "t"), (12, 20, "1"),
+                       (13, 20, "1"), (5, 17, "5"), (6, 17, "5"), (4, 18, "4")):
+        g = overlay(g, grid(ch), x, y)
+    return outline_grid(g, "k")
+
+
 register("az.creature.nraqi.idle", art(_nraqi(), _nraqi(bob=1), legend=NQ, fps=1.5,
                                        note="n'raqi, feelers twitching"))
 register("az.creature.nraqi.move", art(_nraqi(step=1, swing=1), _nraqi(bob=-1), _nraqi(step=-1, swing=-1),
                                        _nraqi(bob=-1), legend=NQ, fps=6, note="n'raqi lurching"))
-register("az.creature.nraqi.dead", art(NQ_DEAD, legend=NQ, note="n'raqi slumped, eyes dark"))
+register("az.creature.nraqi.dead", art(_nraqi_dead(), legend=NQ, note="n'raqi fallen face down, eyes dark"))
 
 
 # --- treant and ancient ------------------------------------------------------------------
@@ -1318,18 +1305,6 @@ register("az.creature.nraqi.dead", art(NQ_DEAD, legend=NQ, note="n'raqi slumped,
 TR = {"b": "rust4", "B": "rust3", "c": "rust2", "C": "rust1", "d": "rust0",
       "l": "ork4", "L": "ork3", "m": "ork2", "M": "ork1",
       "e": "glowlime", "o": "ink2", "f": "spore4", "x": "white:150"}
-
-
-def _seg(x0: float, y0: float, x1: float, y1: float, r0: float, r1: float | None = None) -> set:
-    """A thick tapered line: circles from (x0, y0) r0 to (x1, y1) r1."""
-    r1 = r0 if r1 is None else r1
-    n = max(2, int(math.hypot(x1 - x0, y1 - y0) * 2) + 1)
-    pts: set = set()
-    for i in range(n):
-        t = i / (n - 1)
-        r = r0 + (r1 - r0) * t
-        pts |= _ell(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, max(r, 0.55), max(r, 0.55))
-    return pts
 
 
 def _treant(bob: int = 0, step: int = 0, arm: str = "down") -> Grid:
