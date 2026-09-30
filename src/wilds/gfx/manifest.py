@@ -190,6 +190,9 @@ def _city_terrain() -> list[Need]:
             Need(f"cp.{theme}.road", "16x16", variants=3),
             Need(f"cp.{theme}.wall.top", "16x16", variants=2, note="building roof"),
             Need(f"cp.{theme}.wall.face", "16x16", variants=3, note="building facade (south side)"),
+            Need(f"cp.{theme}.facade.cap", "16x4", variants=1, note="facade column: parapet on top"),
+            Need(f"cp.{theme}.facade.storey", "16x22", variants=3, note="facade column: one upper storey"),
+            Need(f"cp.{theme}.facade.ground", "16x28", variants=3, note="facade column: street floor, doors"),
         ]
     n += [
         Need("cp.any.neon", "16x16", frames=2, note="neon-lit pavement"),

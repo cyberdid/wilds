@@ -8,6 +8,7 @@ generator, can repaint any sprite without touching code.
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import pygame
@@ -153,6 +154,55 @@ class SpriteBank:
             self._iso[key] = s
         return s
 
+    def facade(self, names: tuple[str, ...], t: float = 0.0) -> tuple[pygame.Surface, pygame.Surface | None]:
+        """Stack facade modules top to bottom into one 16 px wide strip, plus the strip's
+        light-emitting pixels (lit windows, neon) or None."""
+        idx = tuple(self._index(n, t) for n in names)
+        key = ("facade", names, idx)
+        hit = self._iso.get(key)
+        if hit is None:
+            parts = [self.base(n)[i] for n, i in zip(names, idx)]
+            s = pygame.Surface((16, sum(p.get_height() for p in parts)), pygame.SRCALPHA)
+            g = pygame.Surface(s.get_size(), pygame.SRCALPHA)
+            y, lit = 0, False
+            for n, p in zip(names, parts):
+                s.blit(p, (0, y))
+                layer = self.glow(n, t)
+                if layer is not None:
+                    g.blit(layer, (0, y))
+                    lit = True
+                y += p.get_height()
+            hit = (s, g if lit else None)
+            self._iso[key] = hit
+        return hit
+
+    def iso_tower(self, top: str, names: tuple[str, ...], t: float, south: bool, east: bool,
+                  memory: bool = False) -> tuple[pygame.Surface, pygame.Surface | None]:
+        """An isometric building tile as tall as its facade strip: the roof diamond on
+        top, the strip itself (1:1, not stretched) on the exposed south/east walls."""
+        ti = self._index(top, t)
+        idx = tuple(self._index(n, t) for n in names)
+        key = ("tower", top, ti, names, idx, south, east, memory)
+        hit = self._iso.get(key)
+        if hit is None:
+            strip, glow = self.facade(names, t)
+            height = strip.get_height()
+            s = pygame.Surface((32, 16 + height), pygame.SRCALPHA)
+            g = pygame.Surface(s.get_size(), pygame.SRCALPHA) if glow is not None and not memory else None
+            for side, x, shade in (("s", 0, 236), ("e", 16, 176)):
+                if (south if side == "s" else east):
+                    s.blit(_to_wall(strip, height, left=side == "s", shade=shade), (x, 8))
+                    if g is not None:
+                        g.blit(_to_wall(glow, height, left=side == "s", shade=255), (x, 8))
+            s.blit(self.iso_tile(top, t), (0, 0))
+            if south and east:
+                pygame.draw.line(s, (20, 15, 30), (16, 16), (16, 15 + height))
+            if memory:
+                s = _tinted(s, "memory")
+            hit = (s, g)
+            self._iso[key] = hit
+        return hit
+
     def anchor(self, name: str, scale: int = 1, flip: bool = False) -> tuple[int, int]:
         a = self.registry.get(name)
         ax, ay = a.ground_anchor
@@ -186,6 +236,12 @@ def _to_wall(src: pygame.Surface, height: int, left: bool, shade: int) -> pygame
     """Map a wall-face texture onto the slanted south (left) or east (right) wall."""
     w, h = src.get_size()
     dst = pygame.Surface((16, height + 8), pygame.SRCALPHA)
+    if (w, h) == (16, height):  # an unstretched strip (a tall facade): shear it column by column
+        for dx in range(16):
+            dst.blit(src, (dx, math.ceil(dx / 2 if left else 8 - dx / 2)), pygame.Rect(dx, 0, 1, h))
+        if shade < 255:
+            dst.fill((shade, shade, min(255, shade + 14), 255), special_flags=pygame.BLEND_RGBA_MULT)
+        return dst
     for dy in range(height + 8):
         for dx in range(16):
             v = dy - (dx / 2 if left else 8 - dx / 2)

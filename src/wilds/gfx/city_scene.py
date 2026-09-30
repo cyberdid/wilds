@@ -26,8 +26,21 @@ SIGN_LIGHT = {CTile.SHOP: (90, 255, 140), CTile.BAR: (255, 226, 90), CTile.FIXER
 GOLD, BAD, GOOD = (255, 222, 90), (255, 96, 96), (140, 255, 150)
 RAINY = ("sprawl", "docks", "corp")
 HEAD_Z = {"TROLL": 25, "DWARF": 13}  # bubble anchor above the feet; dwarves are short
-# isometric building heights per theme: (base, extra per block) - the skyline
-SKYLINE = {"sprawl": (18, 14), "docks": (12, 8), "corp": (28, 20), "station": (16, 4), "outpost": (10, 6)}
+# storeys per building (street floor included), per theme: (lowest, highest) - one
+# height per city block. A storey is taller than the runner, so a street finally
+# reads as a street: tenements, low container stacks, glass towers.
+STOREYS = {"sprawl": (4, 8), "docks": (2, 3), "corp": (9, 14), "station": (2, 4), "outpost": (1, 2)}
+CAP_H, STOREY_H, GROUND_H = 4, 22, 28  # sprites.city_facades module heights
+
+
+def storeys(theme: str, tx: int, ty: int) -> int:
+    lo, hi = STOREYS.get(theme, (3, 5))
+    return lo + hash2(tx // 8, ty // 5, 31) % (hi - lo + 1)
+
+
+def tallest(theme: str) -> int:
+    """Height in px of the highest building a theme can have."""
+    return CAP_H + (STOREYS.get(theme, (3, 5))[1] - 1) * STOREY_H + GROUND_H
 
 
 def _phase(x: int, y: int) -> float:
@@ -40,6 +53,7 @@ class CityScene:
         self.bank = renderer.bank
         self.reg = renderer.bank.registry
         self.actors = ActorTracker()
+        self._facades: dict[tuple, tuple[str, ...]] = {}  # (level, tx, ty) -> facade column
         self.reset()
 
     def reset(self) -> None:
@@ -201,7 +215,10 @@ class CityScene:
         known = hero.known(level.id)
         f.ambient = self.ambient(world)
         night = f.ambient[0] < 190
-        tx0, ty0, tx1, ty1 = f.tile_range()
+        self._hero = hero.pos
+        self._cuts: dict[tuple[int, int], bool] = {}
+        tx0, ty0, vx1, vy1 = f.tile_range()
+        _, _, tx1, ty1 = f.tile_range(rise=tallest(city_theme(level.id)))
         tx0, ty0 = max(0, tx0), max(0, ty0)
         tx1, ty1 = min(level.width - 1, tx1), min(level.height - 1, ty1)
         f.fog_on = not god
@@ -212,8 +229,10 @@ class CityScene:
                 lit = god or p in visible
                 if not lit and p not in known:
                     continue
-                f.fog_tile(tx, ty, None if lit else FOG_MEMORY)
                 tile = level.tile(p) if lit else known[p]
+                if (tx > vx1 or ty > vy1) and tile is not CTile.WALL:
+                    continue  # below the canvas only buildings can reach up into view
+                f.fog_tile(tx, ty, None if lit else FOG_MEMORY)
                 self._tile(f, level, p, tile, lit, now, night)
 
         # the courier job's dead drop
@@ -271,6 +290,44 @@ class CityScene:
             f.sprite(e.name, x, y, now - e.start, flip=e.flip, emissive=e.emissive, center=not e.anchored,
                      layer=3, sort_y=y + e.sort_bias, z=z)
 
+    def _cut(self, f: Frame, level, tx: int, ty: int) -> bool:
+        """Does this tile's city block stand between the camera and the runner? Tall
+        buildings would hide the street he walks, so such a block is cut down."""
+        key = (tx // 8, ty // 5)
+        hit = self._cuts.get(key)
+        if hit is None:
+            hx, hy = self._hero
+            height = CAP_H + (storeys(city_theme(level.id), tx, ty) - 1) * STOREY_H + GROUND_H
+            xs = range(key[0] * 8, key[0] * 8 + 8)
+            ys = range(key[1] * 5, key[1] * 5 + 5)
+            if f.iso:  # in front (deeper) and overlapping on screen
+                hit = any(0 < (x + y) - (hx + hy) <= height // 8 + 2 and abs((x - y) - (hx - hy)) <= 2
+                          for x in xs for y in ys)
+            else:  # south of the runner, its lifted roof reaching up over his street
+                hit = (max(ys) > hy and min(xs) - 1 <= hx <= max(xs) + 1
+                       and max(ys) - hy <= height // 16 + 3)
+            self._cuts[key] = hit
+        return hit
+
+    def _front_row(self, level, tx: int, ty: int) -> int:
+        """The south-most row of the building block this wall tile belongs to."""
+        while level.in_bounds((tx, ty + 1)) and level.tile((tx, ty + 1)) is CTile.WALL:
+            ty += 1
+        return ty
+
+    def _facade(self, level, tx: int, ty: int) -> tuple[str, ...]:
+        """One 16 px column of a facade: parapet, upper storeys, street floor."""
+        theme = city_theme(level.id)
+        key = (level.id, tx, ty)
+        names = self._facades.get(key)
+        if names is None:
+            reg = self.reg
+            ups = [pick(reg, f"cp.{theme}.facade.storey", tx, ty * 17 + k) for k in range(storeys(theme, tx, ty) - 1)]
+            names = (pick(reg, f"cp.{theme}.facade.cap", tx, ty), *ups,
+                     pick(reg, f"cp.{theme}.facade.ground", tx, ty + 101))
+            self._facades[key] = names
+        return names
+
     def _tile(self, f: Frame, level, p, tile: CTile, lit: bool, now: float, night: bool) -> None:
         reg = self.reg
         tx, ty = p
@@ -280,10 +337,16 @@ class CityScene:
             top, face = block
             open_sides = "".join(s for s, (dx, dy) in SIDES.items() if level.in_bounds((tx + dx, ty + dy))
                                  and level.tile((tx + dx, ty + dy)) is not CTile.WALL)
-            base, extra = SKYLINE.get(city_theme(level.id), (16, 8))
-            height = base + hash2(tx // 8, ty // 5, 31) % (extra + 1)  # one height per city block
-            f.block(pick(reg, top, tx, ty), pick(reg, face, tx, ty), tx, ty, now + ph, open_sides, height,
-                    memory=not lit)
+            if self._cut(f, level, tx, ty):
+                if not f.iso:  # between the camera and the runner: drawn flat, the old way
+                    f.block(pick(reg, top, tx, ty), pick(reg, face, tx, ty), tx, ty, now + ph, open_sides)
+                    return
+                facade = self._facade(level, tx, ty)
+                facade = (facade[0], facade[-1])  # cut down to the street floor, Diablo-style
+            else:
+                facade = self._facade(level, tx, ty)
+            f.tower(pick(reg, top, tx, ty), facade, tx, ty, now + ph, open_sides,
+                    self._front_row(level, tx, ty), memory=not lit)
             if "s" in open_sides and lit and night and hash2(tx, ty, 21) % 3 == 0:
                 gx, gy = ground_point(tx, ty)
                 f.light(gx, gy, 16, (255, 200, 120), 0.45, phase=ph, z=6)

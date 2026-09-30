@@ -161,9 +161,14 @@ class Frame:
         vx, vy = self.proj.to_view(gx, gy, z)
         return int(round(vx)) - self.ox, int(round(vy)) - self.oy
 
-    def tile_range(self) -> tuple[int, int, int, int]:
-        """Tiles that can touch the canvas (with slack for tall objects)."""
-        return self.proj.tiles_in(self.ox, self.oy, self.w, self.h)
+    def tile_range(self, rise: int = 0) -> tuple[int, int, int, int]:
+        """Tiles that can touch the canvas (with slack for tall objects); ``rise`` px of
+        buildings standing below the canvas can still reach up into it."""
+        extra = 0
+        if rise:
+            extra = rise // (TILE // 2 if self.proj.iso else TILE) + 1
+        tx0, ty0, tx1, ty1 = self.proj.tiles_in(self.ox, self.oy, self.w, self.h)
+        return tx0, ty0, tx1 + (extra if self.proj.iso else 0), ty1 + extra
 
     def _surf(self, name: str, t: float, flip: bool = False, tint: Tint = None) -> pygame.Surface:
         if name in self.bank:
@@ -224,6 +229,42 @@ class Frame:
         cube = self.bank.iso_block(top, face, t, height, "s" in open_sides, "e" in open_sides, memory)
         depth = tx + ty + 0.5
         self.placed.append(Placed(cube, x0, y0 - height, (depth, 0, tx), solid=True))
+
+    def tower(self, top: str, facade: tuple[str, ...], tx: int, ty: int, t: float, open_sides: str,
+              front_row: int, memory: bool = False) -> None:
+        """A building tile at street scale: ``facade`` is its column of modules (parapet,
+        storeys, street floor), which also sets its height. In 2.5D it is an extruded cube;
+        in 3/4 view the roof is lifted by that height and the south-most row of the block
+        (``front_row``) shows the facade - the whole block sorts at its street front, so
+        people behind it are covered (and get the x-ray outline)."""
+        for name in (top, *facade):
+            if name not in self.bank:
+                self.missing.add(name)
+                return
+        if self.proj.iso:
+            cube, glow = self.bank.iso_tower(top, facade, t, "s" in open_sides, "e" in open_sides, memory)
+            x0, y0 = self.proj.tile_origin(tx, ty)
+            height = cube.get_height() - TILE
+            self.placed.append(Placed(cube, x0 - self.ox, y0 - self.oy - height, (tx + ty + 0.5, 0, tx),
+                                      solid=True, glow=glow))
+            return
+        strip, glow = self.bank.facade(facade, t)
+        height = strip.get_height()
+        x = tx * TILE - self.ox
+        sort = ((front_row + 1) * TILE - 0.5, 0, tx * TILE)
+        roof = self.bank.frame(top, t)
+        edges = "".join(sd for sd in "nwe" if sd in open_sides)
+        if edges:
+            roof = roof.copy()
+            for sd in edges:
+                roof.fill(EDGE, {"n": (0, 0, TILE, 1), "w": (0, 0, 1, TILE), "e": (TILE - 1, 0, 1, TILE)}[sd])
+        self.placed.append(Placed(roof, x, ty * TILE - self.oy - height, sort, solid=True))
+        # the lifted roof stands over tiles further north: don't let their fog veil it
+        for row in range((ty * TILE - height) // TILE, ty):
+            self.fog.setdefault((tx, row), FOG_MEMORY if memory else (0, 0, 0, 0))
+        if ty == front_row:
+            self.placed.append(Placed(strip, x, (ty + 1) * TILE - self.oy - height, sort, solid=True,
+                                      glow=glow))
 
     def fog_tile(self, tx: int, ty: int, rgba: tuple[int, int, int, int] | None) -> None:
         """Mark a drawn tile: None = in plain sight, FOG_MEMORY = remembered only.

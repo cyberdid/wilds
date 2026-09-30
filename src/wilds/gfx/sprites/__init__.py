@@ -15,6 +15,7 @@ MODULES = (
     "ui_icons",
     "fx",
     "city_terrain",
+    "city_facades",
     "city_people",
 )
 
