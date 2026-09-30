@@ -1,0 +1,140 @@
+{
+ "note": "Landmarks the wiki gives no coordinates for, read off the classic zone map art (x% from the west, y% from the north). Estimates, good to a few percent.",
+ "features": [
+  {
+   "id": "great_gate",
+   "name": "Great Gate",
+   "x": 69.9,
+   "y": 59.1,
+   "kind": "gate"
+  },
+  {
+   "id": "camp_narache",
+   "name": "Camp Narache",
+   "x": 52.37,
+   "y": 82.48,
+   "kind": "settlement",
+   "basis": "centre of UiMap 462 (client data)"
+  },
+  {
+   "id": "thunder_bluff_city",
+   "name": "Thunder Bluff",
+   "x": 40.54,
+   "y": 28.33,
+   "kind": "settlement",
+   "basis": "centre of UiMap 88 (client data)"
+  },
+  {
+   "id": "camp_sungraze",
+   "name": "Camp Sungraze",
+   "x": 49.4,
+   "y": 18.7,
+   "kind": "settlement",
+   "basis": "label on the zone map"
+  },
+  {
+   "id": "stonetalon_pass",
+   "name": "Stonetalon Pass (Mulgore)",
+   "x": 31.6,
+   "y": 13.2,
+   "kind": "gate",
+   "basis": "label on the zone map"
+  },
+  {
+   "id": "stonebull_lake",
+   "name": "Stonebull Lake",
+   "x": 49.3,
+   "y": 51.5,
+   "kind": "lake",
+   "basis": "lake blob on the zone map"
+  },
+  {
+   "id": "red_cloud_mesa",
+   "name": "Red Cloud Mesa",
+   "x": 52.4,
+   "y": 80.0,
+   "kind": "plateau",
+   "basis": "wiki: Camp Narache stands on Red Cloud Mesa"
+  }
+ ],
+ "roads": [
+  {
+   "name": "Narache to Bloodhoof",
+   "from": [
+    "Camp Narache",
+    52.4,
+    82.5
+   ],
+   "to": [
+    "Bloodhoof Village",
+    48.6,
+    58.8
+   ]
+  },
+  {
+   "name": "Bloodhoof to Thunderhorn Water Well",
+   "from": [
+    "Bloodhoof Village",
+    48.6,
+    58.8
+   ],
+   "to": [
+    "Thunderhorn Water Well",
+    44.0,
+    46.0
+   ]
+  },
+  {
+   "name": "Thunderhorn to Thunder Bluff",
+   "from": [
+    "Thunderhorn Water Well",
+    44.0,
+    46.0
+   ],
+   "to": [
+    "Thunder Bluff",
+    40.5,
+    31.0
+   ]
+  },
+  {
+   "name": "Bloodhoof to Great Gate",
+   "from": [
+    "Bloodhoof Village",
+    48.6,
+    58.8
+   ],
+   "to": [
+    "Great Gate",
+    69.9,
+    59.1
+   ]
+  },
+  {
+   "name": "Thunderhorn to Bael'dun",
+   "from": [
+    "Thunderhorn Water Well",
+    44.0,
+    46.0
+   ],
+   "to": [
+    "Bael'dun Digsite",
+    33.0,
+    47.0
+   ]
+  },
+  {
+   "name": "Bloodhoof to Venture Co. Mine",
+   "from": [
+    "Bloodhoof Village",
+    48.6,
+    58.8
+   ],
+   "to": [
+    "Venture Co. Mine",
+    61.0,
+    47.0
+   ]
+  }
+ ]
+}
