@@ -109,7 +109,7 @@ The catalog owns searchable entities; atlas.py only draws entries with a tile. W
 - Create: data/azeroth/mulgore/source-manifest.json
 - Local ignored inputs: data/azeroth/raw/mangoszero-database/World/Setup/FullDB/
 
-- [ ] Clone the approved source revision into the already-ignored raw directory and sparse-checkout its FullDB folder:
+- [x] Clone the approved source revision into the already-ignored raw directory and sparse-checkout its FullDB folder:
 
     mkdir -p data/azeroth/raw
     git clone --filter=blob:none --sparse https://github.com/mangoszero/database.git data/azeroth/raw/mangoszero-database
@@ -117,10 +117,10 @@ The catalog owns searchable entities; atlas.py only draws entries with a tile. W
     git -C data/azeroth/raw/mangoszero-database checkout --detach 325948a78015794e6cc626212bc19fee70c805b2
     git -C data/azeroth/raw/mangoszero-database sparse-checkout set World/Setup/FullDB
 
-- [ ] Confirm the local checkout SHA is 325948a78015794e6cc626212bc19fee70c805b2 and inspect these eight files: creature.sql, creature_template.sql, gameobject.sql, gameobject_template.sql, pool_creature.sql, pool_gameobject.sql, game_event_creature.sql, game_event_gameobject.sql.
-- [ ] Add a tracked JSON manifest with source_url, source_revision, source_era, license, license_url, attribution, input_tables, and generated_output. Set source_era to Vanilla 1.12.1–1.12.3, license to CC BY-NC-SA 3.0, license_url to https://creativecommons.org/licenses/by-nc-sa/3.0/, attribution to “based upon the work of getmangos.eu (MaNGOSZero)”, and generated_output to data/azeroth/raw/mulgore-spawns.json.
-- [ ] Confirm Git reports data/azeroth/raw as ignored and leave it unstaged.
-- [ ] Commit the tracked manifest as docs: record Mulgore data provenance.
+- [x] Confirm the local checkout SHA is 325948a78015794e6cc626212bc19fee70c805b2 and inspect these eight files: creature.sql, creature_template.sql, gameobject.sql, gameobject_template.sql, pool_creature.sql, pool_gameobject.sql, game_event_creature.sql, game_event_gameobject.sql.
+- [x] Add a tracked JSON manifest with source_url, source_revision, source_era, license, license_url, attribution, input_tables, and generated_output. Set source_era to Vanilla 1.12.1–1.12.3, license to CC BY-NC-SA 3.0, license_url to https://creativecommons.org/licenses/by-nc-sa/3.0/, attribution to “based upon the work of getmangos.eu (MaNGOSZero)”, and generated_output to data/azeroth/raw/mulgore-spawns.json.
+- [x] Confirm Git reports data/azeroth/raw as ignored and leave it unstaged.
+- [x] Commit the tracked manifest as docs: record Mulgore data provenance.
 
 ## Task 2: Add the World-Coordinate Transform and Mulgore Mask
 
@@ -129,12 +129,12 @@ The catalog owns searchable entities; atlas.py only draws entries with a tile. W
 - Modify: src/wilds/azeroth/terrain.py
 - Read: data/azeroth/mulgore/zone.json and data/azeroth/mulgore/macro.json
 
-- [ ] Extend Geometry with world_map_id, x_min, x_max, y_min, and y_max loaded from zone.json. Follow the coordinate convention documented by tools/zone_scale.py: world X runs north-south and world Y runs west-east.
-- [ ] Implement Geometry.world_to_tile(map_id, x, y): return None for the wrong map ID or coordinates outside x_min < x <= x_max and y_min < y <= y_max. Compute tile_x = floor((y_max - y) / (y_max - y_min) * width) and tile_y = floor((x_max - x) / (x_max - x_min) * height). For an already-valid coordinate, cap a floating-point result equal to the dimension at dimension - 1; do not clamp or accept an out-of-bounds source coordinate.
-- [ ] Keep original world coordinates beside the converted tile; do not overwrite them with rounded tile values.
-- [ ] Add Macro.zone_status(tile, geometry) to classify the converted point against Macro.at(tile_x / geometry.width, tile_y / geometry.height): v is outside, a non-v cell touching a v neighbor or the outer macro border is edge_ambiguous, and other non-v cells are inside_mask.
-- [ ] Confirm source bound (x_max, y_max) maps to tile (0, 0), values just above x_min/y_min map to the final row/column, and a sample map-1 point falls within Mulgore's macro mask. After Task 4, visually compare a joined NPC known to be in Thunder Bluff or Camp Narache against the corresponding approximate feature marker.
-- [ ] Commit as feat: map Mulgore world coordinates to tiles.
+- [x] Extend Geometry with world_map_id, x_min, x_max, y_min, and y_max loaded from zone.json. Follow the coordinate convention documented by tools/zone_scale.py: world X runs north-south and world Y runs west-east.
+- [x] Implement Geometry.world_to_tile(map_id, x, y): return None for the wrong map ID or coordinates outside x_min < x <= x_max and y_min < y <= y_max. Compute tile_x = floor((y_max - y) / (y_max - y_min) * width) and tile_y = floor((x_max - x) / (x_max - x_min) * height). For an already-valid coordinate, cap a floating-point result equal to the dimension at dimension - 1; do not clamp or accept an out-of-bounds source coordinate.
+- [x] Keep original world coordinates beside the converted tile; do not overwrite them with rounded tile values.
+- [x] Add Macro.zone_status(tile, geometry) to classify the converted point against Macro.at(tile_x / geometry.width, tile_y / geometry.height): v is outside, a non-v cell touching a v neighbor or the outer macro border is edge_ambiguous, and other non-v cells are inside_mask.
+- [x] Confirm source bounds and a sample map-1 point with boundary/mask sanity checks. Direct comparison with a Wiki-joined NPC is unavailable in the current content pack: none of its NPC/mob/object records has an `info.id` value, so Task 4 found zero exact joins. Compare the viewer against map features in Task 6 instead.
+- [x] Commit as feat: map Mulgore world coordinates to tiles.
 
 ## Task 3: Parse and Import Spawn Rows Into the Local JSON Snapshot
 
@@ -144,16 +144,16 @@ The catalog owns searchable entities; atlas.py only draws entries with a tile. W
 - Output, ignored: data/azeroth/raw/mulgore-spawns.json
 - Input: the eight named World/Setup/FullDB/*.sql files from Task 1
 
-- [ ] Implement parse_insert_rows(path, table) as a streaming reader for statements shaped as INSERT INTO table (column, ...) VALUES (...), (...);. Decode SQL NULL, integer/decimal literals, single-quoted strings, doubled quotes, and backslash escapes; ignore comments, TRUNCATE, locks, and inserts for other table names.
-- [ ] Read spawn rows from creature.sql and gameobject.sql; read templates from creature_template.sql and gameobject_template.sql. Build dictionaries by INSERT column names, not positional schema assumptions.
-- [ ] Parse condition relations from pool_creature.sql, pool_gameobject.sql, game_event_creature.sql, and game_event_gameobject.sql. Store matching pool/event IDs on each spawn; keep conditional spawns in the output rather than simulating an event state.
-- [ ] Construct spawn keys from row kind and guid; template IDs come from row id. Preserve map, world x/y/z, orientation, movement type, spawn time, gameobject rotation0–rotation3, animprogress, state, and source fields needed to describe a static spawn.
-- [ ] Keep creature_template distinct from spawn rows and gameobject_template distinct from object spawn rows. Preserve template name, subname, level range, faction IDs, NpcFlags, gameobject type, and displayId. Unresolved template IDs remain in the snapshot with an unresolved-template count.
-- [ ] Implement CLI arguments --sql-dir, --pack-dir, and --out with defaults from the file map. Write JSON atomically through a sibling temporary file before replacing the target.
-- [ ] Classify rows without a source area_id using map, Geometry.world_to_tile(), and the macro mask from Task 2. Preserve ambiguous/outside rows in coverage counters by reason; include edge-ambiguous candidates in the searchable catalog with their tile, but keep them off the default map layer until the uncertain-position filter is enabled.
-- [ ] Include source URL/revision, version label, license, attribution, transform version, table totals, included totals, wrong-map/out-of-bounds/outside-mask/edge counts, and unresolved-template counts in the JSON header.
-- [ ] Run the importer once locally; inspect its JSON header and a sample creature/object row. Keep its output under the ignored data/azeroth/raw/ directory.
-- [ ] Commit code as feat: import Vanilla Mulgore spawns without staging raw SQL or generated JSON.
+- [x] Implement parse_insert_rows(path, table) as a streaming reader for statements shaped as INSERT INTO table (column, ...) VALUES (...), (...);. Decode SQL NULL, integer/decimal literals, single-quoted strings, doubled quotes, and backslash escapes; ignore comments, TRUNCATE, locks, and inserts for other table names.
+- [x] Read spawn rows from creature.sql and gameobject.sql; read templates from creature_template.sql and gameobject_template.sql. Build dictionaries by INSERT column names, not positional schema assumptions.
+- [x] Parse condition relations from pool_creature.sql, pool_gameobject.sql, game_event_creature.sql, and game_event_gameobject.sql. Store matching pool/event IDs on each spawn; keep conditional spawns in the output rather than simulating an event state.
+- [x] Construct spawn keys from row kind and guid; template IDs come from row id. Preserve map, world x/y/z, orientation, movement type, spawn time, gameobject rotation0–rotation3, animprogress, state, and source fields needed to describe a static spawn.
+- [x] Keep creature_template distinct from spawn rows and gameobject_template distinct from object spawn rows. Preserve template name, subname, level range, faction IDs, NpcFlags, gameobject type, and displayId. Unresolved template IDs remain in the snapshot with an unresolved-template count.
+- [x] Implement CLI arguments --sql-dir, --pack-dir, and --out with defaults from the file map. Write JSON atomically through a sibling temporary file before replacing the target.
+- [x] Classify rows without a source area_id using map, Geometry.world_to_tile(), and the macro mask from Task 2. Preserve ambiguous/outside rows in coverage counters by reason; include edge-ambiguous candidates in the searchable catalog with their tile, but keep them off the default map layer until the uncertain-position filter is enabled.
+- [x] Include source URL/revision, version label, license, attribution, transform version, table totals, included totals, wrong-map/out-of-bounds/outside-mask/edge counts, and unresolved-template counts in the JSON header.
+- [x] Run the importer once locally; inspect its JSON header and a sample creature/object row. Keep its output under the ignored data/azeroth/raw/ directory.
+- [x] Commit code as feat: import Vanilla Mulgore spawns without staging raw SQL or generated JSON.
 
 ## Task 4: Build a Provenance-Aware Searchable Catalog
 
@@ -162,15 +162,15 @@ The catalog owns searchable entities; atlas.py only draws entries with a tile. W
 - Read: src/wilds/azeroth/content.py
 - Read: data/azeroth/mulgore/npcs.json, mobs.json, objects.json, subzones.json, quests.json, lores.json, and features.json
 
-- [ ] Define SpawnInstance, CatalogEntry, and AtlasCatalog above, plus a Coverage mapping that retains every importer counter.
-- [ ] Load each creature/gameobject template once and attach it to every spawn with the same numeric template_id; never merge spawn rows that share a template.
-- [ ] Join Wiki NPC/mob/object pages only when info.id contains exactly one integer matching a template ID. Do not fuzzy-join by title. Keep nonmatching Wiki pages and templates as catalog-only entries without a marker.
-- [ ] Mark DB-backed entries era_status=vanilla_db and coordinate_status=source_spawn. Display a creature spawn as an NPC when its template has nonzero NpcFlags or its exactly joined Wiki page identifies it as an NPC; otherwise display it as a creature. This changes its filter/marker category only and never duplicates the spawn. Mark Wiki-only pages era_status=unknown unless the record explicitly identifies a later expansion, in which case mark later_era; use source_map only for Wiki coordinates and unplaced when no trusted point exists.
-- [ ] Keep features.json locations as separate source_map/approximate entries according to their basis; never pass heuristic ZoneWorld.placements into the trusted spawn list.
-- [ ] Implement load_catalog(pack_dir, spawn_file) and case-insensitive AtlasCatalog.search(query, kinds). Search title, numeric source ID, template ID, and existing Wiki links; return unplaced rows as normal entries.
-- [ ] Build catalog indexes once at load: normalized searchable names/IDs, a list of unplaced entries, and a spatial chunk index keyed by (tile_x // 64, tile_y // 64). AtlasCatalog.visible(tile_bounds) returns only entries in intersecting spatial chunks and inside the requested tile rectangle.
-- [ ] Manually inspect counts for imported spawn rows, joined templates, joined Wiki pages, and unplaced pages against importer totals. Confirm there are no silent joins or drops.
-- [ ] Commit as feat: add Mulgore entity catalog.
+- [x] Define SpawnInstance, CatalogEntry, and AtlasCatalog above, plus a Coverage mapping that retains every importer counter.
+- [x] Load each creature/gameobject template once and attach it to every spawn with the same numeric template_id; never merge spawn rows that share a template.
+- [x] Join Wiki NPC/mob/object pages only when info.id contains exactly one integer matching a template ID. Do not fuzzy-join by title. Keep nonmatching Wiki pages as separate catalog entries; any explicit page coordinate is a source_map point, never a spawn marker. Keep template-only records unplaced. The current pack has no exact NPC/mob/object IDs, so all 801 pages remain separate catalog entries.
+- [x] Mark DB-backed entries era_status=vanilla_db and coordinate_status=source_spawn. Display a creature spawn as an NPC when its template has nonzero NpcFlags or its exactly joined Wiki page identifies it as an NPC; otherwise display it as a creature. This changes its filter/marker category only and never duplicates the spawn. Mark Wiki-only pages era_status=unknown unless the record explicitly identifies a later expansion, in which case mark later_era; use source_map only for Wiki coordinates and unplaced when no trusted point exists.
+- [x] Keep features.json locations as separate approximate entries according to their basis; never pass heuristic ZoneWorld.placements into the trusted spawn list.
+- [x] Implement load_catalog(pack_dir, spawn_file) and case-insensitive AtlasCatalog.search(query, kinds). Search title, numeric source ID, template ID, and existing Wiki links; return unplaced rows as normal entries.
+- [x] Build catalog indexes once at load: normalized searchable names/IDs, a list of unplaced entries, and a spatial chunk index keyed by (tile_x // 64, tile_y // 64). AtlasCatalog.visible(tile_bounds) returns only entries in intersecting spatial chunks and inside the requested tile rectangle.
+- [x] Manually inspect counts for imported spawn rows, joined templates, joined Wiki pages, and unplaced pages against importer totals. Confirm there are no silent joins or drops.
+- [x] Commit as feat: add Mulgore entity catalog.
 
 ## Task 5: Render the Full-Scale Terrain Viewport and Static Markers
 
