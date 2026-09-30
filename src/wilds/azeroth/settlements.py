@@ -109,6 +109,28 @@ RISE_BUILDINGS = {
 }
 
 
+# Street life of a rise, per 46 tiles of radius (scaled down for smaller rises): sprite, count, min/max radius
+# as a share of the platform radius, footprint in tiles.
+STREET: list[tuple[str, int, float, float, int]] = [
+    ("az.obj.hut_large", 10, 0.30, 0.86, 6), ("az.obj.hut_small", 26, 0.22, 0.90, 4), ("az.obj.tent", 18, 0.25, 0.90, 3),
+    ("az.tb.tent_row", 6, 0.35, 0.85, 10), ("az.tb.totem_tall", 6, 0.20, 0.85, 4), ("az.obj.totem_pole", 6, 0.20, 0.90, 3),
+    ("az.tb.brazier", 14, 0.10, 0.92, 2), ("az.obj.torch", 34, 0.10, 0.95, 1), ("az.obj.bonfire", 5, 0.15, 0.80, 2),
+    ("az.tb.pot", 26, 0.10, 0.95, 1), ("az.obj.barrel", 16, 0.10, 0.95, 1), ("az.obj.crate", 12, 0.10, 0.95, 1),
+    ("az.obj.drying_rack", 9, 0.25, 0.90, 2), ("az.obj.hide_stretcher", 7, 0.25, 0.90, 2),
+    ("az.tb.hanging_hides", 12, 0.20, 0.92, 3), ("az.tb.drum", 8, 0.10, 0.85, 2), ("az.obj.banner", 10, 0.15, 0.95, 1),
+    ("az.tb.banner_pole", 8, 0.20, 0.95, 2), ("az.tb.prayer_flags", 8, 0.20, 0.90, 4), ("az.obj.signpost", 4, 0.15, 0.80, 1),
+    ("az.obj.well", 3, 0.25, 0.75, 2), ("az.obj.anvil", 2, 0.30, 0.80, 1), ("az.obj.forge", 2, 0.30, 0.80, 2),
+    ("az.obj.kodo_saddle_rack", 3, 0.30, 0.85, 2), ("az.obj.haystack", 4, 0.30, 0.85, 2), ("az.obj.cooking_pot", 6, 0.15, 0.80, 1),
+    ("az.obj.wagon", 2, 0.35, 0.85, 3),
+]
+
+
+def _street(plat: Platform) -> Recipe:
+    k = plat.radius / 46
+    return [(sprite, max(1, round(count * k * k)), max(2, int(lo * plat.radius)), int(hi * plat.radius), size)
+            for sprite, count, lo, hi, size in STREET]
+
+
 def _free(world: "ZoneWorld", p: Pos) -> bool:
     return world.terrain.tile(*p) not in (Terrain.WATER, Terrain.SHALLOWS, Terrain.VOID, Terrain.MOUNTAIN,
                                           Terrain.CLIFF, Terrain.BOULDER)
@@ -146,9 +168,14 @@ def build_structures(world: "ZoneWorld") -> list[Structure]:
         radius, recipe = RECIPES[p.title]
         center = world.nearest_passable(p.pos, 30) or p.pos
         out += _scatter(world, random.Random(rng.random()), center, radius, recipe, out)
+    bridge = bridge_tiles(world)
     for plat in platforms(world):
         for sprite, dx, dy, size in RISE_BUILDINGS.get(plat.name, []):
             out.append(Structure(sprite, (plat.center[0] + dx, plat.center[1] + dy), size))
+        rng_plat = random.Random(rng.random())
+        for s in _scatter(world, rng_plat, plat.center, plat.radius, _street(plat), out):
+            if not any((s.pos[0] + dx, s.pos[1] + dy) in bridge for dx in (-1, 0, 1) for dy in (-1, 0, 1)):
+                out.append(s)
     return out
 
 

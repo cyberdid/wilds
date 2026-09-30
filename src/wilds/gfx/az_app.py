@@ -522,11 +522,7 @@ class AzApp:
                     self._scatter(f, terr, x, y, gxw, gyw, seed, now)
                 elif kind in ("mesa", "platform"):
                     if kind == "mesa" and terr is Terrain.MESA:
-                        hh = tile_hash(x, y, seed)
-                        if hh % 53 == 0:
-                            f.sprite(self.painter.variant("az.rock.spire", x, y), gxw, gyw, z=hgt)
-                        elif hh % 41 == 0:
-                            f.sprite(self.painter.variant("az.rock.slab", x, y), gxw, gyw, z=hgt)
+                        self._scatter_mesa(f, x, y, gxw, gyw, hgt, seed, now)
                 if terr is Terrain.BOULDER and hgt == 0:
                     f.sprite(self.painter.variant("az.boulder", x, y), gxw, gyw)
         self._collect(f, tx0, ty0, tx1, ty1)
@@ -542,7 +538,7 @@ class AzApp:
             return v("az.ground.mesa", x, y), face if face in self.bank else v("az.cliff.face", x, y)
         if kind == "platform":
             plat = settlements.on_platform(self.world, (x, y), self.relief.platforms)
-            inlay = plat is not None and math.hypot(x - plat.center[0], (y - plat.center[1]) / 0.75) <= settlements.PLAZA_RADIUS
+            inlay = plat is not None and math.hypot(x - plat.center[0], (y - plat.center[1]) / 0.75) <= settlements.PLAZA_RADIUS and (x + y) % 3 == 0
             top = v("az.tb.platform.inlay" if inlay and "az.tb.platform.inlay" in self.bank.registry._variants else "az.tb.platform", x, y)
             return top, v("az.tb.platform.edge", x, y)
         return v("az.tb.bridge", x, y), v("az.tb.platform.edge", x, y)
@@ -579,6 +575,26 @@ class AzApp:
         elif h % 31 == 0:
             f.sprite(self._variant_name(("az.deco.stones", "az.deco.tuft", "az.deco.dry_bush", "az.deco.bones")[(h >> 5) % 4], x, y),
                      gx, gy, solid=False)
+
+    def _scatter_mesa(self, f: Frame, x: int, y: int, gx: float, gy: float, z: float, seed: int, now: float) -> None:
+        """Dry scrub, spires and stones on a mesa top."""
+        h = tile_hash(x, y, seed)
+        v = self.painter.variant
+        if h % 47 == 0:
+            f.sprite(v("az.rock.spire", x, y), gx, gy, z=z, shadow=14)
+        elif h % 31 == 0:
+            f.sprite(v("az.rock.boulder_big", x, y), gx, gy, z=z, shadow=12)
+        elif h % 23 == 0:
+            f.sprite(v("az.rock.slab", x, y), gx, gy, z=z)
+        elif h % 37 == 0:
+            f.sprite(v("az.plant.dead_tree", x, y), gx, gy, z=z, shadow=10)
+        elif h % 11 == 0:
+            f.sprite(v("az.plant.thornbush", x, y), gx, gy, z=z, shadow=8)
+        elif h % 7 == 0:
+            f.sprite(v("az.plant.grass_clump", x, y), gx, gy, now + (h % 11) * 0.27, z=z, solid=False)
+        elif h % 13 == 0:
+            f.sprite(self._variant_name(("az.deco.dry_bush", "az.deco.stones", "az.deco.bones", "az.deco.tuft")[(h >> 5) % 4], x, y),
+                     gx, gy, z=z, solid=False)
 
     def _variant_name(self, name: str, x: int, y: int) -> str:
         return name if name in self.bank.registry._arts else self.painter.variant(name, x, y)

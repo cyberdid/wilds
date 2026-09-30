@@ -342,7 +342,7 @@ def _mountain_top(seed: int) -> Canvas:
     c = Canvas(T, T)
     h = _rock_height(seed, 3, 1.0, 5.0)
     f = _mix((0.35, _emboss(h)), (0.3, h), (0.35, fbm(T, T, seed + 3, 2, 2)))
-    _quantize(c, _varied(f, seed + 50, 0.5), "opqr", [12, 38, 38, 12], dither=0.1)
+    _quantize(c, _varied(f, seed + 50, 0.5), "opqr", [12, 38, 38, 12], dither=0.0)
     for y in range(T):  # the cracks between slabs, broken up
         for x in range(T):
             if h[y][x] < 0.06 and bayer(x, y) < 0.75:
@@ -374,19 +374,18 @@ def _face_columns(seed: int, tones: str, weights: list[float], bands: float) -> 
 
 
 def _lip(c: Canvas, seed: int, grass: bool) -> None:
-    """Top edge of a wall: an earth-and-grass (or bare rock) lip, a sunlit rim of rock
-    below it and a thin shadow line; periodic sideways. The foot is dark."""
+    """Top edge of a wall: a grass (or bare sunlit rock) rim, a lit rock edge and a thin
+    shadow line - kept to 3 rows because the client stretches faces to the block height;
+    periodic sideways. The foot is dark."""
     n = fbm(T, 1, seed, 2, 4)[0]
     for x in range(T):
         if grass:
-            c.set(x, 0, FRINGE.px[0][x] if n[x] > 0.3 else "C")
-            c.set(x, 1, "C" if n[(x + 4) % T] > 0.45 else "s")
-            c.set(x, 2, "s" if n[(x + 7) % T] > 0.3 else "r")
+            c.set(x, 0, FRINGE.px[0][x] if n[x] > 0.25 else "C")
+            c.set(x, 1, "s" if n[(x + 7) % T] > 0.3 else ("2" if n[x] > 0.6 else "r"))
         else:
-            c.set(x, 0, "t" if n[x] > 0.55 else "s")
-            c.set(x, 1, "s" if n[(x + 7) % T] > 0.35 else "r")
-            c.set(x, 2, "r")
-        c.set(x, 3, "n" if n[(x + 3) % T] > 0.5 else "o")
+            c.set(x, 0, "t" if n[x] > 0.5 else "s")
+            c.set(x, 1, "s" if n[(x + 7) % T] > 0.4 else "r")
+        c.set(x, 2, "n" if n[(x + 3) % T] > 0.45 else "o")
         c.set(x, T - 1, "m")
         if bayer(x, 0) < 0.5:
             c.set(x, T - 2, "m")
@@ -408,51 +407,42 @@ def _cliff_face(seed: int) -> Canvas:
 
 
 def _mesa_face(seed: int) -> Canvas:
-    """Mulgore's layered mesa wall: horizontal strata of uneven thickness in red, rust and
-    pale sandstone (each ledge lit along its top, undercut below), a couple of long
-    vertical joints, a bare-rock lip and a dark foot; periodic sideways."""
+    """Mulgore's layered mesa wall: bold horizontal strata of uneven thickness in brick red,
+    rust, deep maroon and pale sandstone - each ledge sunlit along its top edge and undercut
+    by a dark line below - one long vertical joint, a bare-rock lip and a dark foot;
+    periodic sideways."""
     rng = random.Random(seed)
     c = Canvas(T, T)
     warp = fbm(T, 1, seed, 2, 4)[0]
-    fine = fbm(T, T, seed + 1, 2, 8)
-    bands = []
-    y = 0.0
-    tones = ["q", "p", "r", "o", "q", "p"]
-    while y < T + 4:
-        th = rng.choice((2, 3, 3, 4, 5))
-        pale = rng.random() < 0.18
-        bands.append((y, th, "E" if pale else rng.choice(tones)))
-        y += th
-    tone = {ch: i for i, ch in enumerate(ROCK_CH)}
+    grain = fbm(T, T, seed + 1, 1, 8)
+    # (lit top, body, undercut) for each kind of rock layer
+    kinds = [("r", "q", "o"), ("q", "p", "n"), ("s", "r", "p"), ("G", "F", "D"), ("p", "o", "m")]
+    bands, y, last = [], 0.0, -1
+    while y < T + 6:
+        k = rng.choice([i for i in range(len(kinds)) if i != last])
+        th = rng.choice((2, 3, 3, 4, 4, 5))
+        bands.append((y, th, kinds[k]))
+        last, y = k, y + th
     for y in range(T):
         for x in range(T):
-            s_ = y + 1.4 * (warp[x] - 0.5)
-            y0, th, ch = next(((b0, t_, ch_) for b0, t_, ch_ in bands if b0 <= s_ < b0 + t_), bands[-1])
+            s_ = y + 1.6 * (warp[x] - 0.5)
+            y0, th, (lit, body, under) = next(((b0, t_, k_) for b0, t_, k_ in bands if b0 <= s_ < b0 + t_),
+                                              bands[-1])
             pos = s_ - y0
-            if ch == "E":
-                ch = "F" if pos < 0.9 else ("D" if pos >= th - 0.9 else "E")
-            else:
-                i = tone[ch]
-                if pos < 0.9:
-                    i += 1  # the ledge's lit top
-                elif pos >= th - 0.9:
-                    i -= 2  # undercut
-                i += 1 if fine[y][x] > 0.82 else (-1 if fine[y][x] < 0.12 else 0)
-                if y > 10 and bayer(x, y) < (y - 10) / 7:
-                    i -= 1
-                ch = ROCK_CH[max(0, min(7, i))]
+            ch = lit if pos < 1.0 else (under if pos >= th - 0.9 else body)
+            if ch == body and grain[y][x] > 0.8:
+                ch = lit
+            if y > 11 and bayer(x, y) < (y - 11) / 6:
+                ch = under
             c.set(x, y, ch)
-    for _k in range(2):  # long vertical joints, wobbling
-        x = rng.randrange(T)
-        y = rng.randrange(3, 7)
-        for _j in range(rng.randrange(6, 11)):
-            if y >= T - 1:
-                break
-            c.set(x % T, y, "m")
-            if c.get((x - 1) % T, y) not in "m":
-                c.set((x - 1) % T, y, "r" if bayer(x, y) < 0.5 else "q")
-            y += 1
-            x += rng.choice((0, 0, 0, 1, -1))
+    x = rng.randrange(T)  # one long vertical joint, wobbling
+    y = rng.randrange(3, 6)
+    for _j in range(rng.randrange(7, 11)):
+        if y >= T - 1:
+            break
+        c.set(x % T, y, "m")
+        y += 1
+        x += rng.choice((0, 0, 0, 1, -1))
     _lip(c, seed + 11, grass=False)
     return c
 
@@ -1462,8 +1452,9 @@ def _arch() -> Canvas:
 
 
 def _plants_rocks() -> None:
-    for i in range(4):
-        register(f"az.mesa.face@{i}", art(_mesa_face(850 + i).grid(), legend=TER, note="layered red mesa wall"))
+    # seeds picked so the four walls share the same mean brightness (neighbours sit side by side)
+    for i, sd in enumerate((924, 852, 926, 884)):
+        register(f"az.mesa.face@{i}", art(_mesa_face(sd).grid(), legend=TER, note="layered red mesa wall"))
     notes = ["flat-topped acacia", "wide two-tiered acacia", "broad shade tree", "tall forked tree"]
     for i in range(4):
         register(f"az.plant.tree@{i}", art(_tree(i).grid(), legend=PL, note=notes[i]))

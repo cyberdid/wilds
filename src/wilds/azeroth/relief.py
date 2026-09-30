@@ -17,7 +17,7 @@ from .terrain import Terrain
 if TYPE_CHECKING:
     from .world import ZoneWorld
 
-MESA_HEIGHT = 18
+MESA_HEIGHT = 20
 PLATFORM_HEIGHT = 34
 BRIDGE_HEIGHT = 30
 CLIFF_BASE, CLIFF_VAR = 14, 10
@@ -53,7 +53,7 @@ class Relief:
         if kind == "bridge":
             return BRIDGE_HEIGHT
         if kind == "mesa":
-            return self._q(MESA_HEIGHT + 8 * self.noise.fractal(x / 10 + 9, y / 10 + 9, 2))
+            return MESA_HEIGHT + (8 if self.noise.fractal(x / 26 + 9, y / 26 + 9, 2) > 0.62 else 0)  # rare terraces, not thin ledges
         if kind == "cliff":
             n = self.noise.fractal(x / 14, y / 14, 2)
             return self._q(CLIFF_BASE + CLIFF_VAR * n)
