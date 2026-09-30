@@ -211,12 +211,12 @@ The catalog owns searchable entities; atlas.py only draws entries with a tile. W
 - Create: docs/azeroth/mulgore-atlas.md
 - Read: docs/superpowers/specs/2026-09-30-mulgore-static-atlas-design.md
 
-- [ ] Document the pinned upstream revision, its Vanilla 1.12.1–1.12.3 scope, the CC BY-NC-SA 3.0 license, and required attribution.
-- [ ] Document the sparse-checkout, importer and viewer commands, controls, and the ignored source/output paths.
-- [ ] Explain that MaNGOSZero is not an authoritative 1.13.x+ Blizzard Classic Era database, Wiki-only entries are not presumed Vanilla, and terrain noise/estimated routes are not exact geometry.
-- [ ] Include actual coverage counters and describe totals as coverage of the pinned source snapshot, not of every current Classic Era realm.
-- [ ] Run git diff --check, inspect git status --short, confirm no data/azeroth/raw files are staged, and manually open the documented viewer command from a clean shell.
-- [ ] Commit as docs: explain Mulgore atlas data and controls.
+- [x] Document the pinned upstream revision, its Vanilla 1.12.1–1.12.3 scope, the CC BY-NC-SA 3.0 license, and required attribution.
+- [x] Document the sparse-checkout, importer and viewer commands, controls, and the ignored source/output paths.
+- [x] Explain that MaNGOSZero is not an authoritative 1.13.x+ Blizzard Classic Era database, Wiki-only entries are not presumed Vanilla, and terrain noise/estimated routes are not exact geometry.
+- [x] Include actual coverage counters and describe totals as coverage of the pinned source snapshot, not of every current Classic Era realm.
+- [x] Run git diff --check, inspect git status --short, confirm no data/azeroth/raw files are staged, and manually open the documented viewer command from a clean shell using the headless SDL driver.
+- [x] Commit as docs: explain Mulgore atlas data and controls.
 
 ## Self-Review Against the Spec
 
