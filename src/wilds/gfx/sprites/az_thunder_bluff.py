@@ -1075,6 +1075,338 @@ def _support_pillars() -> None:
                                                   note="lashed timber pillar below a rise"))
 
 
+# --- small props ------------------------------------------------------------------------------------
+
+
+def _ball(c: Canvas, cx: float, cy: float, rx: float, ry: float, ramp: str, x0: int = 0, y0: int = 0,
+          y_min: int = -99, y_max: int = 99) -> None:
+    """A round body (pot, drum, bowl) lit from the top-left, quantised into ``ramp``
+    (dark -> light), Bayer-dithered between steps."""
+    n = len(ramp)
+    for y in range(max(0, y_min), min(c.h, y_max + 1)):
+        for x in range(c.w):
+            nx, ny = (x + 0.5 - cx) / rx, (y + 0.5 - cy) / ry
+            d = nx * nx + ny * ny
+            if d > 1:
+                continue
+            nz = math.sqrt(1 - d)
+            v = (-0.55 * nx - 0.45 * ny + 0.7 * nz + 0.3) / 1.6 + (bayer(x, y) - 0.5) * 0.14
+            c.set(x, y, ramp[max(0, min(n - 1, int(v * n)))])
+
+
+FLAMES = (
+    ["....Q.....",
+     "...QfQ..Q.",
+     "...QfQ.QQ.",
+     "..QfFfQfQ.",
+     "..QfFWFfQ.",
+     ".QfFWWFfQ.",
+     ".QfFWWWFfQ",
+     "QfFFWWFFfQ",
+     "QffFFFFffQ"],
+    ["......Q...",
+     "..Q..QfQ..",
+     "..QQ.QfQ..",
+     ".QfQQfFfQ.",
+     ".QfFfFWFQ.",
+     ".QfFWWFfQ.",
+     "QfFWWWFFfQ",
+     "QfFFWWFFfQ",
+     "QffFFFFffQ"],
+    [".....Q....",
+     "....QfQ...",
+     ".Q..QfFQ..",
+     ".QQ.QFfQQ.",
+     ".QfQfFWfQ.",
+     "QfFfWWFfQ.",
+     "QfFWWWWFfQ",
+     "QfFFWWFFfQ",
+     "QffFFFFffQ"],
+)
+
+
+def _brazier() -> None:
+    """A standing fire brazier: a painted clay bowl on a lashed timber tripod, the fire
+    licking up out of it (3 frames), a spark drifting off."""
+    frames = []
+    for f in range(3):
+        c = Canvas(16, 24)
+        # tripod legs, lashed under the bowl
+        c.line(4, 13, 2, 22, "3")
+        c.line(11, 13, 13, 22, "2")
+        c.vline(7, 13, 22, "3")
+        c.vline(8, 13, 22, "2")
+        _stamp(c, 3, 15, ["dcddcddcdc", "cbccbccbcb"])
+        # the bowl
+        _ball(c, 7.5, 9.5, 6.5, 4.5, "ABCDE", y_min=9, y_max=13)
+        for x in range(1, 15):
+            c.set(x, 9, "D" if x < 8 else "C")
+        for x in range(2, 14):
+            if c.get(x, 11) != ".":
+                c.set(x, 11, "q" if x < 5 else "R" if x < 11 else "r")
+            if x % 3 == 0 and c.get(x, 12) != ".":
+                c.set(x, 12, "T" if x < 8 else "t")
+        g = _finish(c, (8, 23.3, 6, 1.1))
+        _stamp(g, 3, 0, FLAMES[f])  # fire after the outline: flames stay soft
+        for x in range(2, 14):
+            if g.get(x, 9) in "DC":
+                g.set(x, 9, "l" if x % 2 else "Q")  # coals glowing on the rim
+        sx, sy = ((12, 1), (2, 0), (13, 3))[f]
+        g.set(sx, sy, "F")
+        frames.append(g.grid())
+    register("az.tb.brazier", art(*frames, legend=TB, fps=6, note="standing fire brazier"))
+
+
+def _drum() -> None:
+    """A big ceremonial drum: a hide head stretched over a wide timber body, laced down
+    to a lower hoop, painted bands; Elder Rise's has a beater resting on it."""
+    for i in range(2):
+        c = Canvas(16, 16)
+        paint = ("q", "R", "r") if i == 0 else ("T", "t", "t")
+        # body: a squat cylinder
+        for y in range(5, 14):
+            for x in range(2, 14):
+                t = (x - 2) / 11
+                c.set(x, y, "4" if t < 0.15 else "3" if t < 0.55 else "2" if t < 0.85 else "1")
+        # lacing zigzag from the top hoop to the bottom hoop
+        for x in range(2, 14):
+            y = 7 + (x % 4 if x % 4 < 3 else 1)
+            c.set(x, y, "d" if x < 8 else "c")
+        _band(c, 2, 13, 11, *paint)
+        _band(c, 2, 13, 12, *paint)
+        c.hline(2, 13, 13, "1")
+        # the hide head seen from above
+        for y in range(2, 7):
+            for x in range(1, 15):
+                nx, ny = (x + 0.5 - 7.5) / 6.5, (y + 0.5 - 4.5) / 2.3
+                d = nx * nx + ny * ny
+                if d <= 1:
+                    c.set(x, y, "b" if d > 0.72 else "e" if nx < -0.2 and ny < 0.3 else "d")
+        if i == 0:
+            _stamp(c, 6, 3, [".r.", "rRr", ".r."])  # a red sun painted on the head
+        else:
+            _stamp(c, 5, 3, ["t...t", ".tTt."])  # a turquoise moon painted on the head
+            c.line(9, 1, 14, 4, "3")  # the beater
+            _stamp(c, 8, 0, ["ee", "dd"])
+        # short feet
+        c.set(3, 14, "2")
+        c.set(12, 14, "1")
+        g = _finish(c, (8, 15.2, 7, 1.0))
+        if i == 1:
+            _stamp(g, 14, 8, ["j", "e", "R"])  # feathers tied to the hoop
+        register(f"az.tb.drum@{i}", art(g.grid(), legend=TB, note="big ceremonial drum"))
+
+
+def _stairs() -> None:
+    """Wooden stairs climbing north between platform levels: four steps a tile (lit
+    tread, dark riser), log stringers on both sides; seamless when stacked."""
+    for i in range(2):
+        c = Canvas(T, T)
+        g = _grain(2000 + i)
+        for y in range(T):
+            r = y % 4
+            for x in range(2, 14):
+                gv = g[y][x] + (bayer(x, y) - 0.5) * 0.2
+                if r == 0:
+                    ch = "5" if gv > 0.6 else "4"
+                elif r == 1:
+                    ch = "4" if gv > 0.5 else "3"
+                elif r == 2:
+                    ch = "1"
+                else:
+                    ch = "0" if bayer(x, y) < 0.5 else "1"
+                c.set(x, y, ch)
+            c.set(0, y, "3")
+            c.set(1, y, "2")
+            c.set(14, y, "2")
+            c.set(15, y, "1")
+            if r == 2:  # pegs where each tread sits on the stringer
+                c.set(1, y, "0")
+                c.set(14, y, "0")
+        if i == 1:  # a red hide runner laid down the middle
+            for y in range(T):
+                r = y % 4
+                for x in range(6, 10):
+                    base = {0: "q", 1: "R", 2: "r", 3: "r"}[r]
+                    c.set(x, y, "c" if x in (6, 9) and r < 2 else base)
+        else:  # treads worn pale in the middle
+            for y in range(0, T, 4):
+                for x in range(6, 10):
+                    if bayer(x, y) < 0.5:
+                        c.set(x, y, "5")
+        register(f"az.tb.stairs@{i}", art(c.grid(), legend=TB, note="wooden stairs between platform levels"))
+
+
+HIDE = [
+    ".b....b.",
+    "bccccccb",
+    ".cddddc.",
+    ".cdeedc.",
+    ".cdeedcb",
+    ".cddddc.",
+    ".cdddcc.",
+    "bcddccc.",
+    ".ccccccb",
+    "b.cccc..",
+    "..cccc..",
+    "...cc...",
+]
+
+
+def _hanging_hides() -> None:
+    """Hides and feathers hung from a lashed beam between two posts to dry."""
+    for i in range(2):
+        c = Canvas(32, 24)
+        _log_v(c, 1, 2, 2, 22)
+        _log_v(c, 29, 30, 2, 22)
+        c.hline(0, 31, 2, "4")
+        c.hline(0, 31, 3, "2")
+        for lx in (1, 29):
+            _stamp(c, lx, 2, ["dc", "cb"])
+        if i == 0:
+            spots = [(4, "plain"), (13, "paint"), (22, "dark")]
+        else:
+            spots = [(4, "dark"), (15, "paint")]
+        for x0, kind in spots:
+            h = [row for row in HIDE]
+            if kind == "dark":
+                h = [r.translate(str.maketrans("bcde", "abbc")) for r in h]
+            _stamp(c, x0, 4, h)
+            if kind == "paint":
+                _stamp(c, x0 + 2, 7, [".RR.", "RqRr", ".Rr.", "..r."])
+        # a string of feathers (and bones on the second)
+        fx = 21 if i == 0 else 25
+        if i == 0:
+            fx = 12
+        strings = [(fx, 4)] if i == 0 else [(24, 4), (27, 4)]
+        for sx, sy in strings:
+            c.vline(sx, sy, sy + 4, "b")
+            _stamp(c, sx, sy + 5, ["J", "j", "R"] if (sx + i) % 2 else ["i", "J", "t"])
+        if i == 1:
+            _stamp(c, 25, 13, ["jJ", "ij", "Jj"])  # a small bone charm
+        g = _finish(c, (16, 23.3, 15, 1.1))
+        register(f"az.tb.hanging_hides@{i}", art(g.grid(), legend=TB, note="hides and feathers hung from a beam"))
+
+
+def _prayer_flags() -> None:
+    """Prayer flags on a rope between two short posts; the flags flutter in the wind
+    (their tails flick out to the right in the second frame)."""
+    colors = [("q", "R"), ("e", "d"), ("T", "t"), ("D", "C"), ("R", "r")]
+    frames = []
+    for f in range(2):
+        c = Canvas(32, 16)
+        _log_v(c, 1, 2, 1, 14)
+        _log_v(c, 29, 30, 1, 14)
+        for x in range(1, 31):
+            y = 2 + round(2.5 * math.sin(math.pi * (x - 1) / 29))
+            c.set(x, y, "c" if x % 2 else "b")
+        for k, x in enumerate(range(5, 27, 4)):
+            y = 3 + round(2.5 * math.sin(math.pi * (x - 1) / 29))
+            lit, dark = colors[k % len(colors)]
+            wave = (f + k) % 2
+            rows = [lit + lit + dark, lit + lit + dark, lit + dark + dark, lit + dark + "."]
+            for j, row in enumerate(rows):
+                dx = 1 if (wave and j >= 2) else 0
+                _stamp(c, x + dx, y + j, [row])
+        g = _finish(c, (16, 15.3, 15, 0.8))
+        frames.append(g.grid())
+    register("az.tb.prayer_flags", art(*frames, legend=TB, fps=3, note="prayer flags on a rope, flutter"))
+
+
+def _pots() -> None:
+    """Clay pots: a tall water jar with a painted band and a glint of water in its
+    mouth, and a squat storage pot with a hide cover tied down with rope."""
+    # 0: tall water jar
+    c = Canvas(16, 16)
+    _ball(c, 7.5, 9.5, 5.5, 5.5, "ABCDE", y_min=4, y_max=14)
+    for y in range(1, 5):
+        for x in range(5, 11):
+            c.set(x, y, "D" if x < 7 else "C" if x < 9 else "B")
+    c.hline(4, 11, 1, "D")
+    c.set(11, 1, "C")
+    _stamp(c, 6, 1, ["uyy.", ".uu."])  # water in the mouth
+    for x in range(3, 13):  # painted band with a zigzag
+        if c.get(x, 8) != ".":
+            c.set(x, 8, "R" if x < 10 else "r")
+        if c.get(x, 10) != ".":
+            c.set(x, 10, "R" if x < 10 else "r")
+        if c.get(x, 9) != ".":
+            c.set(x, 9, "V" if x % 2 else c.get(x, 9))
+    _stamp(c, 2, 6, ["C", "B"])  # lug handles
+    _stamp(c, 13, 6, ["B", "A"])
+    g = _finish(c, (8, 15.3, 6, 0.9))
+    register("az.tb.pot@0", art(g.grid(), legend=TB, note="clay water jar"))
+    # 1: squat storage pot with a hide cover
+    c = Canvas(16, 16)
+    _ball(c, 7.5, 10.5, 6.5, 4.5, "ABCDE", y_min=7, y_max=14)
+    for y in range(4, 8):  # the hide cover, bunched over the mouth
+        for x in range(3, 13):
+            nx, ny = (x + 0.5 - 7.5) / 5.2, (y + 0.5 - 7.0) / 3.2
+            if nx * nx + ny * ny <= 1:
+                c.set(x, y, "e" if nx < -0.2 and ny < 0 else "d" if nx < 0.4 else "c")
+    c.hline(2, 13, 8, "b")  # the rope tying it down
+    c.set(2, 8, "c")
+    _stamp(c, 12, 8, ["b", "c"])
+    for x in range(3, 13, 3):  # turquoise dots on the belly
+        c.set(x, 11, "T" if x < 8 else "t")
+    g = _finish(c, (8, 15.3, 7, 0.9))
+    register("az.tb.pot@1", art(g.grid(), legend=TB, note="storage pot with a hide cover"))
+
+
+def _banner_cloth(f: int) -> list[str]:
+    """The Bloodhoof banner (9 x 23): red field, brown border, a cream hoofprint, a
+    swallowtail with fringe. Frame 1 ripples: the lower half sways right by a pixel."""
+    rows = []
+    for y in range(23):
+        row = ""
+        for x in range(9):
+            edge = x in (0, 8)
+            ch = "2" if edge else "q" if x == 1 else "r" if x == 7 else "R"
+            if y in (0, 1):
+                ch = "2" if y == 0 else "3"
+            row += ch
+        rows.append(row)
+    hoof = ["..J.J..", ".JJ.JJ.", ".JJ.JJ.", ".Jj.Jj.", "..j.j..", "..jJj..", "...j..."]
+    for j, hr in enumerate(hoof):
+        rows[6 + j] = rows[6 + j][:1] + "".join(h if h != "." else rows[6 + j][1 + i] for i, h in enumerate(hr)) + rows[6 + j][8:]
+    rows[15] = "2rRRRRRr2"
+    rows[16] = "2RqRRRRr2"
+    tail = ["2RRRRRRr2", ".2RRRRr2.", ".2RR.Rr2.", "..2R.r2..", "..2...2..", "..i...i..", "..j...j.."]
+    rows[16:23] = tail
+    if f == 1:
+        rows = rows[:12] + ["." + r[:-1] if r[-1] in ".ij" else r for r in rows[12:]]
+        rows = rows[:12] + [r if r[0] == "." else r for r in rows[12:]]
+    return rows
+
+
+def _banner_pole() -> None:
+    """A tall Bloodhoof banner on a carved pole: horns and feathers on top, bone rings,
+    a crossbar, the red banner fluttering, a stone footing."""
+    frames = []
+    for f in range(2):
+        c = Canvas(16, 40)
+        c.vline(3, 3, 37, "4")
+        c.vline(4, 3, 37, "2")
+        for y in (12, 13, 24, 25, 32):  # carved bone rings
+            c.set(3, y, "J")
+            c.set(4, y, "j")
+        _stamp(c, 0, 0, ["J......J", "jJ....Jj", ".jJiiJj.", "...ii..."])  # horns on top
+        _stamp(c, 5, 3, ["R", "q", "j"])  # a red-tipped feather under the horns
+        c.hline(3, 14, 4, "3")
+        c.hline(3, 14, 5, "1")
+        _stamp(c, 5, 5, _banner_cloth(f))
+        for y in range(36, 40):  # stone footing
+            for x in range(1, 8):
+                v = -(x - 4) / 4 - (y - 37) / 2 + (bayer(x, y) - 0.5) * 0.4
+                if y == 39 and x in (1, 7):
+                    continue
+                c.set(x, y, "N" if v > 0.6 else "n" if v > 0 else "M" if v > -0.6 else "m")
+        g = _finish(c)
+        frames.append(g.grid())
+    register("az.tb.banner_pole", art(*frames, legend=TB, fps=2, anchor=(4, 39),
+                                      note="tall Bloodhoof banner on a carved pole"))
+
+
 _platform()
 _inlay()
 _platform_edge()
@@ -1087,3 +1419,10 @@ _tent_rows()
 _spirit_pool()
 _lift()
 _warrior_hall()
+_brazier()
+_drum()
+_stairs()
+_hanging_hides()
+_prayer_flags()
+_pots()
+_banner_pole()

@@ -34,8 +34,8 @@ AZEROTH_MODULES = (
     "az_items",
     "az_fx",
 )
-# structures and thunder_bluff are being extended (new props, see the manifest): held out until complete
-AZEROTH_DONE: tuple[str, ...] = tuple(m for m in AZEROTH_MODULES if m not in ("az_structures", "az_thunder_bluff"))
+# thunder_bluff is being extended (new pieces, see the manifest): held out until complete
+AZEROTH_DONE: tuple[str, ...] = tuple(m for m in AZEROTH_MODULES if m != "az_thunder_bluff")
 
 
 def load(module: str) -> None:

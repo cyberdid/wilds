@@ -378,37 +378,40 @@ DEAD = {
         .bb...dd..SvvSs
         """,
     "orc": """
-        ...........jh
-        ......yyyyshhh
-        ..PPPPyyyySqhhs
-        .BppppaiaTSqSqs
-        .bboop.TTTSsvsv
-        ...bb..dddddSS
+        ............jh
+        ......yyyyyhhhh
+        .....yyyyyyShqq
+        .....ayyyttsqSq
+        .bpppaittTTSsvs
+        .BPPPaTTTTSSSv
+        .......Dddddd
         """,
     "pandaren": """
-        ...........fF
-        ......Fyyyqqqqf
-        ..PPPPFyyyqqqqq
-        .BppppaiaFsqFqq
-        .bboop.yyFSqqqF
-        ...bb..DdddSsS
+        ............fF
+        ......FFyyyqqqq
+        .....FyyyyyqqqqF
+        .....AyyyttsFFq
+        .bpppaqqqtsqFqF
+        .BPPPaqqSSSssS
+        .......DdddddS
         """,
     "troll": """
-        ............hh
-        ...........jhhh
-        .....yyyytqhhh
-        .PPPPyyyyySqqq
-        BppppaiaaTSqSqqv
-        bb.oop.yyTSsssv
-        ...bb.dddd.SS
+        ...........hh
+        ..........jhhh
+        ......yyyyqqqqq
+        .....yyyyysqSqq
+        .bpppaittTSsqqv
+        .BPPPaTTTTSssv
+        .......Ddddddd
         """,
     "earthen": """
-        ...........sqq
-        .....yyyyysqqqq
-        ..PPPyyyyyySqqq
-        .BppoaaiaaTSqeq
-        .bb..TTTdddhjjq
-        ........DdhhhH
+        .........gG
+        ......yyyyysqqq
+        .....yyyyyysqSq
+        .....AyyyttSqSq
+        .bpppaitttTShhq
+        .BPPPaTTTTjhhhh
+        .......DddddhhH
         """,
 }
 

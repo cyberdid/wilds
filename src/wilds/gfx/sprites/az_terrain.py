@@ -213,12 +213,12 @@ def _dirt(seed: int) -> Canvas:
     """Bare earth: flat and quiet - broad soft shading, a few pebbles and one dry crack."""
     rng = random.Random(seed)
     c = Canvas(T, T)
-    f = _mix((0.55, fbm(T, T, seed, 2, 3)), (0.3, _emboss(fbm(T, T, seed + 1, 2, 3))),
-             (0.15, fbm(T, T, seed + 3, 1, 8)))
-    _quantize(c, _varied(f, seed + 50, 0.5), "BCDE", [8, 40, 42, 10], dither=0.16)
-    for _ in range(3):  # pebbles: a lit top over a shadow, away from the edges
+    f = _mix((0.6, fbm(T, T, seed, 2, 3)), (0.3, _emboss(fbm(T, T, seed + 1, 2, 3))),
+             (0.1, fbm(T, T, seed + 3, 1, 8)))
+    _quantize(c, _varied(f, seed + 50, 0.5), "BCDE", [8, 40, 42, 10], dither=0.07)
+    for _ in range(2):  # pebbles: a lit top over a shadow, away from the edges
         x, y = rng.randrange(2, T - 2), rng.randrange(2, T - 3)
-        c.set(x, y, "F")
+        c.set(x, y, "E")
         c.set(x, y + 1, "B")
     x, y = rng.randrange(3, T - 7), rng.randrange(4, T - 4)  # a dry crack
     for _k in range(4):
@@ -245,24 +245,19 @@ def _road(seed: int) -> Canvas:
 
 
 def _mesa(seed: int) -> Canvas:
-    """Red-brown plateau: broad flat sandstone, wind-smoothed - soft shading only, a few
-    long hairline cracks and a pale scour mark, no grain."""
+    """Red-brown plateau: broad flat sandstone, wind-smoothed - soft shading only and a rare
+    hairline crack, no grain."""
     rng = random.Random(seed)
     c = Canvas(T, T)
     f = _mix((0.55, fbm(T, T, seed, 2, 3)), (0.3, _emboss(fbm(T, T, seed + 1, 2, 3))),
              (0.15, fbm(T, T, seed + 2, 1, 8)))
-    _quantize(c, _varied(f, seed + 50, 0.6), "pqrs", [8, 38, 42, 12], dither=0.16)
-    for _ in range(2):  # long hairline cracks with a lit lip, kept off the borders
-        x, y = rng.randrange(2, T - 9), rng.randrange(3, T - 4)
-        for _k in range(rng.randrange(5, 8)):
+    _quantize(c, _varied(f, seed + 50, 0.6), "pqrs", [8, 38, 42, 12], dither=0.07)
+    if seed % 3 == 0:  # a hairline crack on one variant, kept off the borders
+        x, y = rng.randrange(3, T - 9), rng.randrange(4, T - 4)
+        for _k in range(rng.randrange(4, 6)):
             c.set(x, y, "o")
-            if c.get(x, y - 1) in "pqr":
-                c.set(x, y - 1, "s")
             x += 1
-            y = max(3, min(T - 3, y + rng.choice((-1, 0, 0, 1))))
-    x, y = rng.randrange(3, T - 5), rng.randrange(3, T - 3)  # pale scour
-    c.set(x, y, "t")
-    c.set(x + 1, y, "s")
+            y = max(3, min(T - 4, y + rng.choice((-1, 0, 0, 1))))
     return c
 
 

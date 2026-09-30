@@ -447,14 +447,16 @@ BOAR_DEAD = grid("""
     ................
     ................
     ................
-    ...N.N.N........
-    ..NNMNMNMN.t....
-    .444444444444...
-    .3333333333k344.
-    .21111111123wnn.
-    ..3.3..3.3.w....
+    ...11111111.....
+    ..2333333333.t..
+    .2333333333344n.
+    .333333333x3wnn.
+    ..NMNMNMNM.2w...
+    ................
     ................
 """)
+BOAR_DEAD_LEGS = (L("2", (4, 9), (3, 7), paw=0, foot="h"), L("2", (10, 9), (11, 7), paw=0, foot="h"),
+                  L("3", (5, 9), (4, 6), paw=0, foot="h"), L("3", (9, 9), (10, 6), paw=0, foot="h"))
 
 
 def _boar_legs(off: tuple[int, int, int, int], lift: tuple[bool, ...] = (False,) * 4,
@@ -487,14 +489,14 @@ BOAR = {
                                   L("3", (9, 9), (11, 10), (12, 11), paw=0, foot="h")),
               dy=-2),
     ],
-    "dead": [outline_grid(BOAR_DEAD, "k")],
+    "dead": [_fallen(BOAR_DEAD, BOAR_DEAD_LEGS, 2, 13)],
 }
 
 
 def _boar() -> None:
     legend = {"1": "rust0", "2": "rust1", "3": "rust2", "4": "rust3", "M": "leather1",
               "N": "leather3", "t": "rust1", "e": "ink2", "n": "skin3", "o": "skin1",
-              "w": "bone4", "h": "leather1"}
+              "w": "bone4", "h": "leather1", "x": "ink2"}
     _reg("boar.idle", BOAR["idle"], legend, 2, "battleboar, snuffling")
     _reg("boar.move", BOAR["move"], legend, 10, "battleboar trot")
     _reg("boar.attack", BOAR["attack"], legend, 8, "battleboar: head down, tusk charge")
@@ -519,7 +521,7 @@ GAZELLE_BODY = grid("""
     .........333bb..
     .........33b....
     ..t44444433b....
-    ..t3SSSSS33b....
+    ..t3DDDDD33b....
     ...bbbbbbbb.....
     ................
     ................
@@ -538,7 +540,7 @@ GAZELLE_BODY_B = grid("""
     .........333bb..
     .........33b....
     ...44444433b....
-    .tt3SSSSS33b....
+    .tt3DDDDD33b....
     ...bbbbbbbb.....
     ................
     ................
@@ -556,14 +558,16 @@ GAZELLE_DEAD = grid("""
     ................
     ................
     ................
-    ..........HH....
-    ...........rH...
-    ..t44444443444..
-    ..3SSSSSSS3k4n..
-    ...bbbbbbbbbb...
-    ....3.3..3.3....
+    ...bbbbbbb......
+    ..3DDDDDDD3HH...
+    .t4444444443r44.
+    ..3333333333x3n.
+    ...2222222..bb..
+    ................
     ................
 """)
+GAZELLE_DEAD_LEGS = (L("2", (4, 9), (2, 5), paw=0, foot="h"), L("2", (9, 9), (11, 5), paw=0, foot="h"),
+                     L("3", (5, 9), (3, 4), paw=0, foot="h"), L("3", (8, 9), (10, 4), paw=0, foot="h"))
 
 
 def _gazelle_legs(off: tuple[int, int, int, int], lift: tuple[bool, ...] = (False,) * 4,
@@ -575,7 +579,7 @@ def _gazelle_legs(off: tuple[int, int, int, int], lift: tuple[bool, ...] = (Fals
 
 
 def _gazelle() -> None:
-    legend = {"2": "sand2", "3": "sand3", "4": "sand4", "S": "azc_fur1", "b": "bone4",
+    legend = {"2": "sand2", "3": "sand3", "4": "sand4", "D": "azc_fur1", "b": "bone4", "x": "ink2",
               "h": "leather1", "t": "leather2", "e": "ink2", "n": "leather2",
               "H": "bone1", "r": "sand2"}
     b = GAZELLE_BODY
@@ -589,7 +593,7 @@ def _gazelle() -> None:
     ]
     _reg("gazelle.idle", idle, legend, 2, "gazelle, ear and tail flick")
     _reg("gazelle.move", move, legend, 10, "gazelle springing trot")
-    _reg("gazelle.dead", [outline_grid(GAZELLE_DEAD, "k")], legend, 0, "gazelle, dead")
+    _reg("gazelle.dead", [_fallen(GAZELLE_DEAD, GAZELLE_DEAD_LEGS, 2, 13)], legend, 0, "gazelle, dead")
 
 
 _gazelle()
@@ -689,7 +693,7 @@ def _tallstrider() -> None:
     _reg("tallstrider.idle", idle, legend, 2, "plainstrider, head bob")
     _reg("tallstrider.move", move, legend, 8, "plainstrider stride")
     _reg("tallstrider.attack", attack, legend, 8, "plainstrider: rear back, peck")
-    _reg("tallstrider.dead", [dead], legend, 0, "plainstrider, dead")
+    _reg("tallstrider.dead", [_shadow(dead, 2, 14, 22)], legend, 0, "plainstrider, dead")
 
 
 _tallstrider()
@@ -799,10 +803,55 @@ def _kodo(dy: int = 0, head_dy: int = 0, fore: tuple[int, int] = (0, 0), hind: t
     return outline_grid(c.grid(), "k")
 
 
+def _kodo_dead() -> Grid:
+    """Rolled onto its side with its back to the viewer: the plated hump rests on the
+    ground, the four pillar legs stick stiffly out over the belly, the head lies on its cheek."""
+    c = Canvas(32, 24)
+    a = 26.5  # the standing body mirrored top-to-bottom about y = a / 2
+    for (x0, x1, lean) in ((6, 3, -1), (9, 3, -1), (19, 3, 1), (22, 3, 1)):
+        pts = {(x0 + k + (lean * (11 - y)) // 3, y) for y in range(4, 12) for k in range(x1)}
+        near = x0 in (6, 22)
+        _shade(c, pts, "3" if near else "2", "2" if near else "1", "1" if near else "0")
+        tip = min(y for _, y in pts)
+        for (x, y) in pts:
+            if y == tip:
+                c.set(x, y, "n" if x % 2 == 0 else "1")
+    tail = {(x, y) for x in range(0, 6) for y in range(16, 22) if abs((a - y - 10) - (6 - x) * 1.1) < 1.6}
+    _shade(c, tail, "3", "2", "1")
+    body = _ell(14.5, a - 12.5, 11.5, 5.6) | _ell(14.0, a - 9.5, 8.5, 5.5) | _ell(20.0, a - 10.5, 5.0, 4.0)
+    body = {(x, y) for (x, y) in body if y <= 22}
+    _shade(c, body, "4", "3", "2", deep="1")
+    for (x, y) in body:  # pale belly skin, now facing up
+        if (x, y - 1) not in body:
+            c.set(x, y, "5")
+    bottom: dict[int, int] = {}
+    for (x, y) in body:
+        bottom[x] = max(bottom.get(x, -1), y)
+    for (x, y) in body:  # the armoured back, now along the ground
+        depth = bottom[x] - y
+        if depth < 4:
+            col = (x + (depth // 2) * 2) % 4
+            c.set(x, y, "P" if col == 0 or depth % 2 == 1 and col == 3 else ("s" if col == 1 else "p"))
+        elif depth == 4:
+            c.set(x, y, "P" if x % 2 == 0 else "p")
+    hx, hy = 26, 18
+    head = _ell(hx + 0.5, hy + 0.5, 4.0, 3.6) | _ell(hx + 3.2, hy + 1.5, 2.3, 2.1)
+    _shade(c, head, "4", "3", "2")
+    c.set(hx, hy - 1, "x")
+    c.set(hx + 4, hy + 1, "1")
+    c.set(hx + 2, hy + 3, "1")
+    c.set(hx + 3, hy + 3, "1")
+    for (x, y, ch) in ((hx + 3, hy - 1, "N"), (hx + 4, hy - 1, "n"), (hx + 5, hy - 2, "n"),
+                       (hx + 5, hy - 3, "N"), (hx + 5, hy - 4, "n"), (hx - 1, hy - 3, "n"),
+                       (hx - 2, hy - 4, "N")):
+        c.set(x, y, ch)
+    return _shadow(outline_grid(c.grid(), "k"), 2, 30, 22)
+
+
 def _kodo_sprites() -> None:
     legend = {"0": "azc_kodo0", "1": "azc_kodo1", "2": "azc_kodo2", "3": "azc_kodo3",
               "4": "azc_kodo4", "p": "azc_fur2", "s": "azc_fur3", "P": "azc_fur1",
-              "n": "bone3", "N": "bone2", "e": "ink2", "x": "azc_kodo0"}
+              "n": "bone3", "N": "bone2", "e": "ink2", "x": "azc_kodo0", "5": "azc_kodo5"}
     idle = [_kodo(), _kodo(head_dy=1)]
     move = [  # a heavy, rolling walk: diagonal pairs, the body sagging onto each contact
         _kodo(dy=1, fore=(2, -1), hind=(-1, 2)),
@@ -812,7 +861,7 @@ def _kodo_sprites() -> None:
     ]
     _reg("kodo.idle", idle, legend, 1.5, "kodo, slow head sway")
     _reg("kodo.move", move, legend, 6, "kodo heavy walk")
-    _reg("kodo.dead", [_kodo(dead=True)], legend, 0, "kodo, dead on its side")
+    _reg("kodo.dead", [_kodo_dead()], legend, 0, "kodo, fallen on its side")
 
 
 _kodo_sprites()
