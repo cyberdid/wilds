@@ -382,36 +382,36 @@ DEAD = {
         ......yyyyyhhhh
         .....yyyyyyShqq
         .....ayyyttsqSq
-        .bpppaittTTSsvs
-        .BPPPaTTTTSSSv
-        .......Dddddd
+        .BoppaittTTSsvs
+        .PpPPaTTTTSSSv
+        ..bb...Dddddd
         """,
     "pandaren": """
         ............fF
         ......FFyyyqqqq
-        .....FyyyyyqqqqF
+        .....Fyyyyyqqqq
         .....AyyyttsFFq
-        .bpppaqqqtsqFqF
-        .BPPPaqqSSSssS
-        .......DdddddS
+        .BoppaqqqtsqFqF
+        .PpPPaqqSSSssS
+        ..bb...DdddddS
         """,
     "troll": """
         ...........hh
         ..........jhhh
         ......yyyyqqqqq
         .....yyyyysqSqq
-        .bpppaittTSsqqv
-        .BPPPaTTTTSssv
-        .......Ddddddd
+        .BoppaittTSsqqv
+        .PpPPaTTTTSssv
+        ..bb...Ddddddd
         """,
     "earthen": """
         .........gG
         ......yyyyysqqq
         .....yyyyyysqSq
         .....AyyyttSqSq
-        .bpppaitttTShhq
-        .BPPPaTTTTjhhhh
-        .......DddddhhH
+        .BoppaitttTShhq
+        .PpPPaTTTTjhhhh
+        ..bb...DddddhhH
         """,
 }
 

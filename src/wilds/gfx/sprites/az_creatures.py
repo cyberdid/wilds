@@ -55,6 +55,30 @@ def hind(ch: str, hx: int, hy: int, off: int = 0, lift: bool = False, ground: in
              foot=foot)
 
 
+TONES = "1234"
+
+
+def _lit(g: Grid, tones: str = TONES) -> Grid:
+    """Light from the top-left on the body tones ('1' darkest .. '4' lightest): pixels with open
+    space above or to the left step one tone lighter, those open below or to the right one
+    tone darker, so every form reads as a solid, rounded mass."""
+    h, w = len(g), len(g[0])
+
+    def open_(x: int, y: int) -> bool:
+        return not (0 <= x < w and 0 <= y < h) or g[y][x] == "."
+
+    out = [list(r) for r in g]
+    for y in range(h):
+        for x in range(w):
+            ch = g[y][x]
+            if ch not in tones:
+                continue
+            d = (open_(x, y - 1) + open_(x - 1, y)) - (open_(x, y + 1) + open_(x + 1, y))
+            i = tones.index(ch) + max(-1, min(1, d))
+            out[y][x] = tones[max(0, min(len(tones) - 1, i))]
+    return tuple("".join(r) for r in out)
+
+
 def _pose(w: int, h: int, body: Grid, legs: tuple[Leg, ...] = (), dx: int = 0, dy: int = 0,
           top: tuple[tuple[Grid, int, int], ...] = ()) -> Grid:
     """Legs first (the body covers their tops), then the body shifted by (dx, dy), then
@@ -75,7 +99,7 @@ def _pose(w: int, h: int, body: Grid, legs: tuple[Leg, ...] = (), dx: int = 0, d
     c.blit(shift(body, dx, dy))
     for part, x, y in top:
         c.blit(part, x, y)
-    return outline_grid(c.grid(), "k")
+    return outline_grid(_lit(c.grid()), "k")
 
 
 def _ol(text: str) -> Grid:
@@ -83,8 +107,8 @@ def _ol(text: str) -> Grid:
 
 
 def _shadow(g: Grid, x0: int, x1: int, y: int, rows: int = 2) -> Grid:
-    """A short soft ground shadow ('S', translucent ink) under a sprite, painted only on
-    transparent pixels: ``rows`` rows from ``y`` down, spanning x0..x1 (ends rounded)."""
+    """A soft ground shadow ('S', translucent ink) for flyers only (the client shadows
+    grounded actors), painted on transparent pixels: ``rows`` rows from ``y`` down, spanning x0..x1 (ends rounded)."""
     out = [list(r) for r in g]
     for k in range(rows):
         inset = (rows - 1 - k) if k < rows - 1 else 0
@@ -97,10 +121,10 @@ def _shadow(g: Grid, x0: int, x1: int, y: int, rows: int = 2) -> Grid:
     return tuple("".join(r) for r in out)
 
 
-def _fallen(body: Grid, legs: tuple[Leg, ...], x0: int, x1: int) -> Grid:
-    """A dead beast on its side: legs stiff out toward the viewer, a soft shadow beneath."""
-    w, h = len(body[0]), len(body)
-    return _shadow(_pose(w, h, body, legs), x0, x1, h - 2)
+def _fallen(body: Grid, legs: tuple[Leg, ...]) -> Grid:
+    """A dead beast rolled on its side, back to the viewer, legs stiff out over the belly.
+    (The client draws the soft contact shadow under grounded actors.)"""
+    return _pose(len(body[0]), len(body), body, legs)
 
 
 def _reg(name: str, frames, legend: dict, fps: float = 0.0, note: str = "") -> None:
@@ -223,7 +247,7 @@ def _cat_set(body: Grid, body_b: Grid, lunge: Grid, dead: Grid) -> dict[str, lis
                                   L("3", (4, 9), (2, 11), (1, 13), paw=0),
                                   L("3", (10, 9), (12, 10), (14, 11), paw=0))),
         ],
-        "dead": [_fallen(dead, CAT_DEAD_LEGS, 2, 13)],
+        "dead": [_fallen(dead, CAT_DEAD_LEGS)],
     }
 
 
@@ -276,53 +300,53 @@ _cats()
 WOLF_BODY = grid("""
     ................
     ................
-    ..........3.3...
-    ..........4443..
-    .........443e3n.
-    .........3333bb.
-    ..444444433b....
-    .3333333333b....
-    .3234333322.....
-    .2..2BBBB2......
-    .t..............
+    ................
+    ..........1.3...
+    .........3443...
+    ........333e44n.
+    ...4444443333bb.
+    .3333222333bb...
+    .2233333332b....
+    .tt.2BBBB2......
+    ................
     ................
     ................
     ................
     ................
     ................
 """)
-# panting: tongue out, tail swings
+# panting: jaw dropped, tongue out, tail swung
 WOLF_BODY_B = grid("""
     ................
     ................
-    ..........3.3...
-    ..........4443..
-    .........443e3n.
-    .........3333b..
-    ..444444433b.m..
-    .3333333333b....
-    .3234333322.....
-    ..2.2BBBB2......
-    ..t.............
+    ................
+    ..........1.3...
+    .........3443...
+    ........333e44n.
+    ...4444443333b..
+    ..333222333bbm..
+    .2233333332b....
+    ..t.2BBBB2......
+    ................
     ................
     ................
     ................
     ................
     ................
 """)
-# lunge-bite: head thrust forward, ears pinned, jaws gaping
+# lunge-bite: ears pinned, jaws gaping, tail streaming out behind
 WOLF_LUNGE = grid("""
     ................
     ................
     ................
-    ...........33...
-    ..........4443..
-    .........443e3n.
-    ..t......3333m..
-    ...24444433bbbb.
-    ...333333333b...
-    ...34333322.....
+    ................
+    ........13443...
+    ........333e44n.
+    .334444443333m..
+    t..33222333bbb..
+    ...33333332b....
     ....2BBBB2......
+    ................
     ................
     ................
     ................
@@ -354,8 +378,8 @@ WOLF_DEAD_LEGS = (L("2", (4, 9), (2, 5), paw=0), L("2", (10, 9), (12, 5), paw=0)
 def _wolf_legs(off: tuple[int, int, int, int], lift: tuple[bool, ...] = (False,) * 4,
                hy: int = 9) -> tuple[Leg, ...]:
     """Far hind, far fore, near hind, near fore, each pair side by side."""
-    return (hind("2", 5, hy, off[0], lift[0], paw=0), fore("2", 8, hy, off[1], lift[1], paw=0),
-            hind("3", 4, hy, off[2], lift[2]), fore("3", 9, hy, off[3], lift[3]))
+    return (hind("2", 5, hy, off[0], lift[0], paw=0), fore("2", 9, hy, off[1], lift[1], paw=0),
+            hind("3", 4, hy, off[2], lift[2]), fore("3", 10, hy, off[3], lift[3]))
 
 
 WOLF = {
@@ -369,12 +393,12 @@ WOLF = {
                                     L("3", (3, 11), (2, 13), (3, 14)), L("3", (8, 11), (9, 14))),
               dx=-1, dy=2),
         # the lunge: forelegs reaching, hind legs driving off the ground
-        _pose(16, 16, WOLF_LUNGE, (L("2", (6, 10), (4, 12), (3, 14), paw=0),
-                                   L("2", (9, 10), (11, 12), (12, 13), paw=0),
-                                   L("3", (5, 10), (3, 12), (2, 14), paw=1),
-                                   L("3", (10, 10), (12, 11), (13, 12), paw=0))),
+        _pose(16, 16, WOLF_LUNGE, (L("2", (5, 8), (3, 11), (2, 13), paw=0),
+                                   L("2", (9, 8), (11, 10), (12, 11), paw=0),
+                                   L("3", (4, 8), (2, 10), (1, 12), paw=0),
+                                   L("3", (10, 8), (12, 9), (14, 10), paw=0)), dy=-1),
     ],
-    "dead": [_fallen(WOLF_DEAD, WOLF_DEAD_LEGS, 2, 13)],
+    "dead": [_fallen(WOLF_DEAD, WOLF_DEAD_LEGS)],
 }
 
 
@@ -489,7 +513,7 @@ BOAR = {
                                   L("3", (9, 9), (11, 10), (12, 11), paw=0, foot="h")),
               dy=-2),
     ],
-    "dead": [_fallen(BOAR_DEAD, BOAR_DEAD_LEGS, 2, 13)],
+    "dead": [_fallen(BOAR_DEAD, BOAR_DEAD_LEGS)],
 }
 
 
@@ -579,7 +603,7 @@ def _gazelle_legs(off: tuple[int, int, int, int], lift: tuple[bool, ...] = (Fals
 
 
 def _gazelle() -> None:
-    legend = {"2": "sand2", "3": "sand3", "4": "sand4", "D": "azc_fur1", "b": "bone4", "x": "ink2",
+    legend = {"1": "sand1", "2": "sand2", "3": "sand3", "4": "sand4", "D": "azc_fur1", "b": "bone4", "x": "ink2",
               "h": "leather1", "t": "leather2", "e": "ink2", "n": "leather2",
               "H": "bone1", "r": "sand2"}
     b = GAZELLE_BODY
@@ -593,7 +617,7 @@ def _gazelle() -> None:
     ]
     _reg("gazelle.idle", idle, legend, 2, "gazelle, ear and tail flick")
     _reg("gazelle.move", move, legend, 10, "gazelle springing trot")
-    _reg("gazelle.dead", [_fallen(GAZELLE_DEAD, GAZELLE_DEAD_LEGS, 2, 13)], legend, 0, "gazelle, dead")
+    _reg("gazelle.dead", [_fallen(GAZELLE_DEAD, GAZELLE_DEAD_LEGS)], legend, 0, "gazelle, dead")
 
 
 _gazelle()
@@ -620,13 +644,14 @@ STRIDER_PECK_HEAD = grid("""
     .2r3BB
 """)
 STRIDER_BODY = grid("""
-    .F..............
-    .FF..444443.....
-    ..F344444433....
-    ..F3WWWWW3333...
-    ...23WWWW3332...
-    ...2222222222...
-    ....11111111....
+    F...............
+    .FF...44443.....
+    .FF3444444433...
+    ..F34WWWWV333...
+    ...3WWWWWWV332..
+    ...2WWVWVW2222..
+    ....22V2V2222...
+    ......111111....
 """)
 
 
@@ -643,10 +668,10 @@ def _strider(head: tuple[int, int] = (9, 0), legs: tuple[Leg, ...] = (), dy: int
     hx, hy = head
     c.line(10, 9 + dy, hx + 1, hy + 4, "2")
     c.line(11, 9 + dy, hx + 2, hy + 4, "3")
-    c.blit(STRIDER_BODY, 0, 7 + dy)
+    c.blit(STRIDER_BODY, 0, 6 + dy)
     h = hgrid if not dead else tuple(r.replace("e", "x") for r in hgrid)
     c.blit(h, hx, hy)
-    return outline_grid(c.grid(), "k")
+    return outline_grid(_lit(c.grid()), "k")
 
 
 def _sleg(ch: str, hip: tuple[int, int], knee: tuple[int, int], ankle: tuple[int, int],
@@ -658,18 +683,19 @@ def _strider_step(near: str, far: str, dy: int = 0) -> tuple[Leg, ...]:
     """Leg states: 'fwd' reaching, 'back' pushing off, 'under' planted, 'up' swinging."""
     def leg(ch: str, hx: int, state: str) -> Leg:
         hy = 13 + dy
+        # one clean backward-bending ankle per leg, toes forward
         if state == "fwd":
-            return _sleg(ch, (hx, hy), (hx + 2, hy + 3), (hx + 2, hy + 6), (hx + 3, 22))
+            return _sleg(ch, (hx, hy), (hx + 1, hy + 4), (hx + 2, hy + 6), (hx + 3, 22))
         if state == "back":
-            return _sleg(ch, (hx, hy), (hx, hy + 3), (hx - 2, hy + 6), (hx - 3, 22))
+            return _sleg(ch, (hx, hy), (hx - 2, hy + 4), (hx - 3, hy + 6), (hx - 3, 22))
         if state == "up":
-            return _sleg(ch, (hx, hy), (hx + 2, hy + 2), (hx + 1, hy + 5), (hx + 2, hy + 6), toes=1)
-        return _sleg(ch, (hx, hy), (hx + 1, hy + 3), (hx - 1, hy + 6), (hx, 22))
+            return _sleg(ch, (hx, hy), (hx - 1, hy + 4), (hx, hy + 5), (hx + 2, hy + 6), toes=1)
+        return _sleg(ch, (hx, hy), (hx - 1, hy + 5), (hx - 1, hy + 6), (hx, 22))
     return (leg("l", 9, far), leg("L", 5, near))
 
 
 def _tallstrider() -> None:
-    legend = {"1": "azc_fur0", "2": "azc_fur1", "3": "bone1", "4": "bone2", "W": "water1",
+    legend = {"1": "azc_fur0", "2": "azc_fur1", "3": "bone1", "4": "bone2", "W": "water1", "V": "grey2",
               "F": "water3", "c": "bone3", "B": "grey2", "r": "red2", "m": "red1",
               "L": "sand3", "l": "sand2", "e": "ink2", "x": "grey1"}
     idle = [_strider(legs=_strider_step("under", "under")),
@@ -693,7 +719,7 @@ def _tallstrider() -> None:
     _reg("tallstrider.idle", idle, legend, 2, "plainstrider, head bob")
     _reg("tallstrider.move", move, legend, 8, "plainstrider stride")
     _reg("tallstrider.attack", attack, legend, 8, "plainstrider: rear back, peck")
-    _reg("tallstrider.dead", [_shadow(dead, 2, 14, 22)], legend, 0, "plainstrider, dead")
+    _reg("tallstrider.dead", [dead], legend, 0, "plainstrider, dead")
 
 
 _tallstrider()
@@ -845,7 +871,7 @@ def _kodo_dead() -> Grid:
                        (hx + 5, hy - 3, "N"), (hx + 5, hy - 4, "n"), (hx - 1, hy - 3, "n"),
                        (hx - 2, hy - 4, "N")):
         c.set(x, y, ch)
-    return _shadow(outline_grid(c.grid(), "k"), 2, 30, 22)
+    return outline_grid(c.grid(), "k")
 
 
 def _kodo_sprites() -> None:
@@ -1039,7 +1065,7 @@ def _birds() -> None:
         _bird(BIRD_FLY, **up, dx=-1, dy=-1, shadow=True),
         _bird(BIRD_FLY, **spread, dx=1, dy=1, talons=True, shadow=True),
     ]
-    dead = [_shadow(outline_grid(BIRD_DEAD, "k"), 2, 13, 14)]
+    dead = [outline_grid(BIRD_DEAD, "k")]
     _reg("vulture.idle", idle, vulture, 2, "swoop (vulture) perched, head turn")
     _reg("vulture.move", move, vulture, 8, "swoop flapping flight")
     _reg("vulture.attack", attack, vulture, 8, "swoop: rise, dive with talons")
@@ -1428,7 +1454,7 @@ def _critters() -> None:
                 "e": "ink2", "n": "leather2", "t": "sand1", "x": "sand1"}
     crawdad = {"2": "dust2", "3": "dust3", "4": "dust4", "C": "red2", "a": "dust5",
                "l": "dust2", "e": "ink2", "x": "dust1"}
-    dog = {"2": "azc_fur2", "3": "azc_fur3", "4": "azc_fur4", "B": "azc_fur5", "b": "azc_fur5",
+    dog = {"1": "azc_fur1", "2": "azc_fur2", "3": "azc_fur3", "4": "azc_fur4", "B": "azc_fur5", "b": "azc_fur5",
            "E": "azc_fur1", "t": "azc_fur3", "e": "ink2", "n": "ink2", "m": "blush", "x": "azc_fur1"}
     _reg("rabbit.idle", RABBIT, rabbit, 2, "cottontail, ear and nose twitch")
     _reg("rabbit.move", RABBIT_HOP, rabbit, 6, "cottontail hop")

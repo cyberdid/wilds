@@ -31,6 +31,7 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--start", default=None, help="почати біля місця, напр. 'Bloodhoof Village' (для скріншотів)")
     p.add_argument("--pack", default=str(PACK), help="тека з контент-пакетом зони")
     add_gfx_args(p)
+    p.set_defaults(zoom=2, view="iso")  # Мулгор — 2.5D за замовчуванням
     args, _unknown = p.parse_known_args(argv)
     if args.brain != "scripted":
         print("Мозок на ШІ для Мулгору ще не написано: граю правилами (--brain scripted).", file=sys.stderr)
@@ -49,7 +50,7 @@ def main(argv: list[str] | None = None) -> None:
         from ..gfx.az_app import AzApp
 
         app = AzApp(sim, brain, seed, speed=args.speed, sprites_dir=args.sprites, size=window_size(args),
-                    zoom=args.zoom, headless=True)
+                    zoom=args.zoom, view=args.view, headless=True)
         app.paused = True
         print(f"скріншот: {app.shot(args.shot)}")
         return
@@ -59,7 +60,7 @@ def main(argv: list[str] | None = None) -> None:
     from ..gfx.az_app import AzApp
 
     diary_dir = Path(args.log_dir) if args.log_dir else None
-    AzApp(sim, brain, seed, speed=args.speed, sprites_dir=args.sprites, size=window_size(args), zoom=args.zoom,
+    AzApp(sim, brain, seed, speed=args.speed, sprites_dir=args.sprites, size=window_size(args), zoom=args.zoom, view=args.view,
           fullscreen=args.fullscreen, diary_dir=diary_dir).run()
 
 

@@ -251,130 +251,99 @@ def _platform() -> None:
         register(f"az.tb.platform@{i}", art(_floor(i).grid(), legend=TB, note="plank-and-hide platform floor"))
 
 
-# painted inlay motifs (plazas): each is centred and joins its neighbours through a thin
-# painted line crossing the middle of every border, the same in all three variants
-INLAYS = (
-    [  # 0: turquoise diamond in a red frame
-        ".......RR.......",
-        ".......Rr.......",
-        ".......qR.......",
-        "......RTtr......",
-        ".....RTTttr.....",
-        "....RTTeettr....",
-        "...RTTeeeettr...",
-        "RRqRTTeeRettrRRr",
-        "RRqRTTeRReetrRRr",
-        "...RTTeeeettr...",
-        "....RTTeettr....",
-        ".....RTTttr.....",
-        "......RTtr......",
-        ".......qR.......",
-        ".......Rr.......",
-        ".......Rr.......",
-    ],
-    [  # 1: the red sun with rays
-        ".......RR.......",
-        ".......Rr.......",
-        "..q....Rr....r..",
-        "...q........r...",
-        "......RRRr......",
-        ".....RqRRRr.....",
-        "....RqeeeeRr....",
-        "RRr.RReTTeRr.RRr",
-        "RRr.RqeTteRr.RRr",
-        "....RqeeeeRr....",
-        ".....RRRRRr.....",
-        "......RRrr......",
-        "...q........r...",
-        "..q....Rr....r..",
-        ".......Rr.......",
-        ".......Rr.......",
-    ],
-    [  # 2: thunderbird zigzag on a red band
-        ".......RR.......",
-        ".......Rr.......",
-        "..T...TRrT...T..",
-        ".TtT.TtTtTt.TtT.",
-        "TtetTtetTtetTtet",
-        "................",
-        "qRRRRRRRRRRRRRRr",
-        "RRReRRReRRReRRRr",
-        "RReeeReeeReeeRRr",
-        "rrrrrrrrrrrrrrrr",
-        "................",
-        "TtetTtetTtetTtet",
-        ".TtT.TtTtTt.TtT.",
-        "..T...TRrT...T..",
-        ".......Rr.......",
-        ".......Rr.......",
-    ],
+# Painted inlay for plazas. The game paints whole plazas with it, so it is a quiet,
+# worn pattern rather than a medallion per tile: a diamond lattice of red lines that runs
+# on across every border (x + y and x - y are periodic in 16), with a small accent in the
+# middle of each diamond (the tile centre) that differs per variant. Paint is thin and scuffed; the boards
+# and their seams show through.
+INLAY_ACCENTS = (
+    ["..t..", ".tTt.", "tTeTt", ".tTt.", "..t.."],   # turquoise diamond
+    [".rRr.", "rR.Rr", "R.e.R", "rR.Rr", ".rRr."],   # red sun ring
+    ["e...e", ".e.e.", "..e..", ".....", "..t.."],   # cream chevron over a turquoise dot
 )
 
 
 def _inlay() -> None:
-    """Floor tiles with a painted tribal pattern for plazas: paint laid over the boards
-    (the gaps stay dark, a few worn flecks show the wood through)."""
-    for i, motif in enumerate(INLAYS):
+    for i, accent in enumerate(INLAY_ACCENTS):
         c = _floor((1, 6, 7)[i])
-        for y, row in enumerate(motif):
-            for x, ch in enumerate(row):
-                if ch == "." or bayer(x, y) > 0.92:
+        wear = random.Random(3000 + i)
+        for y in range(T):
+            for x in range(T):
+                # the diamond's corners sit on the middle of each tile border
+                if (x + y) % T != 7 and (x - y) % T != 8:
                     continue
-                if c.get(x, y) in "01":  # paint sinks darker into the seams
-                    ch = {"R": "r", "q": "R", "T": "t", "e": "d"}.get(ch, ch)
+                ch = "R" if (x + y) % T == 7 else "r"  # lines facing the light are brighter
+                if wear.random() < 0.18:
+                    continue  # scuffed off
+                if c.get(x, y) in "01":
+                    ch = "r" if ch == "R" else "l"
                 c.set(x, y, ch)
-        register(f"az.tb.platform.inlay@{i}", art(c.grid(), legend=TB, note="painted tribal floor inlay"))
+        for j, row in enumerate(accent):  # the accent in the middle of the diamond
+            for k, ch in enumerate(row):
+                if ch == "." or wear.random() < 0.1:
+                    continue
+                x, y = 6 + k, 6 + j
+                if c.get(x, y) in "01":
+                    ch = {"R": "r", "T": "t", "e": "d", "r": "l"}.get(ch, ch)
+                c.set(x, y, ch)
+        register(f"az.tb.platform.inlay@{i}", art(c.grid(), legend=TB, note="painted tribal floor inlay (plazas)"))
 
 
-def _drop(c: Canvas, y0: int, seed: int) -> None:
-    """Below the rim: the mesa's rock face falling away into the dark. The border
-    columns follow a shared profile so any two edge variants join."""
-    own = fbm(T, T, seed, 2, 4)
+def _under_deck(c: Canvas, y0: int) -> None:
+    """The dark under the deck: a fixed dithered fall-off (the same on every column
+    phase, so any two edge variants join)."""
     for y in range(y0, T):
         depth = (y - y0) / max(1, T - 1 - y0)
         for x in range(T):
-            w = max(0.0, 1.0 - min(x, T - 1 - x) / 3.0)
-            f = own[y][x] * (1 - w) + _SHARED[y][x] * w
-            v = f * 0.55 + (1 - depth) * 0.95 + (bayer(x, y) - 0.5) * 0.35
-            c.set(x, y, "M" if v > 1.2 else "m" if v > 0.9 else "V" if v > 0.45 else "v")
+            v = 1 - depth + (bayer(x, y) - 0.5) * 0.5
+            c.set(x, y, "0" if v > 0.85 else "V" if v > 0.35 else "v")
 
 
 def _platform_edge() -> None:
-    """South rim: one board row, the round rim log lashed with rope, joist ends under
-    it and the rock face dropping into the dark; six variants with different lashings,
-    a hanging charm, a loose rope, a board end jutting out, a hide strip."""
-    extras = [None, "charm", "rope", "jut", None, "hide"]
+    """South rim of a wooden deck: the last board row, a thick fascia log lashed with
+    rope, and under it the deck's timber posts and braces fading into the drop. Six
+    variants move the posts and lashings and add a charm, a loose rope, a board end
+    jutting out or a hide strip hung over the edge."""
+    extras = [None, "charm", "rope", "jut", "brace", "hide"]
     for i in range(6):
         seed = 1100 + i * 5
         rng = random.Random(seed)
         c = Canvas(T, T)
-        _drop(c, 10, seed)
+        _under_deck(c, 10)
         joints = _boards(c, 1500 + i * 13, boards=((1, 4),))
         _pegs(c, joints, rng, boards=((1, 4),))
         for x in range(T):
             c.set(x, 5, "0")
-        for x in range(T):  # the rim log, lit on its top
-            c.set(x, 6, "5" if bayer(x, 6) < 0.25 else "4")
-            c.set(x, 7, "3")
-            c.set(x, 8, "2" if bayer(x, 8) < 0.7 else "3")
-            c.set(x, 9, "0")
-        lashes = [rng.randrange(1, 6)]
-        if rng.random() < 0.7:
-            lashes.append(lashes[0] + rng.randrange(6, 9))
-        for lx in lashes:  # rope lashings and the joist end they hold
-            _stamp(c, lx, 6, ["d.", "cd", ".b", "b."])
-            if lx + 3 < T - 1:
-                _stamp(c, lx + 2, 10, ["32", "10"])
+        bark = fbm(T, 1, 77, 2, 4)[0]  # shared by every variant: the log runs on seamlessly
+        for x in range(T):  # the fascia log: lit top, bark, shadowed underside
+            c.set(x, 6, "5" if bark[x] > 0.6 else "4")
+            c.set(x, 7, "4" if bark[(x + 5) % T] > 0.55 else "3")
+            c.set(x, 8, "3" if bark[(x + 9) % T] > 0.5 else "2")
+            c.set(x, 9, "1")
+        # posts under the deck, never on the border columns
+        posts = [rng.randrange(2, 6), rng.randrange(9, 13)]
+        if rng.random() < 0.4:
+            posts = posts[:1]
+        for px in posts:
+            for y in range(10, T):
+                fade = y - 10
+                c.set(px, y, "3" if fade < 2 else "2" if fade < 4 else "1")
+                c.set(px + 1, y, "1" if fade < 3 else "0")
+            _stamp(c, px, 9, ["dc", "cb"])  # the lashing that holds the post to the log
+        for lx in [x for x in (rng.randrange(1, 4), rng.randrange(7, 9)) if all(abs(x - p) > 2 for p in posts)]:
+            _stamp(c, lx, 6, ["d.", "cd", ".b", "b."])  # extra rope turns on the log
         e = extras[i]
         if e == "charm":  # a bone-and-feather charm hanging off the rim
-            _stamp(c, 11, 10, [".h", ".j", "jJ", "Ji", "R.", "r."])
+            _stamp(c, 8, 10, [".h", ".j", "jJ", "Ji", "R.", "r."])
         elif e == "rope":  # a loose rope end over the edge
-            _stamp(c, 9, 10, ["c", "b", "c", "b", "a"])
+            _stamp(c, 8, 10, ["c", "b", "c", "b", "a"])
         elif e == "jut":  # a board end sticking out past the rim
-            _stamp(c, 7, 6, ["443", "332", "221", "110"])
+            _stamp(c, 7, 5, ["443", "332", "221", "110"])
+        elif e == "brace":  # a diagonal brace between the posts
+            c.line(posts[0] + 2, 11, min(13, posts[0] + 7), 15, "2")
         elif e == "hide":  # a strip of hide hung over the edge to dry
-            _stamp(c, 5, 9, ["bccb", "bdcb", "bccb", "bcca", ".bb."])
-        register(f"az.tb.platform.edge@{i}", art(c.grid(), legend=TB, note="platform edge over the drop"))
+            _stamp(c, 7, 9, ["bccb", "bdcb", "bccb", "bcca", ".bb."])
+        register(f"az.tb.platform.edge@{i}", art(c.grid(), legend=TB, note="plank rim of the deck over the drop"))
 
 
 PLANK = 4  # bridge slats: 3 px slat + 1 px gap
@@ -555,6 +524,12 @@ def _lodge(variant: int) -> Canvas:
             if ny > -0.07:  # the eave: dark hem
                 ch = "a" if ny > -0.035 else "b"
             c.set(x, y, ch)
+    # a stitched seam where two courses of hide meet, halfway up the roof
+    for x in range(W):
+        for y in range(H):
+            nx, ny = (x + 0.5 - cx) / rx, (y + 0.5 - base) / ry
+            if -0.27 < ny < -0.21 and nx * nx + ny * ny < 0.97 and c.get(x, y) in "bcde" and x % 2:
+                c.set(x, y, "b" if c.get(x, y) in "de" else "a")
     # smoke hole ring at the top of the roof
     c.hline(29, 35, 10, "a")
     c.hline(28, 36, 11, "b")
@@ -563,10 +538,12 @@ def _lodge(variant: int) -> Canvas:
         ["..T..", ".TtT.", "TtJtt", ".ttt.", "..t.."]
     _stamp(c, 14, 20, sun)
     _stamp(c, 45, 20, sun)
-    # fringe of hide tassels under the eave
-    for x in range(5, 60, 3):
+    # fringe of hide tassels under the eave, every fourth one a feather
+    for k, x in enumerate(range(5, 60, 3)):
         c.set(x, 31, "b")
         c.set(x, 32, "a")
+        if k % 4 == 2 and not 24 <= x <= 39:
+            _stamp(c, x, 31, ["J", "j", paint])
     # walls: hide stretched between log posts, dark under the eave
     for y in range(31, 42):
         for x in range(7, 57):
@@ -1183,7 +1160,7 @@ def _drum() -> None:
                 if d <= 1:
                     c.set(x, y, "b" if d > 0.72 else "e" if nx < -0.2 and ny < 0.3 else "d")
         if i == 0:
-            _stamp(c, 6, 3, [".r.", "rRr", ".r."])  # a red sun painted on the head
+            _stamp(c, 6, 3, ["rRr", "R.r", "rrr"])  # a red sun ring painted on the head
         else:
             _stamp(c, 5, 3, ["t...t", ".tTt."])  # a turquoise moon painted on the head
             c.line(9, 1, 14, 4, "3")  # the beater
@@ -1273,12 +1250,9 @@ def _hanging_hides() -> None:
                 h = [r.translate(str.maketrans("bcde", "abbc")) for r in h]
             _stamp(c, x0, 4, h)
             if kind == "paint":
-                _stamp(c, x0 + 2, 7, [".RR.", "RqRr", ".Rr.", "..r."])
-        # a string of feathers (and bones on the second)
-        fx = 21 if i == 0 else 25
-        if i == 0:
-            fx = 12
-        strings = [(fx, 4)] if i == 0 else [(24, 4), (27, 4)]
+                _stamp(c, x0 + 2, 6, ["R..R", "Rq.R", "qR.R", ".R.r", "....", "rRRr"])  # a hoofprint
+        # strings of feathers between the hides (and a bone charm on the second)
+        strings = [(12, 4)] if i == 0 else [(24, 4), (27, 4)]
         for sx, sy in strings:
             c.vline(sx, sy, sy + 4, "b")
             _stamp(c, sx, sy + 5, ["J", "j", "R"] if (sx + i) % 2 else ["i", "J", "t"])
@@ -1354,7 +1328,7 @@ def _pots() -> None:
 
 
 def _banner_cloth(f: int) -> list[str]:
-    """The Bloodhoof banner (9 x 23): red field, brown border, a cream hoofprint, a
+    """The Bloodhoof banner (10 x 23 with a spare column): red field, brown border, a cream hoofprint, a
     swallowtail with fringe. Frame 1 ripples: the lower half sways right by a pixel."""
     rows = []
     for y in range(23):
@@ -1373,9 +1347,9 @@ def _banner_cloth(f: int) -> list[str]:
     rows[16] = "2RqRRRRr2"
     tail = ["2RRRRRRr2", ".2RRRRr2.", ".2RR.Rr2.", "..2R.r2..", "..2...2..", "..i...i..", "..j...j.."]
     rows[16:23] = tail
-    if f == 1:
-        rows = rows[:12] + ["." + r[:-1] if r[-1] in ".ij" else r for r in rows[12:]]
-        rows = rows[:12] + [r if r[0] == "." else r for r in rows[12:]]
+    rows = [r + "." for r in rows]  # one spare column for the ripple
+    if f == 1:  # the wind catches the lower half: it swings a pixel to the right
+        rows = rows[:11] + ["." + r[:-1] for r in rows[11:]]
     return rows
 
 
@@ -1390,7 +1364,7 @@ def _banner_pole() -> None:
         for y in (12, 13, 24, 25, 32):  # carved bone rings
             c.set(3, y, "J")
             c.set(4, y, "j")
-        _stamp(c, 0, 0, ["J......J", "jJ....Jj", ".jJiiJj.", "...ii..."])  # horns on top
+        _stamp(c, 0, 0, ["J......J", "Jj....jj", ".jj..ji.", "..jJJi..", "...43..."])  # horns on top
         _stamp(c, 5, 3, ["R", "q", "j"])  # a red-tipped feather under the horns
         c.hline(3, 14, 4, "3")
         c.hline(3, 14, 5, "1")

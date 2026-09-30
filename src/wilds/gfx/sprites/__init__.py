@@ -35,7 +35,7 @@ AZEROTH_MODULES = (
     "az_fx",
 )
 # thunder_bluff is being extended (new pieces, see the manifest): held out until complete
-AZEROTH_DONE: tuple[str, ...] = tuple(m for m in AZEROTH_MODULES if m != "az_thunder_bluff")
+AZEROTH_DONE: tuple[str, ...] = tuple(m for m in AZEROTH_MODULES if m != "az_terrain")
 
 
 def load(module: str) -> None:

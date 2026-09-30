@@ -43,6 +43,18 @@ One tile = 16 px = 2 yards.
 | `az.edge.cliff.corner.nw` | 16x16 | 1 |  | overlay: inner corner nw |
 | `az.edge.cliff.corner.se` | 16x16 | 1 |  | overlay: inner corner se |
 | `az.edge.cliff.corner.sw` | 16x16 | 1 |  | overlay: inner corner sw |
+| `az.mesa.face` | 16x16 | 1 | 4 | south face of a raised red-rock mesa, layered strata, lit top edge |
+| `az.plant.tree` | <=32x48 | 1 | 4 | lone prairie tree (acacia / broad-crowned), casts soft shade |
+| `az.plant.dead_tree` | <=24x40 | 1 | 3 | gnarled dead tree |
+| `az.plant.bush` | <=16x16 | 1 | 4 | green scrub bush |
+| `az.plant.thornbush` | <=16x16 | 1 | 3 | thorny briar, quilboar country |
+| `az.plant.grass_clump` | <=16x16 | 2 | 4 | tall grass clump, sways |
+| `az.plant.wildflowers` | <=16x16 | 2 | 4 | patch of wildflowers, four colour schemes |
+| `az.plant.reeds` | <=16x24 | 2 | 3 | reeds at the lake shore, sway |
+| `az.rock.spire` | <=24x48 | 1 | 4 | tall red-rock spire, Mulgore's mesa skyline |
+| `az.rock.boulder_big` | <=32x32 | 1 | 3 | big boulder |
+| `az.rock.slab` | <=24x16 | 1 | 3 | flat rock slab / outcrop |
+| `az.rock.arch_small` | <=32x32 | 1 |  | small natural rock arch |
 | `az.deco.flower_red` | <=16x16 | 1 | 2 | scattered, walkable decoration |
 | `az.deco.flower_yellow` | <=16x16 | 1 | 2 | scattered, walkable decoration |
 | `az.deco.flower_blue` | <=16x16 | 1 | 2 | scattered, walkable decoration |

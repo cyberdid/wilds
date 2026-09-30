@@ -159,6 +159,17 @@ def bridges(world: "ZoneWorld") -> list[tuple[Pos, Pos]]:
     return [(hub.center, plats[n].center) for n in ("Spirit Rise", "Elder Rise", "Hunter Rise")]
 
 
+def bridge_tiles(world: "ZoneWorld") -> set[Pos]:
+    """Tiles of the rope bridges (three wide), from each rise's edge to the High Rise."""
+    out: set[Pos] = set()
+    for (x0, y0), (x1, y1) in bridges(world):
+        steps = max(abs(x1 - x0), abs(y1 - y0))
+        for k in range(steps + 1):
+            x, y = round(x0 + (x1 - x0) * k / steps), round(y0 + (y1 - y0) * k / steps)
+            out.update((x + dx, y + dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1))
+    return out
+
+
 def on_platform(world: "ZoneWorld", p: Pos, plats: list[Platform] | None = None) -> Platform | None:
     for plat in plats or platforms(world):
         d = math.hypot((p[0] - plat.center[0]) / 1.0, (p[1] - plat.center[1]) / 0.75)

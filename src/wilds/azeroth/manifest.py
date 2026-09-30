@@ -107,6 +107,21 @@ def terrain() -> list[Need]:
             n.append(Need(f"az.edge.{kind}.{side}", "16x16", note=f"overlay: {kind} meets grass, grass to the {side}"))
         for corner in ("ne", "nw", "se", "sw"):
             n.append(Need(f"az.edge.{kind}.corner.{corner}", "16x16", note=f"overlay: inner corner {corner}"))
+    n += [
+        # 2.5D relief: faces of raised ground, and the plants and rocks that stand on the plains
+        Need("az.mesa.face", "16x16", variants=4, note="south face of a raised red-rock mesa, layered strata, lit top edge"),
+        Need("az.plant.tree", "<=32x48", variants=4, note="lone prairie tree (acacia / broad-crowned), casts soft shade"),
+        Need("az.plant.dead_tree", "<=24x40", variants=3, note="gnarled dead tree"),
+        Need("az.plant.bush", "<=16x16", variants=4, note="green scrub bush"),
+        Need("az.plant.thornbush", "<=16x16", variants=3, note="thorny briar, quilboar country"),
+        Need("az.plant.grass_clump", "<=16x16", variants=4, frames=2, note="tall grass clump, sways"),
+        Need("az.plant.wildflowers", "<=16x16", variants=4, frames=2, note="patch of wildflowers, four colour schemes"),
+        Need("az.plant.reeds", "<=16x24", variants=3, frames=2, note="reeds at the lake shore, sway"),
+        Need("az.rock.spire", "<=24x48", variants=4, note="tall red-rock spire, Mulgore's mesa skyline"),
+        Need("az.rock.boulder_big", "<=32x32", variants=3, note="big boulder"),
+        Need("az.rock.slab", "<=24x16", variants=3, note="flat rock slab / outcrop"),
+        Need("az.rock.arch_small", "<=32x32", note="small natural rock arch"),
+    ]
     n += [Need(f"az.deco.{d}", "<=16x16", variants=2, note="scattered, walkable decoration") for d in
           ("flower_red", "flower_yellow", "flower_blue", "tuft", "stones", "bones", "dry_bush", "stump")]
     return n

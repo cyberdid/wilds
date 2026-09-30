@@ -34,25 +34,28 @@ def test_a_frame_shows_the_village_and_the_panel(app, tmp_path):
     assert len(colours) > 60  # not a blank or single-colour frame
 
 
-def test_structures_and_people_are_found_around_the_village(app):
-    sprites = []
-    x0, y0 = app.sim.hero.pos[0] - 20, app.sim.hero.pos[1] - 15
-    app.plates = []
-    app._collect(sprites, x0, y0, 40, 30)
-    names = {s[1] for s in sprites}
-    assert any(n.startswith("az.obj.") for n in names) and any(n.startswith("az.person.") for n in names)
-    assert "az.person.hero.idle" in names or "az.person.hero.walk" in names
+def test_people_and_creatures_get_name_plates_around_the_village(app):
+    app.draw()
+    titles = {p[3] for p in app.plates}
+    assert app.plates and any("[" in t for t in titles) or len(titles) > 3
+    assert any(p[4] == az_app.hud.CYAN for p in app.plates)  # the hero's own plate
+
+
+def test_structures_are_indexed_by_chunk(app):
+    kinds = {kind for objs in app.by_chunk.values() for kind, _ in objs}
+    assert {"structure", "npc"} <= kinds
 
 
 def test_ground_blends_and_caches_composites(app):
     grid = [[Terrain.GRASS] * 3 for _ in range(3)]
     grid[1][2] = Terrain.TALL_GRASS  # the higher-ranked neighbour bleeds into the centre tile
-    a = app.painter.tile(grid, 1, 1, 10, 10, 2, 0.0)
-    before = len(app.painter._scaled)
-    b = app.painter.tile(grid, 1, 1, 10, 10, 2, 0.0)
-    assert a is b and len(app.painter._scaled) == before
+    a, key = app.painter.composite(grid, 1, 1, 10, 10, 0.0)
+    n = len(app.painter._composite)
+    b, key2 = app.painter.composite(grid, 1, 1, 10, 10, 0.0)
+    assert a is b and key == key2 and len(app.painter._composite) == n
     plain = [[Terrain.GRASS] * 3 for _ in range(3)]
-    assert app.painter.tile(plain, 1, 1, 10, 10, 2, 0.0) is not a
+    assert app.painter.composite(plain, 1, 1, 10, 10, 0.0)[0] is not a
+    assert app.painter.diamond(a, key) is app.painter.diamond(a, key)
 
 
 def test_thunder_bluff_is_platforms_joined_by_bridges(app):
@@ -62,7 +65,25 @@ def test_thunder_bluff_is_platforms_joined_by_bridges(app):
     hub = plats[0]
     assert settlements.on_platform(world, hub.center, plats) is hub
     assert settlements.on_platform(world, (hub.center[0] + 300, hub.center[1]), plats) is None
-    assert len(app.bridge_tiles) > 200
+    assert len(app.relief.bridges) > 200
+
+
+def test_relief_stands_the_platforms_above_the_mesa(app):
+    rel = app.relief
+    hub = rel.platforms[0]
+    kind = rel.kind(*hub.center, Terrain.MESA)
+    assert kind == "platform"
+    assert rel.height(*hub.center, kind) > rel.height(hub.center[0], hub.center[1], "mesa") > 0
+    assert rel.height(0, 0, "ground") == 0
+
+
+def test_the_view_switches_between_25d_and_three_quarter(app):
+    app.view = "iso"
+    app.handle(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_i, unicode="i"))
+    assert app.view == "2d"
+    app.draw()
+    app.handle(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_i, unicode="i"))
+    assert app.view == "iso"
 
 
 def test_zoom_and_keys_do_not_crash(app):
