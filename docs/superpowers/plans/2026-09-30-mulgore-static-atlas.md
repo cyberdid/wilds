@@ -185,7 +185,7 @@ The catalog owns searchable entities; atlas.py only draws entries with a tile. W
 - [x] Draw catalog markers only when filters accept the entry and CatalogEntry.tile exists. Give NPC, other creature, gameobject, landmark, source-map, and approximate markers distinct shapes/colors.
 - [x] Cluster unselected markers into screen-space 24 px buckets at low zoom; a selected search result always draws its exact marker above its cluster.
 - [x] Draw approximate feature roads only as a separate optional dashed layer labeled approximate route; never paint them into the terrain layer.
-- [ ] Manually compare the viewer with tools/preview_zone.py at matching scales; confirm north/orientation, boundary, water, and aspect ratio, allowing the expected route-layer difference because the viewer constructs ZoneWorld with roads=False.
+- [x] Manually compare headless viewer renders with tools/preview_zone.py at matching scales; confirm north/orientation, boundary, water, and aspect ratio, allowing the expected route-layer difference because the viewer constructs ZoneWorld with roads=False.
 - [x] Commit as feat: render Mulgore atlas layers.
 
 ## Task 6: Add the Standalone Pygame Viewer
@@ -195,15 +195,15 @@ The catalog owns searchable entities; atlas.py only draws entries with a tile. W
 - Create: tools/view_mulgore.py
 - Read: existing pygame usage in src/wilds/gfx/app.py and src/wilds/gfx/hud.py
 
-- [ ] Implement MulgoreViewer(pack_dir, spawn_file, size=(1360, 820)) with its own pygame event loop and no Simulation, Brain, Hero, or GfxApp dependency.
-- [ ] Render a 300 px right panel for search/results, layer filters, legend, selected entity details, source/version, confidence, world coordinates, and importer coverage summary. Use pygame fonts and drawing primitives; add no UI packages.
-- [ ] Support left-drag pan, mouse-wheel zoom around the cursor, a home action to fit the zone, and click selection of an individual marker. Clamp only the camera view, never source coordinates.
-- [ ] Support / to focus search, Esc to clear selection/close search, and H to fit the zone. Use pygame text input events for search typing; clicking a result selects it. Search is case-insensitive; selecting an unplaced result opens its details without moving the camera.
-- [ ] Add filters for NPC spawns, other creature spawns, gameobject spawns, landmarks, Wiki-only/unplaced entries, approximate points, edge-ambiguous positions, and later-era/unknown entries. Default to in-mask Vanilla DB spawns and confirmed map features; keep unknown/later-era pages searchable but off-map until enabled.
-- [ ] Show persistent badges Vanilla 1.12.x source and procedural preview; show CC BY-NC-SA 3.0 attribution in the details/about panel.
-- [ ] Implement tools/view_mulgore.py with --pack-dir, --spawn-file, and --window WIDTHxHEIGHT. If local spawn JSON is missing, print this exact importer command and exit cleanly: python tools/import_mulgore_spawns.py --sql-dir data/azeroth/raw/mangoszero-database/World/Setup/FullDB --pack-dir data/azeroth/mulgore --out data/azeroth/raw/mulgore-spawns.json.
-- [ ] Open the viewer and manually inspect full-zone fit, Camp Narache, Bloodhoof Village, Thunder Bluff, a dense creature camp, a placed search result, an unplaced search result, and the approximate layer toggle.
-- [ ] Commit as feat: add Mulgore atlas viewer.
+- [x] Implement MulgoreViewer(pack_dir, spawn_file, size=(1360, 820)) with its own pygame event loop and no Simulation, Brain, Hero, or GfxApp dependency.
+- [x] Render a 300 px right panel for search/results, layer filters, legend, selected entity details, source/version, confidence, world coordinates, and importer coverage summary. Use pygame fonts and drawing primitives; add no UI packages.
+- [x] Support left-drag pan, mouse-wheel zoom around the cursor, a home action to fit the zone, and click selection of an individual marker. Clamp only the camera view, never source coordinates.
+- [x] Support / to focus search, Esc to clear selection/close search, and H to fit the zone. Use pygame text input events for search typing; clicking a result selects it. Search is case-insensitive; selecting an unplaced result opens its details without moving the camera.
+- [x] Add filters for NPC spawns, other creature spawns, gameobject spawns, landmarks, Wiki-only/unplaced entries, approximate points, edge-ambiguous positions, and later-era/unknown entries. Default to in-mask Vanilla DB spawns and map features; keep unknown/later-era pages searchable but off-map until enabled.
+- [x] Show persistent badges Vanilla 1.12.x source and procedural preview; show CC BY-NC-SA 3.0 attribution in the details/about panel.
+- [x] Implement tools/view_mulgore.py with --pack-dir, --spawn-file, and --window WIDTHxHEIGHT. If local spawn JSON is missing, print this exact importer command and exit cleanly: python tools/import_mulgore_spawns.py --sql-dir data/azeroth/raw/mangoszero-database/World/Setup/FullDB --pack-dir data/azeroth/mulgore --out data/azeroth/raw/mulgore-spawns.json.
+- [x] Render the standalone viewer to headless surfaces and manually inspect full-zone fit, Camp Narache, Bloodhoof Village, Thunder Bluff, a dense creature camp, a placed search result, an unplaced search result, and the approximate layer toggle.
+- [x] Commit as feat: add Mulgore atlas viewer.
 
 ## Task 7: Document the Local Workflow and Coverage Limits
 
