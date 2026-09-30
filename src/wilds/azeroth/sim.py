@@ -18,7 +18,7 @@ from ..sim import Conversation, Decision, HistoryEntry, Reflection, remember
 from . import content, quests as q
 from .actions import ACTION_HELP, ATTACK_TICKS, Action, Rest, Status, make_action
 from .route import astar
-from .scale import CHUNK
+from .scale import CHUNK, TICK_SECONDS
 from .terrain import Terrain
 from .world import Placement, ZoneWorld
 
@@ -29,6 +29,7 @@ ACTIVE_CHUNKS = 2      # creatures within this many chunks of the hero are simul
 RESPAWN_TICKS = 1800   # about 8.5 minutes
 PACK_SIZE = 4
 GOAL_LEVEL = 10
+START_HOUR = 9
 REFLECT_EVERY = 6000
 LANDMARK_KINDS = ("subzone", "settlement", "gate", "lake", "plateau")
 ZONE_WIDE = {"mulgore", "varies", "", "-"}
@@ -123,6 +124,8 @@ class ZoneSim:
         subzones = {q.clean(p.title) for p in world.placements if p.kind in LANDMARK_KINDS}
         self.quests = q.load_quests(pack, self.npc_names, set(self._mob_records), subzones)
         start = places.get("camp narache") or next(iter(places.values()))
+        world.tick = world.tick or int(START_HOUR * 3600 / TICK_SECONDS)  # the day begins in the morning
+        self._next_reflection = world.tick + REFLECT_EVERY
         self.hero = Hero(world.nearest_passable(start.pos, 40) or start.pos)
         self.hero.discovered.add("camp narache")
         world.hero = self.hero

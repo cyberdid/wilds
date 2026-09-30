@@ -86,4 +86,4 @@ def test_the_scripted_hero_finishes_the_chapter_at_real_scale():
     sim.run(ScriptedZoneBrain(), 80000)
     assert sim.hero.level >= GOAL_LEVEL - 1
     assert sim.hero.done and sim.hero.kills and len(sim.hero.discovered) > 5
-    assert world.seconds > 3600  # the zone is big: leveling up took over an hour of game time
+    assert world.seconds - 9 * 3600 > 3600  # the zone is big: leveling up took over an hour of game time

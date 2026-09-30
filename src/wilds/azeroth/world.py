@@ -16,7 +16,7 @@ from typing import Callable
 
 from ..noise import ValueNoise
 from ..world import Event
-from . import content, quests
+from . import content, quests, settlements
 from .route import find_route
 from .scale import CHUNK, TICK_SECONDS, Geometry, load_geometry
 from .terrain import Macro, Terrain, ZoneTerrain
@@ -152,7 +152,14 @@ class ZoneWorld:
                     continue
                 ax, ay = anchors[hit]
                 h = sum(map(ord, rec["id"]))  # stable jitter: same spot on every run
-                pos = (ax + h % 41 - 20, ay + h // 41 % 41 - 20)
+                spread = 20
+                if hit == "thunder bluff":  # a whole city: spread its people over the rises
+                    if kind != "npc":
+                        continue
+                    rises = settlements.platforms(self)
+                    plat = rises[h % len(rises)]
+                    ax, ay, spread = plat.center[0], plat.center[1], max(14, plat.radius - 8)
+                pos = (ax + h % (2 * spread + 1) - spread, ay + h // 41 % (2 * spread + 1) - spread)
                 pos = self.nearest_passable(pos, 12) or pos
                 out.append(Placement(rec["id"], rec["title"], kind, pos, rec["zone"], "text", approx=True))
         return out

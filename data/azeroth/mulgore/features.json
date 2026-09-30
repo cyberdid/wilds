@@ -82,6 +82,15 @@
    "kind": "subzone",
    "map": "Thunder Bluff",
    "basis": "label on the Thunder Bluff map"
+  },
+  {
+   "id": "high_rise_tb",
+   "name": "High Rise",
+   "x": 46.5,
+   "y": 50.0,
+   "kind": "subzone",
+   "map": "Thunder Bluff",
+   "basis": "centre of the Thunder Bluff map"
   }
  ],
  "roads": [
