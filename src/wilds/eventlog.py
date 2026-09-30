@@ -40,16 +40,20 @@ class EventLog:
 
     @classmethod
     def for_game(cls, log_dir: Path | str | None, brain_name: str, seed: int,
-                 chapter: str = "tau7") -> "EventLog | None":
+                 chapter: str = "tau7", sim=None) -> "EventLog | None":
         if not log_dir:
             return None
-        return cls(Path(log_dir) / log_name(brain_name, seed, chapter))
+        # a loaded save keeps writing the journal it started in (a campaign's one file),
+        # instead of a fresh per-chapter file named after whatever brain resumed it
+        journal = getattr(sim, "journal_path", None)
+        return cls(Path(journal) if journal else Path(log_dir) / log_name(brain_name, seed, chapter))
 
     # --- wiring ---------------------------------------------------------------
     def attach(self, sim, title: str, brain_label: str, resumed: bool = False) -> None:
         """Follow a (new or loaded) simulation from now on."""
         self.detach()
         self.sim = sim
+        sim.journal_path = str(self.path)
         self._decisions = sim.decisions
         self._pending = [e for e in sim.history if not e.outcome]
         self._ended = False

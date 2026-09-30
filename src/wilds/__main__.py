@@ -13,7 +13,7 @@ from .brain.codex import DEFAULT_MODEL as CODEX_DEFAULT_MODEL
 from .actions import ACTION_HELP
 from .campaign import CHAPTER2_TITLE, ready_for_chapter2
 from .eventlog import EventLog
-from .save import SAVE_DIR, latest_save, load_game, save_game, save_path
+from .save import CITY_SUFFIX, SAVE_DIR, TAU7_SUFFIX, latest_save, load_game, save_game, save_path
 from .sim import Simulation
 from .worldgen import generate
 
@@ -107,7 +107,7 @@ def headless(args: argparse.Namespace, brain, seed: int, loaded: Simulation | No
         sim.diary_path = Path(args.log_dir) / f"diary-{brain.name}-{seed}.md"
     if not args.no_legacy:
         sim.legacy_dir = Path(args.legacy_dir)
-    log = EventLog.for_game(args.log_dir, brain.name, world.seed)
+    log = EventLog.for_game(args.log_dir, brain.name, world.seed, sim=sim)
     if log:
         log.attach(sim, "Тау-7", brain.label, resumed=loaded is not None)
     sim.run(brain, args.headless)
@@ -157,8 +157,22 @@ def shot(args: argparse.Namespace, brain, seed: int, loaded: Simulation | None =
     print(f"скріншот: {app.shot(args.shot)}")
 
 
+def _city_save_requested(argv: list[str] | None) -> bool:
+    """`--load x.csav`, or `--continue` when the newest save of either chapter is a city one."""
+    pre = argparse.ArgumentParser(add_help=False)
+    pre.add_argument("--load", default=None)
+    pre.add_argument("--continue", dest="resume", action="store_true")
+    known, _ = pre.parse_known_args(argv)
+    if known.load:
+        return Path(known.load).suffix == CITY_SUFFIX
+    if known.resume:
+        newest = latest_save(SAVE_DIR, (TAU7_SUFFIX, CITY_SUFFIX))
+        return newest is not None and newest.suffix == CITY_SUFFIX
+    return False
+
+
 def main(argv: list[str] | None = None) -> None:
-    if _chapter(argv) == "cyberpunk":
+    if _chapter(argv) == "cyberpunk" or _city_save_requested(argv):
         from .cyberpunk.__main__ import main as cyberpunk_main
 
         cyberpunk_main(argv)
@@ -195,7 +209,8 @@ def main(argv: list[str] | None = None) -> None:
             from .cyberpunk.worldgen import generate as city_generate
 
             campaign = Campaign(chapter, brain, make_city_brain(args),
-                                lambda legacy: CityChapter(lambda s: city_generate(s, legacy), diary_dir=diary_dir))
+                                lambda legacy: CityChapter(lambda s: city_generate(s, legacy), diary_dir=diary_dir,
+                                                           save_dir=SAVE_DIR))
         GfxApp(chapter, brain, seed, speed=args.speed, sprites_dir=args.sprites, size=window_size(args),
                zoom=args.zoom, loaded=loaded, fullscreen=args.fullscreen, view=args.view, campaign=campaign).run()
         return

@@ -263,7 +263,7 @@ class WildsApp(App):
         if self.eventlog is None or not self.campaign:
             if self.eventlog:
                 self.eventlog.close()
-            self.eventlog = EventLog.for_game(self.diary_dir, self.brain.name, sim.world.seed)
+            self.eventlog = EventLog.for_game(self.diary_dir, self.brain.name, sim.world.seed, sim=sim)
         if self.eventlog:
             self.eventlog.attach(sim, "Тау-7", self.brain.label, resumed)
 

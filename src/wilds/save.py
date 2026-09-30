@@ -15,13 +15,17 @@ from .sim import Simulation
 
 SAVE_VERSION = 1
 SAVE_DIR = Path("saves")
+TAU7_SUFFIX = ".wsav"
+# the city chapter gets its own extension: brain names can coincide across the
+# chapters ("scripted"), and `--continue` must know which chapter a save is for
+CITY_SUFFIX = ".csav"
 
 
-def save_path(sim: Simulation, brain_name: str, directory: Path = SAVE_DIR) -> Path:
-    return directory / f"{brain_name}-{sim.world.seed}.wsav"
+def save_path(sim, brain_name: str, directory: Path = SAVE_DIR, suffix: str = TAU7_SUFFIX) -> Path:
+    return directory / f"{brain_name}-{sim.world.seed}{suffix}"
 
 
-def save_game(sim: Simulation, path: Path, brain_state: dict | None = None) -> Path:
+def save_game(sim, path: Path, brain_state: dict | None = None) -> Path:
     """Write the simulation to ``path`` atomically. UI listeners are not saved."""
     path.parent.mkdir(parents=True, exist_ok=True)
     world = sim.world
@@ -42,11 +46,12 @@ def load_game(path: Path) -> tuple[Simulation, dict]:
         raise ValueError(f"unsupported save version {data.get('version')}")
     sim: Simulation = data["sim"]
     # creature ids come from a global counter; continue after the saved ones
-    ids = [c.id for lv in sim.world.levels.values() for c in lv.creatures]
+    ids = [c.id for lv in sim.world.levels.values() for c in getattr(lv, "creatures", ())]
     creatures._ids = count(max(ids, default=0) + 1)
     return sim, data.get("brain_state", {})
 
 
-def latest_save(directory: Path = SAVE_DIR) -> Path | None:
-    saves = sorted(directory.glob("*.wsav"), key=lambda p: p.stat().st_mtime)
+def latest_save(directory: Path = SAVE_DIR, suffixes: tuple[str, ...] = (TAU7_SUFFIX,)) -> Path | None:
+    saves = sorted((p for p in directory.glob("*") if p.suffix in suffixes), key=lambda p: p.stat().st_mtime) \
+        if directory.exists() else []
     return saves[-1] if saves else None

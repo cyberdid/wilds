@@ -32,10 +32,12 @@ def test_headless_campaign_plays_both_chapters_into_one_journal(tmp_path, capsys
 
 
 def test_standalone_city_journal_and_disabled_logging(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)  # an unfinished headless city run now saves into ./saves
     cli.main(["--chapter", "cyberpunk", "--brain", "scripted", "--seed", "3", "--headless", "150",
               "--no-legacy", "--log-dir", str(tmp_path)])
     log = (tmp_path / "events-cyberpunk-scripted-3.log").read_text(encoding="utf-8")
     assert "===== Тінемісто · seed 3" in log and "] рішення " in log
+    assert (tmp_path / "saves" / "scripted-3.csav").exists()
     monkeypatch.chdir(tmp_path / "..")
     before = set(tmp_path.parent.rglob("events-*.log"))
     cli.main(["--brain", "scripted", "--seed", "4", "--headless", "50", "--no-legacy", "--log-dir", ""])

@@ -6,7 +6,7 @@ while the world waits (exactly like the Textual app), and the renderer only
 reads game state.
 
 Keys: space pause · +/- speed · [ ] or wheel zoom · i 2D <-> isometric 2.5D ·
-d diary · g god view · m minimap · s save (Tau-7) · n new world · Tab HUD ·
+d diary · g god view · m minimap · s save · n new world · Tab HUD ·
 F11 fullscreen · F12 screenshot · h help · q quit.
 """
 
@@ -46,7 +46,7 @@ HELP = [
     ("[ ] або коліщатко — масштаб        Tab — сховати панель", "text"),
     ("i — вид: 2D (3/4 зверху) ↔ ізометрія 2.5D", "text"),
     ("d — щоденник        g — «око бога»        m — мінікарта", "text"),
-    ("s — зберегти (Тау-7)        n — новий світ        q — вихід", "text"),
+    ("s — зберегти               n — новий світ        q — вихід", "text"),
     ("F11 — повний екран        F12 — скріншот        h / F1 — ця довідка", "text"),
     ("", "text"),
     ("ШІ сам вирішує, що робити: думки видно над головою героя, щоденник — клавіша d.", "text"),
@@ -163,11 +163,12 @@ class CityChapter:
     title = "Wilds: Тінемісто"
     log_title = "Тінемісто"
     log_kind = "cyberpunk"
-    can_save = False
+    can_save = True
 
-    def __init__(self, make_world: Callable, diary_dir: Path | None = None) -> None:
+    def __init__(self, make_world: Callable, diary_dir: Path | None = None, save_dir: Path | None = None) -> None:
         self.make_world = make_world
         self.diary_dir = diary_dir
+        self.save_dir = save_dir
 
     def new_sim(self, app, seed: int):
         from ..cyberpunk.sim import CitySim
@@ -220,13 +221,21 @@ class CityChapter:
 
         return CyberScriptedBrain()
 
-    def save(self, app, quiet: bool = False):
+    def save(self, app, quiet: bool = False) -> Path | None:
+        from ..save import CITY_SUFFIX, save_game, save_path
+
+        if self.save_dir is None or app.sim.over:
+            return None
+        path = save_game(app.sim, save_path(app.sim, app.brain.name, self.save_dir, CITY_SUFFIX))
+        if app.eventlog:
+            app.eventlog.meta(f"збережено: {path}")
         if not quiet:
-            app.toast("Кіберпанк-глава не зберігається (як і в терміналі)")
-        return None
+            app.toast(f"Гру збережено: {path}")
+        return path
 
     def answered(self, app, kind: str) -> None:
-        pass
+        if kind == "reflect":
+            self.save(app, quiet=True)  # autosave once per day, like Tau-7
 
 
 class Campaign:
@@ -334,7 +343,7 @@ class GfxApp:
         if self.eventlog is None or self.campaign is None:
             if self.eventlog:
                 self.eventlog.close()
-            self.eventlog = EventLog.for_game(log_dir, self.brain.name, sim.world.seed, self.chapter.log_kind)
+            self.eventlog = EventLog.for_game(log_dir, self.brain.name, sim.world.seed, self.chapter.log_kind, sim=sim)
         if self.eventlog:
             self.eventlog.attach(sim, self.chapter.log_title, self.brain.label, resumed)
 
