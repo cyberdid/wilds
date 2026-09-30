@@ -335,67 +335,118 @@ def _rock_height(seed: int, n: int, stretch: float, cap: float) -> Field:
 
 
 def _mountain_top(seed: int) -> Canvas:
-    """The wall seen from above: big jumbled boulders, sunlit on their top-left shoulders,
-    black crevices between them; seamless every way, so the rim reads as one rock mass."""
+    """The rim's plateau seen from above (in 2.5D it is the top of an extruded block): broad
+    weathered rock slabs, softly lit, with dry-grass patches in the hollows between them."""
     rng = random.Random(seed)
     c = Canvas(T, T)
-    h = _rock_height(seed, 5, 1.0, 3.5)
-    f = _mix((0.55, _emboss(h)), (0.35, h), (0.1, fbm(T, T, seed + 3, 1, 8)))
-    _quantize(c, f, "mnopqrs", [10, 12, 17, 22, 20, 13, 6], dither=0.04)
-    for y in range(T):  # the crevices proper
+    h = _rock_height(seed, 4, 1.0, 4.0)
+    f = _mix((0.4, _emboss(h)), (0.4, h), (0.2, fbm(T, T, seed + 3, 2, 3)))
+    _quantize(c, f, "nopqrs", [8, 16, 30, 28, 14, 4], dither=0.05)
+    for y in range(T):  # the cracks between slabs
         for x in range(T):
-            if h[y][x] < 0.12 and c.px[y][x] in "nop":
-                c.px[y][x] = "m"
-    if seed % 3 == 1:  # one variant has a tuft of grass clinging in a crevice
-        low = sorted((h[y][x], x, y) for y in range(4, T - 4) for x in range(4, T - 4))
-        x, y = low[rng.randrange(3)][1:]
-        c.set(x, y, "1")
-        c.set(x, y - 1, "3")
-        c.set(x + 1, y, "2")
+            if h[y][x] < 0.1:
+                c.px[y][x] = "m" if bayer(x, y) < 0.7 else "n"
+    # grass patches in the low ground, kept inside the tile so sibling tops meet on rock
+    g = fbm(T, T, seed + 7, 2, 3)
+    cand = sorted(((g[y][x] - h[y][x] * 0.6) * _window(x, 3.5) * _window(y, 3.5), x, y)
+                  for y in range(T) for x in range(T))
+    for v, x, y in cand[-26:]:
+        c.px[y][x] = FRINGE.px[y][x]
+        if c.get(x, y - 1) in ROCK_CH and rng.random() < 0.5:
+            c.set(x, y - 1, "e" if rng.random() < 0.5 else "4")  # a lit blade over the rock
     return c
 
 
-def _wall(seed: int, tones: str, weights: list[float], strata: float) -> Canvas:
-    """A steep rock face: tall columns lit on their left flank, dark on the right, with
-    horizontal strata; periodic both ways."""
+def _face_columns(seed: int, tones: str, weights: list[float], bands: float) -> Canvas:
+    """A vertical rock wall, periodic sideways: fractured columns lit on their left flank,
+    dark on the right, crossed by ``bands`` of strata, and darker toward the foot. The
+    client stretches faces to the block's height, so the structure is mostly vertical."""
     c = Canvas(T, T)
-    h = _rock_height(seed, 6, 0.4, 2.5)
+    h = _rock_height(seed, 5, 0.35, 2.5)
     warp = fbm(T, 1, seed + 5, 2, 4)[0]
-    lay = [[0.5 + 0.5 * math.sin(2 * math.pi * (3 * y / T + 0.5 * warp[x])) for x in range(T)] for y in range(T)]
-    f = _mix((0.5, _emboss(h, 1, 0)), (0.25, h), (strata, _emboss(lay, 0, 1)), (0.1, fbm(T, T, seed + 3, 1, 8)))
+    lay = [[0.5 + 0.5 * math.sin(2 * math.pi * (bands * y / T + 0.35 * warp[x])) for x in range(T)]
+           for y in range(T)]
+    f = _mix((0.45, _emboss(h, 1, 0)), (0.2, h), (0.25, _emboss(lay, 0, 1)), (0.1, fbm(T, T, seed + 3, 1, 8)))
+    f = [[v - 0.35 * (y / (T - 1)) ** 1.6 for v in row] for y, row in enumerate(f)]
     _quantize(c, f, tones, weights, dither=0.04)
     for y in range(T):
         for x in range(T):
             if h[y][x] < 0.14:
-                c.px[y][x] = tones[0]
+                c.px[y][x] = tones[0]  # the fissures between columns
+    return c
+
+
+def _lip(c: Canvas, seed: int, grass: bool) -> None:
+    """Top edge of a wall: an earth-and-grass (or bare rock) lip, a sunlit rim of rock
+    below it and a thin shadow line; periodic sideways. The foot is dark."""
+    n = fbm(T, 1, seed, 2, 4)[0]
+    for x in range(T):
+        if grass:
+            c.set(x, 0, FRINGE.px[0][x] if n[x] > 0.3 else "C")
+            c.set(x, 1, "C" if n[(x + 4) % T] > 0.45 else "s")
+            c.set(x, 2, "s" if n[(x + 7) % T] > 0.3 else "r")
+        else:
+            c.set(x, 0, "t" if n[x] > 0.55 else "s")
+            c.set(x, 1, "s" if n[(x + 7) % T] > 0.35 else "r")
+            c.set(x, 2, "r")
+        c.set(x, 3, "n" if n[(x + 3) % T] > 0.5 else "o")
+        c.set(x, T - 1, "m")
+        if bayer(x, 0) < 0.5:
+            c.set(x, T - 2, "m")
+
+
+def _mountain_face(seed: int) -> Canvas:
+    """The rim's wall: dark, deeply fissured red rock under a grassy lip - its lit crest
+    against the plateau above reads as the ridge line."""
+    c = _face_columns(seed, "mnopqr", [18, 24, 26, 19, 10, 3], 2.0)
+    _lip(c, seed + 11, grass=True)
     return c
 
 
 def _cliff_face(seed: int) -> Canvas:
-    """Cliff wall: dark red columnar rock banded by sandstone strata. The client stacks cliff
-    tiles in blobs, so there is no per-tile lip: it tiles seamlessly every way."""
-    return _wall(seed, "mnopqr", [16, 22, 24, 20, 13, 5], 0.3)
+    """Cliff at the land's edge: warmer sandstone columns with bolder strata, grass on top."""
+    c = _face_columns(seed, "nopqrs", [16, 24, 26, 20, 11, 3], 3.0)
+    _lip(c, seed + 11, grass=True)
+    return c
 
 
-def _mountain_face(seed: int) -> Canvas:
-    """South face under ``mountain.top``: a bright broken crest (the ridge line), a shadow
-    under it, then dark columns falling to a black foot."""
-    c = _wall(seed, "mnopq", [18, 26, 28, 20, 8], 0.2)
-    for y in range(T):  # the face turns away from the sky toward the foot
+def _mesa_face(seed: int) -> Canvas:
+    """Mulgore's layered mesa wall: horizontal strata of red, rust and pale sandstone (each
+    ledge lit along its top, undercut below), vertical joints, a bare-rock lip."""
+    rng = random.Random(seed)
+    c = Canvas(T, T)
+    warp = fbm(T, 1, seed, 2, 4)[0]
+    fine = fbm(T, T, seed + 1, 1, 8)
+    joints = _rock_height(seed + 2, 4, 0.3, 2.0)
+    layers = ["q", "p", "F", "r", "o", "q", "E", "p"]
+    k = rng.randrange(len(layers))
+    layers = layers[k:] + layers[:k]
+    tone = {"m": 0, "n": 1, "o": 2, "p": 3, "q": 4, "r": 5, "s": 6, "t": 7}
+    for y in range(T):
         for x in range(T):
-            if y > 9 and bayer(x, y) < (y - 9) / 7:
-                c.px[y][x] = ROCK_CH[max(0, ROCK_CH.index(c.px[y][x]) - 1)]
-    crest = fbm(T, 1, seed + 11, 2, 4)[0]
-    for x in range(T):
-        thick = 2 if crest[x] > 0.4 else 1
-        c.set(x, 0, "s" if crest[(x + 5) % T] > 0.35 else "r")
-        if thick == 2:
-            c.set(x, 1, "t" if crest[(x + 9) % T] > 0.75 else "r")
-        c.set(x, thick, "q" if crest[(x + 3) % T] > 0.6 else "p")
-        c.set(x, thick + 1, "m")
-        c.set(x, thick + 2, "n" if bayer(x, 0) < 0.5 else c.get(x, thick + 2))
-    for x in range(T):
-        c.set(x, T - 1, "m")
+            s_ = y + 1.6 * (warp[x] - 0.5)
+            band = int(s_ // 3)
+            pos = s_ - band * 3
+            ch = layers[band % len(layers)]
+            if ch in tone:
+                i = tone[ch]
+                if pos < 0.9:
+                    i += 1  # the ledge's lit top
+                elif pos >= 2.2:
+                    i -= 2  # undercut
+                i += 1 if fine[y][x] > 0.8 else 0
+                if y > 10 and bayer(x, y) < (y - 10) / 6:
+                    i -= 1
+                if joints[y][x] < 0.14:
+                    i = 0 if y > 3 else i - 2
+                ch = ROCK_CH[max(0, min(7, i))]
+            else:  # a pale sandstone band
+                if pos >= 2.2 or joints[y][x] < 0.14:
+                    ch = "o"
+                elif pos < 0.9:
+                    ch = "F" if ch == "E" else "G"
+            c.set(x, y, ch)
+    _lip(c, seed + 11, grass=False)
     return c
 
 
@@ -424,16 +475,17 @@ def _shadow(c: Canvas, cx: float, cy: float, rx: float, ry: float, ch: str = "z"
                 c.px[y][x] = ch
 
 
-def _outline(c: Canvas, skip: str = ".zy") -> None:
+def _outline(c: Canvas, skip: str = ".zyZ", ch: str = "k") -> None:
+    """1px outline around every opaque pixel; shadow pixels (in ``skip``) may be outlined over."""
     src = [row[:] for row in c.px]
     for y in range(c.h):
         for x in range(c.w):
-            if src[y][x] not in ".zy":
+            if src[y][x] not in skip:
                 continue
             for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
                 nx, ny = x + dx, y + dy
                 if 0 <= nx < c.w and 0 <= ny < c.h and src[ny][nx] not in skip:
-                    c.px[y][x] = "k"
+                    c.px[y][x] = ch
                     break
 
 
