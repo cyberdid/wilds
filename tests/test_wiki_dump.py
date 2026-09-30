@@ -114,3 +114,12 @@ def test_gives_up_after_retries(server):
 def test_categories_from_wikitext():
     text = "x [[Category:Zones]] y [[Категория:Города|Орг]] [[Категорія:Зони]] [[Category:Zones]]"
     assert wiki_dump.categories(text) == ["Zones", "Города", "Зони"]
+
+
+def test_no_redirects_asks_the_api_to_filter(server, tmp_path):
+    seen = []
+    client = _client(server)
+    real_get = client.get
+    client.get = lambda **kw: (seen.append(kw), real_get(**kw))[1]
+    wiki_dump.dump(client, tmp_path, [14], redirects=False, log=lambda *_: None)
+    assert seen and all(kw.get("gapfilterredir") == "nonredirects" for kw in seen)

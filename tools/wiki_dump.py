@@ -76,13 +76,14 @@ class Client:
         raise WikiError("unreachable")
 
 
-def batches(client: Client, namespace: int, resume: dict[str, str] | None,
-            batch_size: int = 50) -> Iterator[tuple[list[dict[str, Any]], dict[str, str] | None]]:
+def batches(client: Client, namespace: int, resume: dict[str, str] | None, batch_size: int = 50,
+            redirects: bool = True) -> Iterator[tuple[list[dict[str, Any]], dict[str, str] | None]]:
     """Yield (pages, continue-token) for one namespace; the token is None after the last batch."""
     cont = dict(resume) if resume else {}
+    extra = {} if redirects else {"gapfilterredir": "nonredirects"}
     while True:
         data = client.get(action="query", generator="allpages", gapnamespace=namespace, gaplimit=batch_size,
-                          prop="revisions", rvprop="ids|timestamp|content", rvslots="main", **cont)
+                          prop="revisions", rvprop="ids|timestamp|content", rvslots="main", **extra, **cont)
         pages = []
         for page in data.get("query", {}).get("pages", []):
             revs = page.get("revisions") or []
@@ -100,7 +101,7 @@ def batches(client: Client, namespace: int, resume: dict[str, str] | None,
 
 
 def dump(client: Client, out: Path, namespaces: list[int], batch_size: int = 50,
-         log=print) -> dict[str, Any]:
+         redirects: bool = True, log=print) -> dict[str, Any]:
     out.mkdir(parents=True, exist_ok=True)
     state_path = out / "state.json"
     state = json.loads(state_path.read_text("utf-8")) if state_path.exists() else {}
@@ -113,7 +114,7 @@ def dump(client: Client, out: Path, namespaces: list[int], batch_size: int = 50,
             continue
         log(f"ns {ns} ({NS_NAMES.get(ns, 'other')}): {'resuming' if entry['continue'] else 'starting'}")
         with (out / f"ns{ns}.jsonl").open("a", encoding="utf-8") as f:
-            for pages, cont in batches(client, ns, entry["continue"], batch_size):
+            for pages, cont in batches(client, ns, entry["continue"], batch_size, redirects):
                 for page in pages:
                     f.write(json.dumps(page, ensure_ascii=False) + "\n")
                 f.flush()
@@ -140,11 +141,12 @@ def main(argv: list[str] | None = None) -> None:
                    help="comma-separated namespace ids (0 articles, 10 templates, 14 categories)")
     p.add_argument("--delay", type=float, default=0.5, help="seconds between requests")
     p.add_argument("--batch", type=int, default=50, help="pages per request (max 50)")
+    p.add_argument("--no-redirects", action="store_true", help="skip redirect pages (they carry no content)")
     p.add_argument("--user-agent", default=DEFAULT_UA)
     args = p.parse_args(argv)
     client = Client(args.base, args.user_agent, args.delay)
     try:
-        dump(client, args.out, [int(n) for n in args.namespaces.split(",")], min(50, args.batch))
+        dump(client, args.out, [int(n) for n in args.namespaces.split(",")], min(50, args.batch), not args.no_redirects)
     except WikiError as exc:
         sys.exit(f"stopped: {exc}\nrun the same command again to resume")
     print(f"done: {client.requests} requests -> {args.out}")
