@@ -1,0 +1,24 @@
+{
+  "source_id": "mangoszero_vanilla_world_db",
+  "source_url": "https://github.com/mangoszero/database",
+  "source_revision": "325948a78015794e6cc626212bc19fee70c805b2",
+  "source_era": "Vanilla 1.12.1-1.12.3",
+  "retrieved_on": "2026-09-30",
+  "license": "CC BY-NC-SA 3.0",
+  "license_url": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+  "attribution": "Based upon the work of getmangos.eu (MaNGOSZero)",
+  "input_tables": [
+    "creature.sql",
+    "creature_template.sql",
+    "gameobject.sql",
+    "gameobject_template.sql",
+    "pool_creature.sql",
+    "pool_gameobject.sql",
+    "game_event_creature.sql",
+    "game_event_gameobject.sql"
+  ],
+  "raw_checkout": "data/azeroth/raw/mangoszero-database/World/Setup/FullDB",
+  "generated_output": "data/azeroth/raw/mulgore-spawns.json",
+  "compatibility_note": "This upstream database explicitly targets Vanilla 1.12.1-1.12.3 and does not support 1.13.x or later. It is not authoritative for current Blizzard Classic Era realms.",
+  "distribution_note": "Keep source-derived raw and normalized rows local unless any redistribution follows the source license terms."
+}
