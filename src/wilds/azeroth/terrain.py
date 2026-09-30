@@ -85,22 +85,29 @@ class ZoneTerrain:
         ly = int(LAKE_SEED_PCT[1] / 100 * macro.height)
         self._lake = macro.component(lx, ly) if macro.rows[ly][lx] == "r" else set()
         self.roads: set[tuple[int, int]] = set()
+        self._macro_cache: dict[tuple[int, int], tuple[str, bool]] = {}
 
     def in_bounds(self, p: tuple[int, int]) -> bool:
         return 0 <= p[0] < self.geo.width and 0 <= p[1] < self.geo.height
 
     def _macro_class(self, x: int, y: int) -> tuple[str, bool]:
-        """Macro class under a tile, with the coast wobbled by domain-warp noise."""
-        wx = (self._warp.fractal(x / 55, y / 55, 3) - 0.5) * 34
-        wy = (self._warp.fractal(x / 55 + 91, y / 55 + 37, 3) - 0.5) * 34
-        u = (x + wx) / self.geo.width
-        v = (y + wy) / self.geo.height
+        """Macro class under a tile, with the coast wobbled by domain-warp noise (per 4x4 block)."""
+        key = (x >> 2, y >> 2)
+        hit = self._macro_cache.get(key)
+        if hit is not None:
+            return hit
+        bx, by = key[0] * 4 + 2, key[1] * 4 + 2
+        wx = (self._warp.fractal(bx / 55, by / 55, 3) - 0.5) * 34
+        wy = (self._warp.fractal(bx / 55 + 91, by / 55 + 37, 3) - 0.5) * 34
+        u = (bx + wx) / self.geo.width
+        v = (by + wy) / self.geo.height
         cls = self.macro.at(u, v)
         in_lake = False
         if cls == "r" and self._lake:
             cx = min(self.macro.width - 1, max(0, int(u * self.macro.width)))
             cy = min(self.macro.height - 1, max(0, int(v * self.macro.height)))
             in_lake = (cx, cy) in self._lake
+        self._macro_cache[key] = (cls, in_lake)
         return cls, in_lake
 
     def tile(self, x: int, y: int) -> Terrain:

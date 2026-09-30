@@ -12,11 +12,13 @@ import json
 from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
 from ..noise import ValueNoise
-from . import content
+from ..world import Event
+from . import content, quests
 from .route import find_route
-from .scale import CHUNK, Geometry, load_geometry
+from .scale import CHUNK, TICK_SECONDS, Geometry, load_geometry
 from .terrain import Macro, Terrain, ZoneTerrain
 
 Pos = tuple[int, int]
@@ -40,12 +42,44 @@ class ZoneWorld:
         self.geo: Geometry = load_geometry(self.pack)
         self.terrain = ZoneTerrain(self.geo, Macro.load(self.pack), seed)
         self.seed = seed
+        self.tick = 0
+        self.events: list[Event] = []
+        self.listeners: list[Callable[[Event], None]] = []
+        self.hero = None  # set by the simulation
         self._chunks: OrderedDict[Pos, bytes] = OrderedDict()
         self.features: list[dict] = json.loads((self.pack / "features.json").read_text("utf-8"))["features"] \
             if (self.pack / "features.json").exists() else []
         self.placements: list[Placement] = self._place()
         if roads:
             self.build_roads()
+
+    # --- time and journal -------------------------------------------------------------
+    @property
+    def seconds(self) -> float:
+        return self.tick * TICK_SECONDS
+
+    @property
+    def day(self) -> int:
+        return int(self.seconds // 86400) + 1
+
+    @property
+    def hour(self) -> int:
+        return int(self.seconds // 3600) % 24
+
+    @property
+    def minute(self) -> int:
+        return int(self.seconds // 60) % 60
+
+    def clock(self) -> str:
+        return f"День {self.day}, {self.hour:02d}:{self.minute:02d}"
+
+    def log(self, text: str, kind: str = "info") -> None:
+        ev = Event(self.tick, text, kind)
+        self.events.append(ev)
+        if len(self.events) > 500:
+            del self.events[:100]
+        for fn in self.listeners:
+            fn(ev)
 
     # --- terrain ---------------------------------------------------------------------
     def chunk(self, cx: int, cy: int) -> bytes:
@@ -83,9 +117,10 @@ class ZoneWorld:
     # --- content ---------------------------------------------------------------------
     def _place(self) -> list[Placement]:
         out: list[Placement] = []
+        refs = quests.quest_refs(self.pack)  # removed content that live quests still point at stays
         for kind in ("subzone", "npc", "mob", "object"):
             for rec in content.load(self.pack, kind):
-                if rec["removed"] or not rec["coords"]:
+                if (rec["removed"] and quests.clean(rec["title"]) not in refs) or not rec["coords"]:
                     continue
                 c = rec["coords"][0]
                 pos = self.geo.sub_to_tile(c["map"], c["x"], c["y"]) if c["map"].lower() != "mulgore" \
@@ -94,8 +129,10 @@ class ZoneWorld:
         known = {p.title.lower() for p in out}
         for f in self.features:
             if f["name"].lower() not in known:
-                out.append(Placement(f["id"], f["name"], f["kind"], self.geo.pct_to_tile(f["x"], f["y"]),
-                                     "mulgore", "Mulgore"))
+                sub = f.get("map", "")
+                pos = self.geo.sub_to_tile(sub, f["x"], f["y"]) if sub else self.geo.pct_to_tile(f["x"], f["y"])
+                out.append(Placement(f["id"], f["name"], f["kind"], pos,
+                                     "thunder_bluff" if sub else "mulgore", sub or "Mulgore"))
         out += self._place_by_text(out)
         return out
 
@@ -103,10 +140,11 @@ class ZoneWorld:
         """Creatures and people the wiki gives no coordinates for: near the place their page names."""
         anchors = {p.title.lower(): p.pos for p in placed if p.kind in ("subzone", "settlement", "gate", "lake", "plateau")}
         done = {p.id for p in placed}
+        refs = quests.quest_refs(self.pack)
         out: list[Placement] = []
         for kind in ("npc", "mob", "object"):
             for rec in content.load(self.pack, kind):
-                if rec["removed"] or rec["id"] in done or rec["coords"]:
+                if (rec["removed"] and quests.clean(rec["title"]) not in refs) or rec["id"] in done or rec["coords"]:
                     continue
                 text = " ".join([rec["info"].get("location", ""), *rec["links"]]).lower()
                 hit = next((t for t in sorted(anchors, key=len, reverse=True) if t in text), None)

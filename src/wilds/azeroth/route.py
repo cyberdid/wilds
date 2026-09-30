@@ -58,18 +58,73 @@ def astar(start: Pos, goal: Pos, passable, max_nodes: int = 30000, bounds=None) 
     return None
 
 
-def coarse_passable(world: "ZoneWorld", cell: Pos) -> bool:
-    """A coarse cell is open when the macro map under its centre is walkable land."""
-    x, y = cell[0] * COARSE + COARSE // 2, cell[1] * COARSE + COARSE // 2
-    return world.terrain.macro_walkable(x, y)
+class Coarse:
+    """The zone at 8x8 tiles per cell: which cells are open and which connected region each is in."""
+
+    def __init__(self, world: "ZoneWorld") -> None:
+        self.w = world.geo.width // COARSE + 1
+        self.h = world.geo.height // COARSE + 1
+        t = world.terrain
+        self.open = [[t.macro_walkable(x * COARSE + COARSE // 2, y * COARSE + COARSE // 2)
+                      for x in range(self.w)] for y in range(self.h)]
+        self.region = [[0] * self.w for _ in range(self.h)]
+        next_id = 0
+        for y0 in range(self.h):
+            for x0 in range(self.w):
+                if self.open[y0][x0] and not self.region[y0][x0]:
+                    next_id += 1
+                    self.region[y0][x0] = next_id
+                    stack = [(x0, y0)]
+                    while stack:
+                        x, y = stack.pop()
+                        for dx, dy, _ in _STEPS:
+                            nx, ny = x + dx, y + dy
+                            if 0 <= nx < self.w and 0 <= ny < self.h and self.open[ny][nx] \
+                                    and not self.region[ny][nx]:
+                                self.region[ny][nx] = next_id
+                                stack.append((nx, ny))
+
+    def passable(self, c: Pos) -> bool:
+        return 0 <= c[0] < self.w and 0 <= c[1] < self.h and self.open[c[1]][c[0]]
+
+    def snap(self, c: Pos, radius: int = 3) -> Pos | None:
+        """The open cell at or nearest to ``c``."""
+        if self.passable(c):
+            return c
+        for r in range(1, radius + 1):
+            ring = [(c[0] + dx, c[1] + dy) for dx in range(-r, r + 1) for dy in range(-r, r + 1)
+                    if max(abs(dx), abs(dy)) == r and self.passable((c[0] + dx, c[1] + dy))]
+            if ring:
+                return ring[0]
+        return None
+
+    def region_of(self, c: Pos) -> int:
+        return self.region[c[1]][c[0]] if self.passable(c) else 0
+
+
+def coarse_map(world: "ZoneWorld") -> Coarse:
+    cm = getattr(world, "_coarse", None)
+    if cm is None:
+        cm = world._coarse = Coarse(world)
+    return cm
+
+
+def reachable(world: "ZoneWorld", start: Pos, goal: Pos) -> bool:
+    """Cheap test on the coarse map: are the two spots in the same connected region?"""
+    cm = coarse_map(world)
+    a = cm.snap((start[0] // COARSE, start[1] // COARSE))
+    b = cm.snap((goal[0] // COARSE, goal[1] // COARSE))
+    return a is not None and b is not None and cm.region_of(a) == cm.region_of(b)
 
 
 def find_route(world: "ZoneWorld", start: Pos, goal: Pos) -> list[Pos] | None:
     """Tile path from ``start`` to ``goal`` over the whole zone, or None if unreachable."""
-    cw, ch = world.geo.width // COARSE + 1, world.geo.height // COARSE + 1
-    a, b = (start[0] // COARSE, start[1] // COARSE), (goal[0] // COARSE, goal[1] // COARSE)
-    coarse = astar(a, b, lambda c: coarse_passable(world, c) or c in (a, b), max_nodes=cw * ch,
-                   bounds=lambda c: 0 <= c[0] < cw and 0 <= c[1] < ch)
+    cm = coarse_map(world)
+    a = cm.snap((start[0] // COARSE, start[1] // COARSE))
+    b = cm.snap((goal[0] // COARSE, goal[1] // COARSE))
+    if a is None or b is None or cm.region_of(a) != cm.region_of(b):
+        return None
+    coarse = astar(a, b, cm.passable, max_nodes=cm.w * cm.h, bounds=lambda c: 0 <= c[0] < cm.w and 0 <= c[1] < cm.h)
     if coarse is None:
         return None
     waypoints = [start] + [(c[0] * COARSE + COARSE // 2, c[1] * COARSE + COARSE // 2) for c in coarse[:-1]] + [goal]

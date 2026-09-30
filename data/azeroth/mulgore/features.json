@@ -55,6 +55,33 @@
    "y": 80.0,
    "kind": "plateau",
    "basis": "wiki: Camp Narache stands on Red Cloud Mesa"
+  },
+  {
+   "id": "spirit_rise_tb",
+   "name": "Spirit Rise",
+   "x": 25.7,
+   "y": 21.0,
+   "kind": "subzone",
+   "map": "Thunder Bluff",
+   "basis": "label on the Thunder Bluff map"
+  },
+  {
+   "id": "elder_rise_tb",
+   "name": "Elder Rise",
+   "x": 76.8,
+   "y": 29.0,
+   "kind": "subzone",
+   "map": "Thunder Bluff",
+   "basis": "label on the Thunder Bluff map"
+  },
+  {
+   "id": "hunter_rise_tb",
+   "name": "Hunter Rise",
+   "x": 57.0,
+   "y": 84.6,
+   "kind": "subzone",
+   "map": "Thunder Bluff",
+   "basis": "label on the Thunder Bluff map"
   }
  ],
  "roads": [
