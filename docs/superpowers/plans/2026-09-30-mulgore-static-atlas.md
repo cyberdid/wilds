@@ -31,6 +31,7 @@
 |---|---|
 | data/azeroth/mulgore/source-manifest.json | Pinned source URL, revision, version, license, attribution, input tables, and local output path. |
 | src/wilds/azeroth/scale.py | World-coordinate bounds and world-to-tile transform; keep existing Wiki-percent conversion. |
+| src/wilds/azeroth/terrain.py | Classify a source tile against the coarse Mulgore macro mask. |
 | src/wilds/azeroth/mangos_sql.py | Parse named-column SQL INSERT statements from the four required source tables and four condition tables. |
 | tools/import_mulgore_spawns.py | Convert a pinned World/Setup/FullDB directory into local spawn/template/coverage JSON. |
 | src/wilds/azeroth/catalog.py | Typed reference entries, spawn instances, provenance, joins to Wiki records, filtering, and search. |
@@ -44,6 +45,9 @@
 
     # src/wilds/azeroth/scale.py
     Geometry.world_to_tile(map_id: int, x: float, y: float) -> tuple[int, int] | None
+
+    # src/wilds/azeroth/terrain.py
+    Macro.zone_status(tile: tuple[int, int], geometry: Geometry) -> str
 
     # src/wilds/azeroth/mangos_sql.py
     parse_insert_rows(path: Path, table: str) -> Iterator[dict[str, str | int | float | None]]
@@ -122,12 +126,13 @@ The catalog owns searchable entities; atlas.py only draws entries with a tile. W
 
 **Files:**
 - Modify: src/wilds/azeroth/scale.py
+- Modify: src/wilds/azeroth/terrain.py
 - Read: data/azeroth/mulgore/zone.json and data/azeroth/mulgore/macro.json
 
 - [ ] Extend Geometry with world_map_id, x_min, x_max, y_min, and y_max loaded from zone.json. Follow the coordinate convention documented by tools/zone_scale.py: world X runs north-south and world Y runs west-east.
 - [ ] Implement Geometry.world_to_tile(map_id, x, y): return None for the wrong map ID or coordinates outside x_min < x <= x_max and y_min < y <= y_max. Compute tile_x = floor((y_max - y) / (y_max - y_min) * width) and tile_y = floor((x_max - x) / (x_max - x_min) * height). Do not swap these axes back or clamp.
 - [ ] Keep original world coordinates beside the converted tile; do not overwrite them with rounded tile values.
-- [ ] Add an importer helper that classifies the converted point against Macro.at(tile_x / geometry.width, tile_y / geometry.height): v is outside, a non-v cell touching a v neighbor or the outer macro border is edge_ambiguous, and other non-v cells are inside_mask.
+- [ ] Add Macro.zone_status(tile, geometry) to classify the converted point against Macro.at(tile_x / geometry.width, tile_y / geometry.height): v is outside, a non-v cell touching a v neighbor or the outer macro border is edge_ambiguous, and other non-v cells are inside_mask.
 - [ ] Confirm source bound (x_max, y_max) maps to tile (0, 0), values just above x_min/y_min map to the final row/column, and a sample map-1 point falls within Mulgore's macro mask. After Task 4, visually compare a joined NPC known to be in Thunder Bluff or Camp Narache against the corresponding approximate feature marker.
 - [ ] Commit as feat: map Mulgore world coordinates to tiles.
 
