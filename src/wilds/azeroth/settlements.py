@@ -39,28 +39,21 @@ class Platform:
 Recipe = list[tuple[str, int, int, int, int]]
 
 RECIPES: dict[str, tuple[int, Recipe]] = {
-    "Bloodhoof Village": (34, [  # a few big airy tents on the grass, tall totems between them
-        ("az.obj.big_teepee", 1, 8, 16, 8), ("az.obj.totem_pole@0", 2, 2, 8, 2), ("az.obj.bonfire", 2, 4, 12, 2),
-        ("az.obj.well", 2, 8, 18, 2), ("az.obj.hut_large", 3, 12, 28, 7), ("az.obj.hut_small", 4, 10, 32, 5),
-        ("az.obj.tent", 4, 12, 34, 4), ("az.obj.totem_pole@1", 3, 10, 30, 2), ("az.obj.totem_pole@2", 2, 14, 32, 2),
-        ("az.obj.eagle_totem", 2, 10, 28, 3), ("az.obj.stilt_lodge", 1, 20, 32, 6), ("az.obj.banner", 3, 8, 26, 2),
-        ("az.obj.drying_rack", 2, 10, 30, 3), ("az.obj.inn", 1, 16, 26, 6), ("az.obj.forge", 1, 18, 28, 3),
-        ("az.obj.anvil", 1, 18, 28, 2), ("az.obj.stable", 1, 26, 40, 5), ("az.obj.kodo_pen", 5, 28, 46, 4),
-        ("az.obj.barrel@0", 3, 8, 34, 1), ("az.obj.crate@1", 2, 8, 34, 1), ("az.node.prairie_flower", 3, 10, 44, 1),
-        ("az.obj.haystack", 3, 24, 40, 3), ("az.obj.cooking_pot", 2, 2, 10, 1), ("az.obj.torch", 4, 6, 32, 1),
-        ("az.obj.signpost", 3, 30, 40, 1), ("az.obj.prayer_flags", 2, 10, 26, 4),
-        ("az.obj.stone_circle", 1, 20, 30, 6), ("az.obj.hide_stretcher", 2, 10, 30, 3),
-        ("az.obj.kodo_saddle_rack", 1, 24, 36, 3), ("az.obj.grave_cairn", 3, 30, 40, 1)]),
-    "Camp Narache": (28, [
-        ("az.obj.bonfire", 2, 0, 8, 2), ("az.obj.totem_pole@1", 3, 4, 20, 2), ("az.obj.eagle_totem", 1, 8, 18, 3),
-        ("az.obj.hut_large", 2, 8, 22, 7), ("az.obj.tent", 3, 8, 28, 4), ("az.obj.hut_small", 2, 12, 28, 5),
-        ("az.obj.training_dummy", 5, 8, 26, 2), ("az.obj.banner", 2, 4, 20, 2), ("az.obj.drying_rack", 2, 10, 28, 3),
-        ("az.obj.barrel@1", 2, 6, 26, 1), ("az.obj.torch", 3, 6, 24, 1), ("az.obj.signpost", 2, 22, 28, 1),
-        ("az.obj.haystack", 1, 14, 24, 3), ("az.obj.cooking_pot", 2, 2, 8, 1), ("az.obj.hide_stretcher", 2, 10, 24, 3)]),
-    "Camp Sungraze": (24, [
-        ("az.obj.bonfire", 2, 0, 8, 2), ("az.obj.totem_pole@2", 2, 4, 14, 2), ("az.obj.tent", 3, 8, 26, 4),
-        ("az.obj.hut_large", 1, 10, 22, 7), ("az.obj.hut_small", 2, 10, 28, 5), ("az.obj.drying_rack", 2, 8, 24, 3),
-        ("az.obj.torch", 3, 6, 20, 1), ("az.obj.cooking_pot", 1, 2, 8, 1), ("az.obj.haystack", 1, 12, 20, 3)]),
+    "Bloodhoof Village": (34, [  # a few big airy tents on the grass, tall totems between them (see reference-notes.md)
+        ("az.obj.big_teepee", 1, 0, 4, 8), ("az.obj.hut_large", 3, 12, 26, 12), ("az.obj.inn", 1, 14, 24, 10),
+        ("az.obj.hide_longhouse", 1, 12, 24, 10), ("az.obj.tent", 2, 12, 28, 8), ("az.obj.totem_pole", 5, 8, 30, 3),
+        ("az.obj.eagle_totem", 3, 10, 28, 4), ("az.obj.stilt_lodge", 1, 22, 33, 8), ("az.obj.bonfire", 2, 3, 14, 2),
+        ("az.obj.forge", 1, 18, 28, 4), ("az.obj.anvil", 1, 18, 28, 2), ("az.obj.drying_rack", 2, 10, 30, 3),
+        ("az.obj.hide_stretcher", 2, 10, 30, 3), ("az.obj.stable", 1, 26, 40, 6), ("az.obj.kodo_pen", 1, 28, 44, 4),
+        ("az.obj.barrel@0", 2, 12, 30, 1), ("az.obj.crate@1", 1, 12, 30, 1), ("az.obj.cooking_pot", 1, 3, 8, 1)]),
+    "Camp Narache": (24, [
+        ("az.obj.bonfire", 1, 0, 3, 2), ("az.obj.hut_large", 3, 8, 18, 12), ("az.obj.hide_longhouse", 1, 10, 20, 10),
+        ("az.obj.tent", 1, 10, 20, 8), ("az.obj.totem_pole", 7, 12, 24, 3), ("az.obj.eagle_totem", 1, 8, 18, 4),
+        ("az.obj.windbreak", 3, 16, 24, 4), ("az.obj.training_dummy", 2, 6, 14, 2), ("az.obj.drying_rack", 1, 10, 20, 3),
+        ("az.obj.hide_stretcher", 1, 10, 20, 3)]),
+    "Camp Sungraze": (10, [
+        ("az.obj.bonfire", 1, 0, 1, 2), ("az.obj.tent", 3, 4, 8, 6), ("az.obj.totem_pole", 1, 6, 9, 3),
+        ("az.obj.hide_stretcher", 1, 5, 9, 3), ("az.obj.kodo_bones", 1, 9, 10, 4)]),
     "Venture Co. Mine": (26, [
         ("az.obj.mine_entrance", 1, 0, 6, 6), ("az.obj.goblin_shack", 3, 8, 26, 4), ("az.obj.ore_cart", 3, 6, 24, 3),
         ("az.obj.crate@0", 5, 6, 26, 1), ("az.obj.barrel@0", 4, 6, 26, 1), ("az.obj.scaffold", 1, 12, 24, 4),
@@ -69,16 +62,16 @@ RECIPES: dict[str, tuple[int, Recipe]] = {
         ("az.obj.dig_tent", 3, 4, 22, 4), ("az.obj.scaffold", 2, 8, 26, 4), ("az.obj.crate@0", 4, 6, 24, 1),
         ("az.obj.barrel@1", 2, 6, 24, 1), ("az.obj.ore_cart", 1, 10, 24, 3), ("az.obj.torch", 3, 4, 22, 1)]),
     "Palemane Rock": (26, [
-        ("az.obj.rock_arch", 1, 0, 4, 6), ("az.obj.bonfire", 2, 6, 16, 2), ("az.obj.kodo_bones", 1, 10, 20, 4)]),
-    "Kodo Rock": (16, [("az.obj.kodo_bones", 2, 0, 10, 4)]),
-    "Red Rocks": (22, [("az.obj.stone_circle", 1, 0, 6, 6), ("az.obj.grave_cairn", 5, 6, 20, 1)]),
+        ("az.obj.cave_mouth", 1, 0, 4, 8), ("az.obj.bonfire", 1, 8, 16, 2)]),
+    "Kodo Rock": (16, [("az.obj.standing_stone", 1, 0, 2, 2)]),
+    "Red Rocks": (22, [("az.rock.dome", 5, 2, 20, 4), ("az.rock.hoodoo", 4, 4, 20, 3), ("az.tb.pine", 3, 8, 22, 2)]),
     "Ravaged Caravan": (14, [("az.obj.wagon", 2, 0, 8, 5), ("az.obj.crate@0", 3, 3, 10, 1),
                               ("az.obj.barrel@1", 2, 3, 10, 1)]),
     "Great Gate": (8, [("az.obj.great_gate", 1, 0, 1, 8)]),
     "Stonetalon Pass (Mulgore)": (8, [("az.obj.stonetalon_pass", 1, 0, 1, 6)]),
-    "Thunderhorn Water Well": (8, [("az.obj.well", 1, 0, 1, 2), ("az.obj.barrel@0", 1, 3, 6, 1)]),
-    "Wildmane Water Well": (8, [("az.obj.well", 1, 0, 1, 2), ("az.obj.barrel@1", 1, 3, 6, 1)]),
-    "Winterhoof Water Well": (8, [("az.obj.well", 1, 0, 1, 2), ("az.obj.crate@0", 1, 3, 6, 1)]),
+    "Thunderhorn Water Well": (8, [("az.obj.water_well", 1, 0, 1, 4)]),
+    "Wildmane Water Well": (8, [("az.obj.water_well", 1, 0, 1, 4)]),
+    "Winterhoof Water Well": (8, [("az.obj.water_well", 1, 0, 1, 4)]),
 }
 
 # Thunder Bluff rises: (name, x%, y% on Thunder Bluff's own map, platform radius in tiles)
@@ -115,7 +108,7 @@ STREET: list[tuple[str, int, float, float, int]] = [
     ("az.obj.drying_rack", 9, 0.25, 0.90, 2), ("az.obj.hide_stretcher", 7, 0.25, 0.90, 2),
     ("az.tb.hanging_hides", 8, 0.20, 0.92, 3), ("az.tb.drum", 6, 0.10, 0.85, 2), ("az.obj.banner", 8, 0.15, 0.95, 1),
     ("az.tb.banner_pole", 8, 0.20, 0.95, 2), ("az.tb.prayer_flags", 6, 0.20, 0.90, 4), ("az.obj.signpost", 4, 0.15, 0.80, 1),
-    ("az.obj.well", 3, 0.25, 0.75, 2), ("az.obj.anvil", 2, 0.30, 0.80, 1), ("az.obj.forge", 2, 0.30, 0.80, 2),
+    ("az.obj.anvil", 2, 0.30, 0.80, 1), ("az.obj.forge", 2, 0.30, 0.80, 2),
     ("az.obj.kodo_saddle_rack", 3, 0.30, 0.85, 2), ("az.obj.haystack", 4, 0.30, 0.85, 2),
     ("az.obj.cooking_pot", 6, 0.15, 0.80, 1),
 ]

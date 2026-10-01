@@ -55,6 +55,8 @@ One tile = 16 px = 2 yards.
 | `az.rock.boulder_big` | <=32x32 | 1 | 3 | big boulder |
 | `az.rock.slab` | <=24x16 | 1 | 3 | flat rock slab / outcrop |
 | `az.rock.arch_small` | <=32x32 | 1 |  | small natural rock arch |
+| `az.rock.dome` | <=48x56 | 1 | 3 | Red Rocks: rounded pale pink-tan sandstone dome with orange banding toward the top |
+| `az.rock.hoodoo` | <=32x64 | 1 | 3 | Red Rocks: mushroom-shaped pale sandstone hoodoo, orange bands |
 | `az.deco.flower_red` | <=16x16 | 1 | 2 | scattered, walkable decoration |
 | `az.deco.flower_yellow` | <=16x16 | 1 | 2 | scattered, walkable decoration |
 | `az.deco.flower_blue` | <=16x16 | 1 | 2 | scattered, walkable decoration |
@@ -408,7 +410,14 @@ One tile = 16 px = 2 yards.
 | `az.obj.harpy_nest` | <=24x24 | 1 |  | windfury harpy nest on a ridge |
 | `az.obj.rock_arch` | <=48x40 | 1 |  | Palemane Rock natural arch |
 | `az.obj.kodo_bones` | <=32x16 | 1 |  | Kodo Rock: bleached giant bones |
-| `az.obj.great_gate` | <=64x48 | 2 |  | Great Gate on the eastern edge, torches |
+| `az.obj.great_gate` | <=128x112 | 2 |  | Great Gate: ALL CARVED WOOD, no stone: a gate of tall rope-bound sharpened stakes (~10 yd) between two tall tower-totems with fur-fringed pagoda roofs and a spread-winged eagle on top, flaming torches, a rope of hanging talismans; palisade of horizontal logs with sharp posts on both sides |
+| `az.obj.water_well` | <=48x80 | 1 |  | tauren well-totem: low round grey stone dais, four splayed log legs holding a carved beast-face box and a small drum, a wide shallow conical hide canopy with a spiky red-brown fringe, a cross-pole with two dark hides hanging |
+| `az.obj.hide_longhouse` | <=96x48 | 1 |  | long low lodge of brown hide stretched over arched poles, a few stitched seams, a doorway |
+| `az.obj.windbreak` | <=48x32 | 1 | 2 | brown hide screen strung between two poles |
+| `az.obj.cave_mouth` | <=64x48 | 1 |  | Palemane Rock: cave mouth framed by blue-grey boulders in a pale cliff |
+| `az.obj.standing_stone` | <=16x32 | 1 |  | Kodo Rock: single dark blue-grey stone with faint carved symbols |
+| `az.obj.stake_row` | <=32x16 | 1 | 2 | row of crooked sharpened stakes angled outward |
+| `az.obj.thorn_vine` | <=48x64 | 1 | 3 | giant coiled olive-brown thorn vine with big thorns (quilboar blight) |
 | `az.obj.stonetalon_pass` | <=48x32 | 1 |  | pass through the northern mountains |
 | `az.node.peacebloom` | <=16x16 | 2 |  |  |
 | `az.node.silverleaf` | <=16x16 | 2 |  |  |
@@ -448,7 +457,7 @@ One tile = 16 px = 2 yards.
 | `az.tb.tower_totem` | <=32x96 | 1 |  | the High Rise tower: tall cylinder, bands of red, teal hexagons and cream, a carved bull head with horns at the top |
 | `az.tb.windmill_totem` | <=24x40 | 4 |  | wind totem: carved pole with a spinning four-blade pinwheel |
 | `az.tb.lift_tower` | <=32x80 | 2 |  | the rope elevator: very tall carved pole with a small cab, round wooden landing disc at its foot with a ramp |
-| `az.tb.pine` | <=24x56 | 1 | 4 | tall dark-green mountain pine / fir, layered boughs, golden sunlit tips (Thunder Bluff is full of them) |
+| `az.tb.pine` | <=32x96 | 1 | 4 | TALL olive-green Mulgore pine 15-25 yd: layered DROOPING tiers with gaps between, a straight red-brown trunk with flared base visible for the lower third, sunlit golden tips, golden sunlit tips (Thunder Bluff is full of them) |
 
 ## items
 

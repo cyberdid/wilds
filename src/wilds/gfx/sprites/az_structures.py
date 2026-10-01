@@ -582,10 +582,10 @@ def canvas(seams: int = 10, off: float = 0.0, ramp: Sequence[str] = (), rings: S
                     return c
         a = (th / math.tau * seams + off) % 1.0
         dist = min(a, 1 - a) * math.tau * r / seams          # arc px to the nearest seam
-        if dist < 0.5:
-            return cord(v) if int(z) % tick else step(ramp, tone(ramp, v * gain, ix, iy), -1)
-        if dist < 1.6 and int(z) % tick == 0:
+        if dist < 1.5 and int(z) % tick == 0:
             return cord(v)
+        if dist < 0.5:
+            return step(ramp, tone(ramp, v * gain, ix, iy), -2)
         for rz in rings:
             if abs(z - rz) < 0.5:
                 return cord(v) if int(th * r) % 3 else step(ramp, tone(ramp, v * gain, ix, iy), -1)
@@ -698,20 +698,19 @@ def _hut_large() -> None:
     posts, a stitched canvas bell above, painted band and crossed horns at the top."""
     W, H = 64, 56
     cx, cy = 32.0, 0.0
-    sc = Scene(W, H, 0, 41)
+    sc = Scene(W, H, 0, 42)
     door = arch_door(8, 9)
-    sc.lathe(cx, cy, [(0, 18.5), (9.5, 18.5), (10.5, 29.5), (11.5, 29.8), (19, 14.5)],
-             lambda th, z, r, v, ix, iy: (door(th, z, r, v, ix, iy) if z < 9.5 else None)
-             or (planks(WOOD[1:], 3.0)(th, z, r, v, ix, iy) if z < 10 else
-                 canvas(12, 0.5, rings=(13.5,), tick=3)(th, z, r, v, ix, iy)))
-    band = paint_band("hex", 4.0)
-    sc.lathe(cx, cy, [(18.5, 15.2), (22, 14.5), (28, 12.0), (33, 8.5), (37, 4.5), (39.5, 1.2), (39.6, 0)],
-             canvas(10, 0.0, bands=((19.5, 23.5, band),), tick=3))
-    ring_posts(sc, cx, cy, 27.5, 14, 21, off=0.2, rad=0.9)
-    apex_poles(sc, cx, cy, 36, 46, 4.5, (0.4, 2.7, 1.6, 4.3))
+    drum = planks(WOOD[1:], 3.0)
+    eave = canvas(12, 0.5, rings=(14.5,), tick=3)
+    sc.lathe(cx, cy, [(0, 17.0), (10, 17.0), (11, 29.0), (11.8, 29.2), (20, 14.5)],
+             lambda th, z, r, v, ix, iy: ((door(th, z, r, v, ix, iy) or drum(th, z, r, v, ix, iy)) if z < 10.2
+                                          else eave(th, z, r, v, ix, iy)))
+    sc.lathe(cx, cy, [(19.5, 15.0), (23, 14.2), (28, 11.5), (32, 7.5), (35, 3.5), (36.5, 0.8), (36.6, 0)],
+             canvas(10, 0.0, bands=((20.5, 24.5, paint_band("hex", 4.0)),), tick=3))
+    ring_posts(sc, cx, cy, 24.5, 12, 19, off=0.26, rad=0.9)
     p = sc.pic()
     finial(p, 32, 0)
-    register("az.obj.hut_large", _art(finish(p, 32, 51.5, 31, 4.2),
+    register("az.obj.hut_large", _art(finish(p, 32, 53, 30, 3.4),
              note="Camp Narache's great tent: timber drum, flared canvas eave, ring of posts, stitched bell"))
 
 
@@ -1026,6 +1025,7 @@ TOTEM_TOPS = [
         ".....hokmmd.....",
         ".....hmmmyYY....",
         "......mmmd......",
+        "......hmmd......",
         "tTthhmmmmmmddtTT",
         ".tthmmmmmmmmdTT.",
         "....rrrrrrRR....",
@@ -1051,7 +1051,7 @@ def totem_mat(zones: Sequence[tuple[float, float, str]]) -> Callable:
             if z0 <= z < z1:
                 red = PAINT_RED[2] if v > 0.4 else PAINT_RED[1]
                 if kind == "hex":
-                    i, j, e = hexcell(u + 1.0, z - z0 + 0.5, 1.9)
+                    i, j, e = hexcell(u + 1.0, z - z0 + 0.5, 2.3)
                     if e < 0.42 or z - z0 < 0.8 or z1 - z < 0.8:
                         return red
                     if (i + 2 * j) % 3 == 0:
@@ -1083,9 +1083,7 @@ def _totem(v: int) -> None:
     for z, face in faces:
         p.stamp(face, _FACE_LG, 3, 68 - z - len(face))
     crest = TOTEM_TOPS[v]
-    p.stamp(crest, _FACE_LG, 0, 68 - top - len(crest) + (1 if v != 1 else 6))
-    if v == 1:
-        p.stamp(crest[:4], _FACE_LG, 0, 68 - top - 9)
+    p.stamp(crest, _FACE_LG, 0, 68 - top - len(crest) + 2)
     # stones heaped around the foot
     p.stamp(["..abb.ab.abb..", ".abbcabbcabbc.", "abbccbbccbbccc"],
             {"a": STONE[4], "b": STONE[3], "c": STONE[1]}, 1, 67)
@@ -1096,56 +1094,70 @@ def _totem(v: int) -> None:
 
 
 def eagle_wing(p: Pic, cx: int, side: int, tip_y: float, lit: bool) -> None:
-    """One spread wing in screen space: carved covert, cream band, teal and red-tipped feathers."""
-    s0 = cx + side * 3
-    span = 13
+    """One spread wing in screen space: carved coverts along the leading edge, a cream band,
+    teal-striped flight feathers with dark tips, separate finger feathers at the end."""
+    s0, span, d = cx + side * 4, 12, (0 if lit else -1)
     for i in range(span + 1):
         x = s0 + side * i
         t = i / span
-        lead = 8 + (tip_y - 8) * t - math.sin(t * math.pi) * 2.2
-        trail = 16 + (tip_y + 2 - 16) * t ** 0.8 + (1 if (i % 3 == 2 and t > 0.2) else 0)
-        for y in range(int(round(lead)), int(round(trail)) + 1):
+        lead = 11 + (tip_y - 11) * t - math.sin(t * math.pi) * 3.0
+        trail = 22 + (tip_y + 3 - 22) * t ** 0.7 - (1 if (i % 3 == 0 and 0.1 < t) else 0)
+        if t > 0.7 and i % 2:
+            lead += 2   # gaps between the finger feathers
+        top = int(round(lead))
+        for y in range(top, int(round(trail)) + 1):
             fy = (y - lead) / max(1.0, trail - lead)
-            d = 0 if lit else -1
-            if t < 0.3 and fy < 0.7 or fy < 0.35:
-                c = DRIFT[4 + d] if y == int(round(lead)) else DRIFT[3 + d]
-            elif fy < 0.6:
+            if y == top:
+                c = DRIFT[5 + d]
+            elif fy < 0.3 and t < 0.75:
+                c = DRIFT[3 + d]
+            elif fy < 0.5 and t < 0.75:
                 c = CANVAS[4 + d]
-            elif t > 0.45 and fy > 0.82:
-                c = PAINT_RED[2 + d]
+            elif fy > 0.84:
+                c = DRIFT[1] if t > 0.4 else PAINT_RED[2 + d]
             else:
-                c = TEAL[3 + d] if (i % 3) != 1 else TEAL[2 + d]
+                c = TEAL[3 + d] if i % 3 != 1 else CANVAS[3 + d]
             p.set(x, y, c)
+
+
+EAGLE = [
+    "...cccC...",
+    "..ccccCC..",
+    "..ckcCkC..",
+    "..cccbCC..",
+    "...cbBC...",
+    "..hmmBmd..",
+    ".hmmmmmmd.",
+    ".hmttTTmd.",
+    ".hmrrRRmd.",
+    ".hmttTTmd.",
+    "..hmmmmd..",
+    "..hmmmmd..",
+    "...hmmd...",
+    "..hmhmdd..",
+    ".hmhmdmdd.",
+    ".hh.mm.dd.",
+    "..bb..BB..",
+]
 
 
 def _eagle_totem() -> None:
     """A carved pole on a round stone plinth, an eagle with spread wings on top (wings flap)."""
     W, H = 32, 56
+    lg = {**_FACE_LG, "c": CANVAS[5], "C": CANVAS[3], "b": "gold2", "B": "gold1"}
     frames = []
     for fr in range(2):
         sc = Scene(W, H, 0, 51)
         sc.lathe(16.0, 0.0, [(0, 7.0), (2.6, 6.6), (2.6, 0)],
                  lambda th, z, r, v, ix, iy: STONE[1] if z < 2.5 and int(th * r / 3) % 4 == 0 else
                  tone(STONE[1:], v + (0.08 if r < 4 else 0), ix, iy, 0.15))
-        sc.lathe(16.0, 0.0, [(2.5, 2.4), (38, 2.0), (38, 0)],
-                 totem_mat([(8, 9, "red"), (9.5, 10.5, "teal"), (22, 30, "hex"), (36, 37, "red")]))
+        sc.lathe(16.0, 0.0, [(2.5, 2.4), (30, 2.0), (30, 0)],
+                 totem_mat([(7, 8, "red"), (8.5, 9.5, "teal"), (16, 24, "hex"), (28, 29, "red")]))
         p = sc.pic()
-        tip = 4.0 if fr == 0 else 8.0
-        eagle_wing(p, 16, -1, tip, True)
-        eagle_wing(p, 15, 1, tip + 0.5, False)
-        p.stamp([
-            "..hmmd..",
-            ".hoommd.",
-            ".hokmmd.",
-            "hmmyYYdd",
-            ".hmmyYd.",
-            ".hmmmmd.",
-            "hmttTTdd",
-            "hmmmmmmd",
-            ".hmmmmd.",
-            ".hmdhmd.",
-            "..d..d..",
-        ], _FACE_LG, 12, 4)
+        tip = 2.0 if fr == 0 else 8.0
+        eagle_wing(p, 15, -1, tip, True)
+        eagle_wing(p, 16, 1, tip + 0.5, False)
+        p.stamp(EAGLE, lg, 11, 5)
         frames.append(finish(p, 16, 52, 8, 2))
     register("az.obj.eagle_totem", _art(frames, fps=2, note="eagle totem: carved pole on a stone plinth, eagle with spread wings"))
 

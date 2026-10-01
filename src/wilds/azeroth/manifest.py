@@ -121,6 +121,8 @@ def terrain() -> list[Need]:
         Need("az.rock.boulder_big", "<=32x32", variants=3, note="big boulder"),
         Need("az.rock.slab", "<=24x16", variants=3, note="flat rock slab / outcrop"),
         Need("az.rock.arch_small", "<=32x32", note="small natural rock arch"),
+        Need("az.rock.dome", "<=48x56", variants=3, note="Red Rocks: rounded pale pink-tan sandstone dome with orange banding toward the top"),
+        Need("az.rock.hoodoo", "<=32x64", variants=3, note="Red Rocks: mushroom-shaped pale sandstone hoodoo, orange bands"),
     ]
     n += [Need(f"az.deco.{d}", "<=16x16", variants=2, note="scattered, walkable decoration") for d in
           ("flower_red", "flower_yellow", "flower_blue", "tuft", "stones", "bones", "dry_bush", "stump")]
@@ -234,7 +236,17 @@ def structures() -> list[Need]:
         Need("az.obj.harpy_nest", "<=24x24", note="windfury harpy nest on a ridge"),
         Need("az.obj.rock_arch", "<=48x40", note="Palemane Rock natural arch"),
         Need("az.obj.kodo_bones", "<=32x16", note="Kodo Rock: bleached giant bones"),
-        Need("az.obj.great_gate", "<=64x48", frames=2, note="Great Gate on the eastern edge, torches"),
+        Need("az.obj.great_gate", "<=128x112", frames=2, note="Great Gate: ALL CARVED WOOD, no stone: a gate of tall rope-bound sharpened stakes "
+             "(~10 yd) between two tall tower-totems with fur-fringed pagoda roofs and a spread-winged eagle on top, flaming torches, "
+             "a rope of hanging talismans; palisade of horizontal logs with sharp posts on both sides"),
+        Need("az.obj.water_well", "<=48x80", note="tauren well-totem: low round grey stone dais, four splayed log legs holding a carved beast-face box "
+             "and a small drum, a wide shallow conical hide canopy with a spiky red-brown fringe, a cross-pole with two dark hides hanging"),
+        Need("az.obj.hide_longhouse", "<=96x48", note="long low lodge of brown hide stretched over arched poles, a few stitched seams, a doorway"),
+        Need("az.obj.windbreak", "<=48x32", variants=2, note="brown hide screen strung between two poles"),
+        Need("az.obj.cave_mouth", "<=64x48", note="Palemane Rock: cave mouth framed by blue-grey boulders in a pale cliff"),
+        Need("az.obj.standing_stone", "<=16x32", note="Kodo Rock: single dark blue-grey stone with faint carved symbols"),
+        Need("az.obj.stake_row", "<=32x16", variants=2, note="row of crooked sharpened stakes angled outward"),
+        Need("az.obj.thorn_vine", "<=48x64", variants=3, note="giant coiled olive-brown thorn vine with big thorns (quilboar blight)"),
         Need("az.obj.stonetalon_pass", "<=48x32", note="pass through the northern mountains"),
         # gathering and loot
         Need("az.node.peacebloom", "<=16x16", frames=2), Need("az.node.silverleaf", "<=16x16", frames=2),
@@ -278,7 +290,7 @@ def thunder_bluff() -> list[Need]:
         Need("az.tb.windmill_totem", "<=24x40", frames=4, note="wind totem: carved pole with a spinning four-blade pinwheel"),
         Need("az.tb.lift_tower", "<=32x80", frames=2, note="the rope elevator: very tall carved pole with a small cab, "
              "round wooden landing disc at its foot with a ramp"),
-        Need("az.tb.pine", "<=24x56", variants=4, note="tall dark-green mountain pine / fir, layered boughs, "
+        Need("az.tb.pine", "<=32x96", variants=4, note="TALL olive-green Mulgore pine 15-25 yd: layered DROOPING tiers with gaps between, a straight red-brown trunk with flared base visible for the lower third, sunlit golden tips, "
              "golden sunlit tips (Thunder Bluff is full of them)"),
     ]
 

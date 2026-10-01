@@ -407,116 +407,110 @@ def _rock_height(seed: int, n: int, stretch: float, cap: float) -> Field:
 
 
 def _mountain_top(seed: int) -> Canvas:
-    """The rim's plateau seen from above: broad slabs of grey granite, softly lit, fine
-    cracks between them, dark pine-green moss in the hollows and a tuft or two of grass.
-    Calm on purpose - on the diamond it is seen many times over."""
+    """The rim's plateau seen from above: broad, softly lit grey granite, a fine crack or
+    two, a soft patch of dark pine-green moss and a tuft of grass. Calm on purpose - on the
+    diamond it covers whole mountainsides."""
     rng = random.Random(seed)
-    c = Canvas(T, T)
-    h = _rock_height(seed, 4, 1.0, 4.5)
-    f = _mix((0.35, _emboss(h)), (0.3, h), (0.35, fbm(T, T, seed + 3, 2, 2)))
-    _quantize(c, f, GRAN[3:6], [26, 48, 26])
-    _despeckle(c)
-    for y in range(T):  # the cracks between slabs, broken up
+    c = _patches(seed, GRAN[3:6], [20, 58, 22], lumps=5)
+    moss = fbm(T, T, seed + 8, 2, 1)
+    cut = sorted(v for row in moss for v in row)
+    lo, mid = cut[int(T * T * 0.86)], cut[int(T * T * 0.95)]
+    for y in range(T):  # one soft mat of moss per tile (the same share on every variant)
         for x in range(T):
-            if h[y][x] < 0.07 and (x + 2 * y + seed) % 4:
-                c.px[y][x] = GRAN[2]
-    moss = fbm(T, T, seed + 8, 2, 2)
-    for y in range(T):  # moss creeping out of the low, shaded ground
-        for x in range(T):
-            if moss[y][x] > 0.74 and h[y][x] < 0.6:
-                c.px[y][x] = PINE[3] if moss[y][x] < 0.86 else PINE[2]
-    _despeckle(c, 1)
+            if moss[y][x] >= lo:
+                c.px[y][x] = PINE[3] if moss[y][x] < mid else PINE[2]
+    _despeckle(c, 2)
     taken: set = set()
-    for k in range(2 + seed % 2):  # tufts of grass in the cracks
+    for _k in range(2):  # hairline cracks, short, running down-right on screen (texture x)
         x, y = _free(rng, taken, gap=4)
-        c.set(x, y, MEAD[1])
-        _blade(c, (x - 1) % T, y, 2, tip_ch=MEAD[4])
-        _blade(c, x, (y - 1) % T, 2, tip_ch=MEAD[3])
+        for i in range(rng.randrange(3, 6)):
+            if c.px[y][(x + i) % T] in GRAN:
+                c.px[y][(x + i) % T] = GRAN[2]
+                c.px[(y + 1) % T][(x + i) % T] = _step(c.px[(y + 1) % T][(x + i) % T], 1) \
+                    if c.px[(y + 1) % T][(x + i) % T] in GRAN else c.px[(y + 1) % T][(x + i) % T]
+            if rng.random() < 0.3:
+                y = (y + 1) % T
+    x, y = _free(rng, taken, gap=4)  # a tuft of grass
+    _blade(c, x, y, 2, tip_ch=MEAD[4])
+    _blade(c, (x + 1) % T, y, 3, tip_ch=MEAD[3])
     return c
 
 
-def _colfield(seed: int, cols: int, blur: int) -> Field:
-    """Rock fluting: noise with fine columns sideways and long runs downward (periodic in x,
-    smeared over ``blur`` rows), the stuff vertical streaks are made of."""
-    n = fbm(T, T, seed, 2, cols)
-    return _norm([[sum(n[(y + k) % T][x] for k in range(-blur, blur + 1)) for x in range(T)] for y in range(T)])
-
-
-def _granite_face(seed: int, tones: str, weights: list[float], crevices: int, ledges: int,
-                  lip_rows: int = 3) -> Canvas:
-    """A grey rock wall, periodic sideways (neighbouring blocks continue it) - the client
-    stretches it to 30-70 px, so everything runs vertically: broad buttresses lit on their
-    left flank and shaded on the right, long streaks, dark crevices with a lit right lip,
-    a couple of short sunlit ledges, a grass lip with pine-green moss hanging over the top
-    and a darker foot with a few blades of grass where it meets the meadow."""
+def _granite_face(seed: int, tones: str, weights: list[float], crevices: int, ledges: int) -> Canvas:
+    """A grey rock wall, periodic sideways (neighbouring blocks continue it). The client
+    stretches it to the block's height, and on inner steps of the mountain only its top
+    rows show, so: everything runs vertically - broad buttresses lit on their left flank,
+    long streaks, dark crevices - and the top reads as a sunlit rock ledge with grass tufts
+    and pine-green moss trickling over it. The foot darkens, a few blades of grass at it."""
     rng = random.Random(seed)
     c = Canvas(T, T)
-    ridge = fbm(T, 1, seed, 2, 2)[0]  # big buttresses across the face
-    flank = _norm([[ridge[x] - ridge[(x + 1) % T]] for x in range(T)])  # >0.5: faces the light
-    streak = _colfield(seed + 1, 4, 4)
-    f = [[0.45 * flank[x][0] + 0.2 * ridge[x] + 0.35 * streak[y][x] for x in range(T)] for y in range(T)]
-    f = [[v + 0.12 * (1 - y / (T - 1)) - 0.3 * max(0.0, (y - 10) / 5) ** 1.5 for v in row]
+    ridge = fbm(T, 1, seed, 2, 2)[0]  # two broad buttresses across the face
+    flank = [ridge[x] - ridge[(x + 1) % T] for x in range(T)]
+    lo, hi = min(flank), max(flank)
+    flank = [(v - lo) / ((hi - lo) or 1) for v in flank]  # 1: faces the light
+    f = [[0.0] * T for _ in range(T)]
+    for x in range(T):  # streaks: each column is broken into long runs, each a touch lighter or darker
+        y, off = 0, rng.choice((-1, 0, 1))
+        while y < T:
+            ln = rng.randrange(4, 10)
+            for yy in range(y, min(T, y + ln)):
+                f[yy][x] = 0.55 * flank[x] + 0.25 * ridge[x] + 0.12 * off
+            y += ln
+            off = rng.choice((-1, 0, 0, 1))
+    f = [[v + 0.15 * (1 - y / (T - 1)) - 0.35 * max(0.0, (y - 10) / 5) ** 1.5 for x, v in enumerate(row)]
          for y, row in enumerate(f)]
     _quantize(c, f, tones, weights)
-    _despeckle(c, 1)
-    # crevices: dark cracks running down most of the face, a lit edge on their right
-    xs = sorted(rng.sample(range(T), crevices))
+    # crevices: long dark cracks, the rock on their right lit
+    xs = rng.sample(range(T), crevices)
     for x in xs:
-        y = rng.randrange(lip_rows, lip_rows + 4)
-        end = rng.randrange(T - 5, T)
-        while y < end:
-            c.set(x % T, y, GRAN[0] if y > lip_rows + 1 else GRAN[1])
-            if c.px[y][(x + 1) % T] not in GRAN[:2]:
-                c.set((x + 1) % T, y, _step(c.px[y][(x + 1) % T], 1))
-            y += 1
-            if rng.random() < 0.12:
-                x += rng.choice((-1, 1))
-    # short ledges catching the light (rows kept apart so they never line up as stripes)
-    rows = rng.sample(range(lip_rows + 2, T - 4), ledges)
-    for y in rows:
-        x0, ln = rng.randrange(T), rng.randrange(3, 6)
-        for i in range(ln):
+        y0, y1 = rng.randrange(2, 6), rng.randrange(T - 5, T - 1)
+        for y in range(y0, y1):
+            c.px[y][x] = GRAN[1] if y0 + 1 < y < y1 - 1 else _step(c.px[y][x], -2)
+            r = (x + 1) % T
+            if (y + x) % 3 and c.px[y][r] != GRAN[1]:
+                c.px[y][r] = _step(c.px[y][r], 1)
+    # short sunlit ledges, in rows that never line up between variants
+    for y in rng.sample(range(5, T - 4), ledges):
+        x0 = rng.randrange(T)
+        for i in range(rng.randrange(3, 6)):
             x = (x0 + i) % T
-            if c.px[y][x] in GRAN[:2]:
-                continue
-            c.px[y][x] = _step(c.px[y][x], 2)
-            c.px[y + 1][x] = GRAN[1]
-    _turf_lip(c, seed + 11, lip_rows)
-    # the foot: a few blades of meadow grass against the rock
-    for x in range(T):
+            if c.px[y][x] != GRAN[1]:
+                c.px[y][x] = _step(c.px[y][x], 2)
+                c.px[y + 1][x] = _step(c.px[y + 1][x], -1)
+    _rim(c, seed + 11)
+    for x in range(T):  # the foot: a few blades of meadow grass against the rock
         if rng.random() < 0.3:
-            c.set(x, T - 1, MEAD[2 + rng.randrange(2)])
+            c.px[T - 1][x] = MEAD[2 + rng.randrange(2)]
             if rng.random() < 0.5:
-                c.set(x, T - 2, MEAD[3])
+                c.px[T - 2][x] = MEAD[3]
     return c
 
 
-def _turf_lip(c: Canvas, seed: int, rows: int) -> None:
-    """The top of a wall: a grass rim, dark pine-green moss hanging over the edge in
-    uneven tongues, and a thin sunlit rock edge under it; periodic sideways."""
+def _rim(c: Canvas, seed: int) -> None:
+    """The top of a wall: a sunlit rock edge with tufts of grass along it, a row of shade
+    under it and pine-green moss trickling down in a few places; periodic sideways."""
+    rng = random.Random(seed)
     n = fbm(T, 1, seed, 2, 4)[0]
-    m = fbm(T, 1, seed + 1, 2, 2)[0]
     for x in range(T):
-        c.set(x, 0, MEAD[4] if n[x] > 0.55 else MEAD[3])
-        c.set(x, 1, MEAD[3] if n[(x + 5) % T] > 0.4 else MEAD[2])
-        hang = int(m[x] * (rows + 2))  # moss tongue length below the grass
-        for y in range(2, 2 + hang):
-            if y < T:
-                c.set(x, y, PINE[3] if y == 2 else PINE[2])
-        y = 2 + hang
-        if y < T:  # the lit rock edge right under the turf
-            c.set(x, y, GRAN[6] if n[(x + 3) % T] > 0.35 else GRAN[5])
+        grass = n[x] > 0.55
+        c.px[0][x] = (MEAD[4] if n[(x + 3) % T] > 0.5 else MEAD[3]) if grass else GRAN[7 if n[x] < 0.3 else 6]
+        c.px[1][x] = (PINE[3] if grass else _step(c.px[1][x], 1))
+        c.px[2][x] = _step(c.px[2][x], -1) if not grass else PINE[2]
+    for _k in range(3):  # moss trickles
+        x = rng.randrange(T)
+        for y in range(2, 2 + rng.randrange(1, 4)):
+            c.px[y][x] = PINE[2] if y > 2 else PINE[3]
 
 
 def _mountain_face(seed: int) -> Canvas:
-    """The rim's wall: tall grey granite with bold vertical streaks and crevices, grass and
-    pine moss along its crest."""
-    return _granite_face(seed, GRAN[1:6], [10, 22, 32, 24, 12], crevices=3, ledges=2)
+    """The rim's wall: tall grey granite with bold vertical streaks and crevices, a sunlit
+    edge with grass and pine moss along its crest."""
+    return _granite_face(seed, GRAN[1:6], [8, 22, 34, 25, 11], crevices=3, ledges=1)
 
 
 def _cliff_face(seed: int) -> Canvas:
     """Cliff at the land's edge: a paler grey rock, more broken by ledges, grass on top."""
-    return _granite_face(seed, GRAN[2:7], [10, 22, 32, 24, 12], crevices=2, ledges=3)
+    return _granite_face(seed, GRAN[2:7], [8, 22, 34, 25, 11], crevices=2, ledges=2)
 
 
 def _mesa_lip(c: Canvas, seed: int) -> None:
