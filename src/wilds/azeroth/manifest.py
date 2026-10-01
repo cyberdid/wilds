@@ -1,0 +1,365 @@
+"""The sprite contract of the Azeroth chapter: every name the renderer may ask for in Mulgore.
+
+Derived from the content pack wherever possible (which species live there, which races and
+roles of people, which quest givers deserve portraits) so the list grows with the data,
+and from the terrain enum for ground. Sizes follow the world's scale: a tile is 16 px and
+two yards, so one yard is 8 px. A human-sized body fits a tile; a tauren stands taller
+(16x24), a kodo is two tiles long (32x24), Thunder Bluff's buildings are multi-tile pieces.
+
+Sprite modules (``wilds.azeroth.sprites.<module>``) must satisfy ``REQUIRED[module]``;
+``check`` reports what is still missing, with the same rules as the Wilds manifest.
+"""
+
+from __future__ import annotations
+
+import collections
+import json
+import re
+from pathlib import Path
+
+from ..gfx.manifest import Need, check as _check
+from .content import load, slug
+from .terrain import Terrain
+
+PACK = Path(__file__).resolve().parents[3] / "data" / "azeroth" / "mulgore"
+
+# --- creatures --------------------------------------------------------------------------
+# species slug -> (sprite size, yards it stands/measures): design classes, see module doc
+CRITTER = "<=12x12"
+SMALL = "<=16x16"
+MEDIUM = "<=16x24"
+LARGE = "<=32x24"
+HUGE = "<=32x40"
+SPECIES_SIZE = {
+    "rabbit": CRITTER, "mouse": CRITTER, "ground_squirrel": CRITTER, "crawdad": CRITTER, "dog": CRITTER,
+    "gazelle": SMALL, "wolf": SMALL, "timber_wolf": SMALL, "boar": SMALL, "vulture": SMALL, "eagle": SMALL,
+    "cougar": SMALL, "lion": SMALL, "mountain_lion": SMALL, "gnoll": SMALL, "harpy": SMALL, "quilboar": SMALL,
+    "homunculus": SMALL, "tentacle": SMALL, "skeleton": SMALL, "bag": SMALL, "barrel": SMALL,
+    "tallstrider": MEDIUM, "ghost": MEDIUM, "wraith": MEDIUM, "haunt": MEDIUM, "earth_elemental": MEDIUM,
+    "totem": MEDIUM, "training_dummy": MEDIUM, "ogre": MEDIUM, "nraqi": MEDIUM, "treant": LARGE,
+    "kodo": LARGE, "pink_elekk": LARGE, "ancient": HUGE,
+}
+# species that are people: drawn from the body sets below, not as creatures
+PERSON_SPECIES = {"tauren", "highmountain_tauren", "goblin", "forsaken", "dwarf", "orc", "pandaren", "earthen",
+                  "blood_elf", "jungle_troll", "human", "varies", ""}
+OBJECT_SPECIES = {"bag", "barrel", "totem", "training_dummy"}  # stand-alone props, handled as objects
+
+# --- people -----------------------------------------------------------------------------
+BODIES = {  # body -> sprite size
+    "tauren_m": "<=16x24", "tauren_f": "<=16x24", "goblin": "<=16x16", "forsaken": "<=16x16", "dwarf": "<=16x16",
+    "orc": "<=16x20", "pandaren": "<=16x20", "troll": "<=16x24", "earthen": "<=16x20", "blood_elf": "<=16x16",
+    "human": "<=16x16",
+}
+TAUREN_OUTFITS = ("civilian", "hunter", "shaman", "druid", "warrior", "priest", "merchant", "trainer", "elder",
+                  "guard", "palemane")
+COMBAT_OUTFITS = {"hunter", "warrior", "guard", "palemane", "shaman", "druid"}
+OTHER_OUTFITS = ("civilian", "merchant")
+PORTRAIT_QUEST_GIVERS = 3  # an NPC who starts at least this many quests gets a portrait
+
+
+def _active(kind: str, pack: Path) -> list[dict]:
+    return [r for r in load(pack, kind) if not r["removed"]]
+
+
+def species(pack: Path = PACK) -> list[str]:
+    seen: collections.Counter[str] = collections.Counter()
+    for kind in ("mob", "npc"):
+        for r in _active(kind, pack):
+            s = slug(r["info"].get("race", ""))
+            if s and s not in PERSON_SPECIES and s not in OBJECT_SPECIES and s != "page":
+                seen[s] += 1
+    for s in ("tallstrider", "kodo", "wolf", "boar", "gazelle", "rabbit"):  # the plains fauna, always
+        seen.setdefault(s, 0)
+    return sorted(seen)
+
+
+def hostile_species(pack: Path = PACK) -> set[str]:
+    """Species with at least one mob that is hostile to the Horde (the hero's side)."""
+    return {slug(r["info"]["race"]) for r in _active("mob", pack)
+            if r["info"].get("race") and r.get("aggro", {}).get("horde") == -1}
+
+
+def portraits(pack: Path = PACK) -> list[str]:
+    starts = collections.Counter(re.sub(r"\s*\(.*", "", r["info"].get("start", "")).strip()
+                                 for r in _active("quest", pack) if r["info"].get("start"))
+    names = {r["title"]: r["id"] for r in _active("npc", pack)}
+    return sorted(names[n] for n, c in starts.items() if c >= PORTRAIT_QUEST_GIVERS and n in names)
+
+
+# --- needs, by sprite module ---------------------------------------------------------------
+def terrain() -> list[Need]:
+    n = [
+        Need("az.ground.grass", "16x16", variants=4, note="short green prairie grass, seamless"),
+        Need("az.ground.tall_grass", "16x16", variants=4, note="tall swaying golden-green grass, seamless"),
+        Need("az.ground.dry_grass", "16x16", variants=4, note="yellowed dry grass, seamless"),
+        Need("az.ground.dirt", "16x16", variants=3, note="bare earth, seamless"),
+        Need("az.ground.road", "16x16", variants=3, note="packed dirt road, seamless with dirt"),
+        Need("az.ground.mesa", "16x16", variants=3, note="red-brown rock plateau surface"),
+        Need("az.ground.sand", "16x16", variants=3, note="soft pale tan sand and mud of the lake shore (#B79A6A), seamless, calm, a few pebbles"),
+        Need("az.ground.water", "16x16", frames=4, variants=2, note="lake water, animated"),
+        Need("az.ground.shallows", "16x16", frames=4, variants=2, note="clear shallow water over sand"),
+        Need("az.mountain.top", "16x16", variants=3, note="top of the mountain wall"),
+        Need("az.mountain.face", "16x16", variants=3, note="south face of a mountain"),
+        Need("az.cliff.face", "16x16", variants=3, note="cliff wall at the land's edge"),
+        Need("az.boulder", "<=16x16", variants=3, note="boulder, blocks the way"),
+    ]
+    for kind in ("water", "dirt", "cliff"):
+        for side in ("n", "s", "e", "w"):
+            n.append(Need(f"az.edge.{kind}.{side}", "16x16", note=f"overlay: {kind} meets grass, grass to the {side}"))
+        for corner in ("ne", "nw", "se", "sw"):
+            n.append(Need(f"az.edge.{kind}.corner.{corner}", "16x16", note=f"overlay: inner corner {corner}"))
+    n += [
+        # 2.5D relief: faces of raised ground, and the plants and rocks that stand on the plains
+        Need("az.mesa.face", "16x16", variants=4, note="south face of a raised red-rock mesa, layered strata, lit top edge"),
+        Need("az.plant.tree", "<=32x48", variants=4, note="lone prairie tree (acacia / broad-crowned), casts soft shade"),
+        Need("az.plant.dead_tree", "<=24x40", variants=3, note="gnarled dead tree"),
+        Need("az.plant.bush", "<=16x16", variants=4, note="green scrub bush"),
+        Need("az.plant.thornbush", "<=16x16", variants=3, note="thorny briar, quilboar country"),
+        Need("az.plant.grass_clump", "<=16x16", variants=4, frames=2, note="tall grass clump, sways"),
+        Need("az.plant.wildflowers", "<=16x16", variants=4, frames=2, note="patch of wildflowers, four colour schemes"),
+        Need("az.plant.reeds", "<=16x24", variants=3, frames=2, note="reeds at the lake shore, sway"),
+        Need("az.rock.spire", "<=24x48", variants=4, note="tall red-rock spire, Mulgore's mesa skyline"),
+        Need("az.rock.boulder_big", "<=32x32", variants=3, note="big boulder"),
+        Need("az.rock.slab", "<=24x16", variants=3, note="flat rock slab / outcrop"),
+        Need("az.rock.arch_small", "<=32x32", note="small natural rock arch"),
+        Need("az.rock.dome", "<=48x56", variants=3, note="Red Rocks: rounded pale pink-tan sandstone dome with orange banding toward the top"),
+        Need("az.rock.hoodoo", "<=32x64", variants=3, note="Red Rocks: mushroom-shaped pale sandstone hoodoo, orange bands"),
+    ]
+    n += [Need(f"az.deco.{d}", "<=16x16", variants=2, note="scattered, walkable decoration") for d in
+          ("flower_red", "flower_yellow", "flower_blue", "tuft", "stones", "bones", "dry_bush", "stump")]
+    return n
+
+
+MONSTER_SPECIES = {"quilboar", "gnoll", "harpy", "ogre", "wraith", "ghost", "haunt", "earth_elemental", "treant",
+                   "tentacle", "nraqi", "ancient", "skeleton", "homunculus", "pink_elekk"}
+
+
+def _creature_needs(names: list[str], pack: Path) -> list[Need]:
+    hostile = hostile_species(pack)
+    n = []
+    for s in names:
+        size = SPECIES_SIZE.get(s, SMALL)
+        n.append(Need(f"az.creature.{s}.idle", size, frames=2))
+        n.append(Need(f"az.creature.{s}.move", size, frames=4 if size != CRITTER else 2))
+        if s in hostile:
+            n.append(Need(f"az.creature.{s}.attack", size, frames=2))
+        n.append(Need(f"az.creature.{s}.dead", size))
+    return n
+
+
+def creatures(pack: Path = PACK) -> list[Need]:
+    """Beasts and critters of the plains."""
+    return _creature_needs([s for s in species(pack) if s not in MONSTER_SPECIES], pack)
+
+
+def monsters(pack: Path = PACK) -> list[Need]:
+    """Sapient and supernatural creatures: quilboar, gnolls, harpies, spirits, elementals, ogres."""
+    return _creature_needs([s for s in species(pack) if s in MONSTER_SPECIES], pack)
+
+
+def _body_needs(bodies: dict[str, str]) -> list[Need]:
+    n = []
+    for body, size in bodies.items():
+        outfits = TAUREN_OUTFITS if body.startswith("tauren") else OTHER_OUTFITS
+        for outfit in outfits:
+            n += [Need(f"az.person.{body}.{outfit}.idle", size, frames=2),
+                  Need(f"az.person.{body}.{outfit}.walk", size, frames=4),
+                  Need(f"az.person.{body}.{outfit}.talk", size, frames=2, note="gesturing mid-conversation")]
+            if outfit in COMBAT_OUTFITS:
+                n.append(Need(f"az.person.{body}.{outfit}.attack", size, frames=3))
+        n.append(Need(f"az.person.{body}.dead", size))
+        n.append(Need(f"az.person.{body}.hurt", size))
+    return n
+
+
+def people_other() -> list[Need]:
+    """Goblins, forsaken, dwarves, orcs, pandaren, trolls, earthen, blood elves, humans."""
+    return _body_needs({b: z for b, z in BODIES.items() if not b.startswith("tauren")})
+
+
+def people_tauren(pack: Path = PACK) -> list[Need]:
+    """Tauren in every outfit, the hero (a tauren) and the quest-giver portraits."""
+    n = _body_needs({b: z for b, z in BODIES.items() if b.startswith("tauren")})
+    n += [Need(f"az.portrait.{p}", "24x24", note="quest giver portrait") for p in portraits(pack)]
+    n.append(Need("az.portrait.hero", "24x24", note="the hero's portrait"))
+    n += [Need("az.person.hero.idle", "<=16x24", frames=2), Need("az.person.hero.walk", "<=16x24", frames=4),
+          Need("az.person.hero.attack", "<=16x24", frames=3), Need("az.person.hero.work", "<=16x24", frames=2)]
+    return n
+
+
+def structures() -> list[Need]:
+    """Camps, villages, mines, nests, gates and things to gather or open."""
+    return [
+        # Bloodhoof Village, Camp Narache, Camp Sungraze
+        Need("az.obj.hut_large", "<=64x56", frames=1, note="big tauren round hide tent: white-cream stitched canvas, a ring of "
+             "wooden posts, horn-cross finial, painted band; ~12 yards across"),
+        Need("az.obj.big_teepee", "<=64x80", note="Bloodhoof's great teepee: tall white stitched cone on a round timber base with "
+             "steps, a bundle of crossed long poles poking out of the top"),
+        Need("az.obj.eagle_totem", "<=32x56", frames=2, note="tall carved pole with a spread-winged eagle on top, wings flutter"),
+        Need("az.obj.stilt_lodge", "<=56x48", note="timber lodge on stilts with a sloped teal-grey roof and a ladder (Bloodhoof by the lake)"),
+        Need("az.obj.hut_small", "<=48x44", variants=3, note="medium tauren tent: stitched white or tan canvas, a painted red/teal band, horn finial"),
+        Need("az.obj.tent", "<=40x48", variants=3, note="tall conical hide tent with stitched seams and a crossed-horn finial, three patterns"),
+        Need("az.obj.totem_pole", "<=16x72", variants=3, note="VERY tall carved totem: stacked faces and bands of teal and red hexagons on weathered wood, horns on top"),
+        Need("az.obj.bonfire", "<=16x16", frames=3, note="camp bonfire"),
+        Need("az.obj.drying_rack", "<=24x16", note="hide/meat drying rack"),
+        Need("az.obj.kodo_pen", "<=32x24", note="kodo corral fence section"),
+        Need("az.obj.well", "<=16x24", note="water well with bucket"),
+        Need("az.obj.banner", "<=16x32", frames=2, note="horde war banner, waves"),
+        Need("az.obj.anvil", "<=16x16", note="blacksmith anvil"),
+        Need("az.obj.forge", "<=24x24", frames=3, note="burning forge"),
+        Need("az.obj.stable", "<=40x32", note="stable, kodo and strider stalls"),
+        Need("az.obj.inn", "<=48x40", note="tauren inn"),
+        Need("az.obj.training_dummy", "<=16x24", note="training dummy"),
+        Need("az.obj.barrel", "<=16x16", variants=2),
+        # the small things that make a village look lived in
+        Need("az.obj.fence", "16x16", variants=3, note="low timber-and-rope fence section, tiles sideways"),
+        Need("az.obj.haystack", "<=24x24", variants=2, note="stack of prairie hay"),
+        Need("az.obj.cooking_pot", "<=16x16", frames=2, note="iron pot over coals, steam"),
+        Need("az.obj.torch", "<=16x24", frames=3, note="standing torch on a pole"),
+        Need("az.obj.signpost", "<=16x24", variants=2, note="wooden signpost with carved arrows"),
+        Need("az.obj.prayer_flags", "<=32x24", frames=2, note="string of coloured prayer flags between poles, flutter"),
+        Need("az.obj.stone_circle", "<=48x32", note="ring of standing stones, sacred ground"),
+        Need("az.obj.palisade", "<=32x24", variants=2, note="pointed log wall section (quilboar / gnoll camps)"),
+        Need("az.obj.hide_stretcher", "<=24x24", note="animal hide stretched on a frame"),
+        Need("az.obj.kodo_saddle_rack", "<=24x16", note="rack with kodo saddles and harness"),
+        Need("az.obj.grave_cairn", "<=16x16", variants=2, note="stone cairn with feathers: tauren grave"),
+        Need("az.obj.crate", "<=16x16", variants=2),
+        Need("az.obj.wagon", "<=40x24", note="ravaged caravan wagon"),
+        # Bael'dun Digsite, Venture Co. Mine
+        Need("az.obj.dig_tent", "<=32x28", note="dwarven expedition tent"),
+        Need("az.obj.scaffold", "<=32x32", note="wooden excavation scaffold"),
+        Need("az.obj.mine_entrance", "<=48x40", note="Venture Co. mine shaft, timber frame"),
+        Need("az.obj.goblin_shack", "<=32x28", note="goblin worker shack"),
+        Need("az.obj.ore_cart", "<=24x16", note="mine cart"),
+        # quilboar, harpies, palemane
+        Need("az.obj.thorn_hut", "<=32x32", variants=2, note="quilboar thorn-and-hide hut"),
+        Need("az.obj.barricade", "<=24x16", note="thorn barricade"),
+        Need("az.obj.harpy_nest", "<=24x24", note="windfury harpy nest on a ridge"),
+        Need("az.obj.rock_arch", "<=48x40", note="Palemane Rock natural arch"),
+        Need("az.obj.kodo_bones", "<=32x16", note="Kodo Rock: bleached giant bones"),
+        Need("az.obj.great_gate", "<=128x112", frames=2, note="Great Gate: ALL CARVED WOOD, no stone: a gate of tall rope-bound sharpened stakes "
+             "(~10 yd) between two tall tower-totems with fur-fringed pagoda roofs and a spread-winged eagle on top, flaming torches, "
+             "a rope of hanging talismans; palisade of horizontal logs with sharp posts on both sides"),
+        Need("az.obj.log_wall", "32x32", variants=3, note="CONTINUOUS wall of tall vertical carved logs with sharpened tops: art runs edge to edge "
+             "with no transparent margin so a row of pieces joins into one unbroken fence; two painted bands (teal and red) and a rope lashing; "
+             "base in shadow; each variant joins any other"),
+        Need("az.obj.log_wall_post", "<=16x48", note="tall carved end post of the Great Gate wall: thick log, painted bands, horned or feathered top"),
+        Need("az.obj.water_well", "<=48x80", note="tauren well-totem: low round grey stone dais, four splayed log legs holding a carved beast-face box "
+             "and a small drum, a wide shallow conical hide canopy with a spiky red-brown fringe, a cross-pole with two dark hides hanging"),
+        Need("az.obj.hide_longhouse", "<=96x48", note="long low lodge of brown hide stretched over arched poles, a few stitched seams, a doorway"),
+        Need("az.obj.windbreak", "<=48x32", variants=2, note="brown hide screen strung between two poles"),
+        Need("az.obj.cave_mouth", "<=64x48", note="Palemane Rock: cave mouth framed by blue-grey boulders in a pale cliff"),
+        Need("az.obj.standing_stone", "<=16x32", note="Kodo Rock: single dark blue-grey stone with faint carved symbols"),
+        Need("az.obj.stake_row", "<=32x16", variants=2, note="row of crooked sharpened stakes angled outward"),
+        Need("az.obj.thorn_vine", "<=48x64", variants=3, note="giant coiled olive-brown thorn vine with big thorns (quilboar blight)"),
+        Need("az.obj.stonetalon_pass", "<=48x32", note="pass through the northern mountains"),
+        # gathering and loot
+        Need("az.node.peacebloom", "<=16x16", frames=2), Need("az.node.silverleaf", "<=16x16", frames=2),
+        Need("az.node.earthroot", "<=16x16", frames=2), Need("az.node.copper_vein", "<=16x16"),
+        Need("az.node.prairie_flower", "<=16x16", frames=2), Need("az.node.shiny_stone", "<=16x16", frames=2),
+        Need("az.obj.chest", "<=16x16", frames=2, note="closed / opened by frame"),
+        Need("az.obj.chest_locked", "<=16x16"), Need("az.obj.spirit_portal", "<=24x32", frames=4),
+    ]
+
+
+def thunder_bluff() -> list[Need]:
+    """The bluff city: platform tileset and multi-tile buildings."""
+    return [
+        # Thunder Bluff: platform tileset and composite buildings
+        Need("az.tb.platform", "16x16", variants=8, note="plank-and-hide platform floor; must tile without a visible grid"),
+        Need("az.tb.platform.edge", "16x16", variants=6, note="platform edge over the drop"),
+        Need("az.tb.platform.inlay", "16x16", variants=3, note="floor tile with a painted tribal pattern, for plazas"),
+        Need("az.tb.brazier", "<=16x24", frames=3, note="standing fire brazier"),
+        Need("az.tb.drum", "<=16x16", variants=2, note="big ceremonial drum"),
+        Need("az.tb.stairs", "16x16", variants=2, note="wooden stairs between platform levels"),
+        Need("az.tb.hanging_hides", "<=32x24", variants=2, note="hides and feathers hung from a beam"),
+        Need("az.tb.prayer_flags", "<=32x16", frames=2, note="flags strung along a rope rail, flutter"),
+        Need("az.tb.pot", "<=16x16", variants=2, note="clay pot / water jar"),
+        Need("az.tb.banner_pole", "<=16x40", frames=2, note="tall Bloodhoof banner on a carved pole"),
+        Need("az.tb.bridge", "16x16", variants=2, note="rope bridge between rises"),
+        Need("az.tb.rope_rail", "16x16", variants=2, note="rope railing"),
+        Need("az.tb.support_pillar", "<=16x48", variants=2, note="pillar below a rise"),
+        Need("az.tb.lodge", "<=64x48", variants=2, note="Elder Rise / High Rise lodge"),
+        Need("az.tb.totem_tall", "<=24x64", note="tall ceremonial totem"),
+        Need("az.tb.tent_row", "<=48x32", variants=2),
+        Need("az.tb.spirit_pool", "<=32x24", frames=3, note="Pools of Vision"),
+        Need("az.tb.lift", "<=32x24", frames=2, note="the rope elevator"),
+        Need("az.tb.warrior_hall", "<=64x48", note="Hunter Rise / warrior hall"),
+        # v4, from the reference pictures: the rises are grassy mesa tops with dirt roads and pines over
+        # sheer pale cliffs, and the city is tall hide tents, teal-roofed longhouses and painted totem towers
+        Need("az.tb.cliff.face", "16x16", variants=6, note="sheer pale tan-grey cliff wall, bold VERTICAL streaks and "
+             "crevices, a few moss ledges; stretched vertically to 40-80 px by the client, seamless sideways"),
+        Need("az.tb.cobble", "16x16", variants=4, note="light cobblestone paving for plazas; tiles seamlessly"),
+        Need("az.tb.tower_totem", "<=32x96", note="the High Rise tower: tall cylinder, bands of red, teal hexagons and "
+             "cream, a carved bull head with horns at the top"),
+        Need("az.tb.windmill_totem", "<=24x40", frames=4, note="wind totem: carved pole with a spinning four-blade pinwheel"),
+        Need("az.tb.lift_tower", "<=32x80", frames=2, note="the rope elevator: very tall carved pole with a small cab, "
+             "round wooden landing disc at its foot with a ramp"),
+        Need("az.tb.pine", "<=32x96", variants=4, note="TALL olive-green Mulgore pine 15-25 yd: layered DROOPING tiers with gaps between, a straight red-brown trunk with flared base visible for the lower third, sunlit golden tips, "
+             "golden sunlit tips (Thunder Bluff is full of them)"),
+    ]
+
+
+ITEM_FAMILIES = ("belt", "boots", "bracers", "chest", "gloves", "helm", "legs", "shoulders", "cloak", "shield",
+                 "sword", "axe", "mace", "dagger", "staff", "ranged", "totem", "relic", "ring", "amulet", "food",
+                 "drink", "potion", "bag", "reagent", "quest_item", "ticket", "book")
+
+
+def items() -> list[Need]:
+    return [Need(f"az.item.{f}", "16x16", variants=4, note="item icon family, four looks") for f in ITEM_FAMILIES]
+
+
+def fx() -> list[Need]:
+    return [
+        Need("az.fx.dust_kick", "<=12x8", frames=3, note="dust under a running kodo/hero"),
+        Need("az.fx.totem_glow", "<=16x16", frames=4, note="shaman totem pulse"),
+        Need("az.fx.earth_spirit", "<=24x24", frames=4, note="earth elemental aura"),
+        Need("az.fx.quest_marker", "<=8x16", frames=3, note="yellow exclamation over a quest giver"),
+        Need("az.fx.quest_turnin", "<=8x16", frames=3, note="yellow question mark"),
+        Need("az.fx.wind", "<=16x8", frames=4, note="wind streak over the plains"),
+        Need("az.fx.grass_sway", "<=16x8", frames=4),
+        Need("az.fx.campfire_smoke", "<=16x24", frames=5),
+        Need("az.fx.water_ripple", "<=12x8", frames=4),
+        Need("az.fx.cast_circle", "<=24x16", frames=4, note="ground circle while casting"),
+        Need("az.fx.hit_spark", "<=8x8", frames=3),
+        Need("az.fx.level_up", "<=32x32", frames=5),
+    ]
+
+
+def required(pack: Path = PACK) -> dict[str, list[Need]]:
+    """Sprite module (``az_<key>``) -> what it must define."""
+    return {"terrain": terrain(), "creatures": creatures(pack), "monsters": monsters(pack),
+            "people_tauren": people_tauren(pack), "people_other": people_other(),
+            "structures": structures(), "thunder_bluff": thunder_bluff(), "items": items(), "fx": fx()}
+
+
+def check(registry, modules: list[str] | None = None, pack: Path = PACK) -> list[str]:
+    return _check(registry, modules, required=required(pack))
+
+
+def terrain_kinds() -> list[str]:
+    """Terrain enum members that have ground art (everything but the void)."""
+    return [t.name for t in Terrain if t is not Terrain.VOID]
+
+
+def summary(pack: Path = PACK) -> dict[str, dict[str, int]]:
+    out = {}
+    for module, needs in required(pack).items():
+        sprites = sum(n.variants or 1 for n in needs)
+        frames = sum((n.variants or 1) * n.frames for n in needs)
+        out[module] = {"names": len(needs), "sprites": sprites, "frames": frames}
+    return out
+
+
+def write_listing(path: Path, pack: Path = PACK) -> None:
+    lines = ["# Mulgore art manifest", "", "Generated by `tools/azeroth_manifest.py` from the content pack.",
+             "One tile = 16 px = 2 yards.", ""]
+    for module, needs in required(pack).items():
+        lines += [f"## {module}", "", "| name | size | frames | variants | note |", "|---|---|---|---|---|"]
+        lines += [f"| `{n.name}` | {n.size} | {n.frames} | {n.variants or ''} | {n.note} |" for n in needs]
+        lines.append("")
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    print(json.dumps(summary(), indent=1))

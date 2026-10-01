@@ -244,10 +244,10 @@ def all_needs() -> list[Need]:
     return [need for needs in REQUIRED.values() for need in needs]
 
 
-def check(registry, modules: list[str] | None = None) -> list[str]:
+def check(registry, modules: list[str] | None = None, required: dict[str, list[Need]] | None = None) -> list[str]:
     """Human-readable problems: missing names, too few frames/variants, wrong sizes."""
     problems = []
-    for module, needs in REQUIRED.items():
+    for module, needs in (REQUIRED if required is None else required).items():
         if modules and module not in modules:
             continue
         for need in needs:

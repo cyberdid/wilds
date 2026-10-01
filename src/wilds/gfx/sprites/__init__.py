@@ -20,11 +20,35 @@ MODULES = (
 )
 
 
+# The Azeroth chapter's art (wilds.azeroth.manifest). Kept out of ``load_all`` so Wilds
+# does not pay for it; ``load_azeroth`` imports it. ``AZEROTH_DONE`` lists the modules
+# that are complete: the coverage test holds exactly those to the manifest.
+AZEROTH_MODULES = (
+    "az_terrain",
+    "az_creatures",
+    "az_monsters",
+    "az_people_tauren",
+    "az_people_other",
+    "az_structures",
+    "az_thunder_bluff",
+    "az_items",
+    "az_fx",
+)
+# structures: the Great Gate log wall (az.obj.log_wall, log_wall_post) is being drawn
+AZEROTH_DONE: tuple[str, ...] = tuple(m for m in AZEROTH_MODULES if m != "az_structures")
+
+
 def load(module: str) -> None:
     importlib.import_module(f"{__name__}.{module}")
 
 
 def load_all() -> Registry:
     for m in MODULES:
+        load(m)
+    return SPRITES
+
+
+def load_azeroth() -> Registry:
+    for m in AZEROTH_MODULES:
         load(m)
     return SPRITES

@@ -143,6 +143,7 @@ class Frame:
     post: list[Placed] = field(default_factory=list)
     lights: list[Light] = field(default_factory=list)
     ambient: tuple[int, int, int] = DAY
+    shadow_on_ground: bool = False  # sprite ``z`` is terrain elevation: shadows sit at that height too
     fog: dict = field(default_factory=dict)  # (tx, ty) -> rgba, None = no fog (god view)
     fog_on: bool = False
     fog_range: tuple = (0, 0, -1, -1)
@@ -288,7 +289,7 @@ class Frame:
             surf = surf.copy()
             surf.set_alpha(alpha)
         cx, cy = self.project(gx, gy, z)
-        bx, by = self.project(gx, gy)
+        bx, by = self.project(gx, gy, z if self.shadow_on_ground else 0.0)
         depth = self.proj.depth(gx, sort_y if sort_y is not None else gy)
         p = Placed(surf, cx - ax, cy - ay, (depth, layer, gx), shadow, bx, by,
                    solid=(layer == 0) if solid is None else solid)

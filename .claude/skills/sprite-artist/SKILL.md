@@ -85,3 +85,23 @@ neighbours on the sheet, animations loop without popping, and `--check` is clean
 side, 1x). Edit any of them (Aseprite, a generator like Retro Diffusion / PixelLab), put
 them in a folder and run the game with `--sprites FOLDER`: same-named files replace the
 built-in art frame-for-frame.
+
+
+## Azeroth (Mulgore) art
+
+The Azeroth chapter has its own contract, `wilds.azeroth.manifest` (read the generated
+`docs/azeroth/mulgore-art-manifest.md`), and its own sprite modules `az_terrain`,
+`az_creatures`, `az_monsters`, `az_people_tauren`, `az_people_other`, `az_structures`,
+`az_thunder_bluff`, `az_items`, `az_fx`. Names start with `az.`.
+
+- **Scale is real.** A tile is 16 px = 2 yards, so 1 yard = 8 px. A human-sized body fits one
+  tile; tauren are 16x24; a kodo is 32x24 (two tiles long); Thunder Bluff's lodges are
+  multi-tile pieces. The manifest sizes are the contract - do not shrink a kodo to fit a tile.
+- Same rules as above: palette names only, 1px `ink` outline on actors/objects, light from the
+  top-left, actors face right with feet on the bottom row, seeded procedural textures.
+- Mulgore look: golden-green rolling prairie, red-brown mesas, tauren hide-and-timber huts,
+  totems, bright Horde red banners. Palette ramps `moss`, `dust`, `tent`, `rock`, `bone`, `fire`,
+  `water` exist; add a ramp to `palette.py` only if truly needed (say so in your report).
+- Preview and check one module: `uv run wilds-sprites --module az_terrain --out /tmp/az --scale 6`
+  and `uv run wilds-sprites --module az_terrain --check`. A module is done when `--check` is clean;
+  then its name is added to `AZEROTH_DONE` in `gfx/sprites/__init__.py`.

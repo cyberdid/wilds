@@ -25,7 +25,7 @@ import pygame  # noqa: E402
 from . import manifest  # noqa: E402
 from .bank import SpriteBank  # noqa: E402
 from .registry import SPRITES, Registry  # noqa: E402
-from .sprites import MODULES, load, load_all  # noqa: E402
+from .sprites import AZEROTH_MODULES, MODULES, load, load_all, load_azeroth  # noqa: E402
 
 BG = (22, 21, 30)
 CELL_BG = (34, 32, 46)
@@ -154,8 +154,9 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--out", default="sprites_export", help="output directory")
     p.add_argument("--scale", type=int, default=4, help="preview scale for sheets and GIFs")
     p.add_argument("--prefix", default="", help="only sprites whose name starts with this")
-    p.add_argument("--module", action="append", choices=MODULES,
+    p.add_argument("--module", action="append", choices=(*MODULES, *AZEROTH_MODULES),
                    help="import only this sprite module (repeatable); default: all")
+    p.add_argument("--azeroth", action="store_true", help="the Azeroth chapter's art (az_* modules) instead of Wilds")
     p.add_argument("--strips", action="store_true", help="write 1x PNG strips (the override format)")
     p.add_argument("--gif", action="store_true", help="write animated GIFs for animated sprites (Pillow)")
     p.add_argument("--sprites", default=None, help="override directory to preview replaced art")
@@ -167,10 +168,21 @@ def main(argv: list[str] | None = None) -> None:
         for m in args.module:
             load(m)
         registry: Registry = SPRITES
+    elif args.azeroth:
+        registry = load_azeroth()
     else:
         registry = load_all()
     if args.check:
-        problems = manifest.check(registry, args.module)
+        from ..azeroth import manifest as az_manifest
+
+        chosen = args.module or []
+        az = [m[3:] for m in chosen if m in AZEROTH_MODULES]
+        wild = [m for m in chosen if m not in AZEROTH_MODULES]
+        problems = []
+        if wild or not (chosen or args.azeroth):
+            problems += manifest.check(registry, wild or None)
+        if az or args.azeroth:
+            problems += az_manifest.check(registry, az or None)
         for line in problems:
             print(line)
         print(f"{len(registry)} sprites registered, {len(problems)} problems")

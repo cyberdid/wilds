@@ -1,0 +1,1666 @@
+[
+ {
+  "id": "baeldun_digsite",
+  "title": "Bael'dun Digsite",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 33.0,
+    "y": 47.0,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "The Bael'dun Digsite is an excavation site of the dwarven expedition based at Bael Modan. It is a large quarry dug into the mountainside in the western edge of Mulgore. This incursion was against the warnings of Baine Bloodhoof, who saw the excavations as an affront to the Earth Mother, and as diplomatic solutions failed, the Bloodhoof tribe resolved to drive the invaders out by taking and breaking their pickaxes. The dwarves refused to heed the tauren's warnings and their reckless digging infuriated the spirits of the land and killed them. Since the Cataclysm, Ahmo Thunderhorn sends adventurers to calm the Agitated Earth Spirits in the ruined dig site with a magic drum.",
+   "In the RPG": "The Explorers' Guild has set up an excavation site here of 200 inhabitants. It is a strong supply line runs from Bael'dun to Bael Modan in the Barrens.\n\nAfter Brann Bronzebeard visited the dwarves of the digsite he knew he needed to act before his friends were put in greater danger. While he visited Thunder Bluff he suggested to Cairne Bloodhoof that he send a group of his own people to work with the dwarves in exchange for making sure that the land was properly cared for. Cairne agreed to bring up his offer to his council of elders for discussion. Apparently, it worked, as Baine Bloodhoof asked a group of young tauren to act as emissaries to the dwarven excavation of Bael’dun to convince the dwarves to cease their careless digging. Given enough effort, the tauren apparently convinced the dwarves to allow a shaman to oversee their site to make sure that the land is properly cared for during the excavation, and that the dwarves return to the land as much as they take."
+  },
+  "links": [
+   "Ahmo Thunderhorn",
+   "Dwarf",
+   "Bael'dun",
+   "Bael Modan",
+   "Mulgore",
+   "Baine Bloodhoof",
+   "Earth Mother",
+   "Bloodhoof tribe",
+   "Cataclysm (event)",
+   "Agitated Earth Spirit",
+   "The Restless Earth",
+   "Explorers' Guild",
+   "Brann Bronzebeard",
+   "Cairne Bloodhoof",
+   "Lands of Mystery"
+  ],
+  "categories": [
+   "Dwarf territories",
+   "Excavation sites",
+   "Explorers' League",
+   "Lands of Mystery"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 185448,
+   "revid": 6500664,
+   "timestamp": "2025-10-06T00:43:15Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "battleboar_pen",
+  "title": "Battleboar Pen",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "The Battleboar Pen is an area of southern Mulgore, in the south section of Red Cloud Mesa, southwest of the Thornsnarl.\n\nHere the Bristleback quilboar under Chief Squealer Thornmantle raise Armored Battleboars, which are force-fed raw flesh and trained to be malicious. Nearby, the tauren Adana Thunderhorn is intent on killing the Battleboars and retaking the land, and asks for aid in doing so."
+  },
+  "links": [
+   "Mulgore",
+   "Red Cloud Mesa",
+   "Thornsnarl",
+   "Bristleback tribe",
+   "quilboar",
+   "Chief Squealer Thornmantle",
+   "Armored Battleboar",
+   "tauren",
+   "Adana Thunderhorn"
+  ],
+  "categories": [
+   "Quilboar territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 400134,
+   "revid": 6865443,
+   "timestamp": "2026-09-08T04:12:24Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "bloodhoof_village",
+  "title": "Bloodhoof Village",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "infobox town",
+  "info": {
+   "name": "Bloodhoof Village",
+   "faction": "Horde",
+   "type": "Village",
+   "leader": "Baine Bloodhoof",
+   "language": "Taur-ahe",
+   "affiliation": "Bloodhoof tribe, Horde",
+   "loc": "Central Mulgore",
+   "facilities": "Yes",
+   "inn": "Yes",
+   "mailbox": "Yes",
+   "stables": "Yes",
+   "anvil": "Yes",
+   "trainers": "Yes",
+   "class": "Yes",
+   "profession": "Yes",
+   "status": "Active"
+  },
+  "coords": [
+   {
+    "x": 48.6,
+    "y": 58.8,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "Bloodhoof Village is a tauren settlement named in honor of the Bloodhoof tribe, located in central Mulgore, around the waters of Stonebull Lake.\n\nThis is the first settlement in which young tauren adventurers arrive after departing from Camp Narache to the south. Located in the central plains of Mulgore, the village is the hub of questing and commerce until adventurers depart for Thunder Bluff to the north. Bloodhoof Village is also the principal location in which the wild kodo beasts are tamed and sold as mounts for the tauren.\n\nBaine Bloodhoof is the leader of the village and oversaw its protection from threats, and later took command in Thunder Bluff as High Chieftain of the tauren tribes. While Baine focused on more day-to-day matters, the spiritual needs of the Bloodhoof tribe and young tauren passing through are catered to by Zarlman Two-Moons.\n\nShortly before the Cataclysm, right after Cairne Bloodhoof died in Orgrimmar, Grimtotem assassins tried to kill his son Baine but failed.\n\nDuring the Fourth War, the village was invaded by ghosts. The attack was repelled by a tauren champion.",
+   "In the RPG": "Bloodhoof Village is located in the Golden Plains of Mulgore. Lake Stonebull partially encircles the village. Here Baine Bloodhoof, son of Cairne Bloodhoof, leads an investigation into Venture Company operations to the east and a campaign against the Palemane gnolls to the west.",
+   "Notes": "- The village is known for its drummaking. Drums made here are unlike any others. Zekhan spent some time here, enjoying watching the creation process of Tihku Fogcaller.\n- The former brave Otue lives in the village.\n- In Cataclysm, Baine was replaced by Ahmo Thunderhorn as quest giver. However, the Ultimate Visual Guides still list Baine as the leader of the village. Exploring Azeroth: Kalimdor reinforces UVG's information by stating that Baine leads from his seat in Bloodhoof Village, following the footsteps of his father.\n- This area was planned to be available in the Southern Barrens warfront."
+  },
+  "links": [
+   "Stonebull Lake",
+   "tauren",
+   "settlement",
+   "World of Warcraft: Exploring Azeroth: Kalimdor",
+   "Bloodhoof tribe",
+   "Ahmo Thunderhorn",
+   "Mulgore",
+   "adventurer",
+   "Camp Narache",
+   "Thunder Bluff",
+   "kodo",
+   "mount",
+   "Baine Bloodhoof",
+   "Zarlman Two-Moons",
+   "Rite of Vision",
+   "Cataclysm (event)",
+   "Cairne Bloodhoof",
+   "Orgrimmar",
+   "Grimtotem tribe",
+   "assassin",
+   "The Shattering: Prelude to Cataclysm",
+   "Fourth War",
+   "ghost",
+   "Adventurer",
+   "Storm in Bloodhoof",
+   "Lunar Festival",
+   "Golden Plains",
+   "Lake Stonebull",
+   "Venture Company",
+   "Venture Company Mine",
+   "Palemane tribe",
+   "gnoll",
+   "Lands of Mystery",
+   "Zekhan",
+   "Tihku Fogcaller",
+   "brave",
+   "Otue",
+   "Traveler: The Shining Blade",
+   "World of Warcraft: Cataclysm",
+   "quest giver",
+   "Ultimate Visual Guide",
+   "Exploring Azeroth: Kalimdor",
+   "Southern Barrens warfront"
+  ],
+  "categories": [
+   "Horde settlements",
+   "Lands of Mystery",
+   "Tauren territories",
+   "Villages"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 381399,
+   "revid": 6669624,
+   "timestamp": "2026-03-10T12:48:15Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "brambleblade_ravine",
+  "title": "Brambleblade Ravine",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nBrambleblade Ravine is the home to the Bristleback quilboars found on the northeastern edge of Red Cloud Mesa. Early tauren adventurers journeyed here in order to disrupt the quilboar attacks, even to go as far as attacking their leader Chief Sharptusk Thornmantle, who resided in a large hut towards the back of this ravine.\n\nAfter the Cataclysm, Garrosh Hellscream and Baine Bloodhoof, now leaders of their people, led the invasion to annihilate the local quilboar. Many Bristleback quilboars have also moved out of their home to join the efforts of claiming new land from the tauren in the Thornsnarl.",
+   "Inhabitants": "- Chief Sharptusk Thornmantle\n- \"Squealer\" Thornmantle\n- Bristleback Quilboar\n- Bristleback Battleboar\n- Bristleback Shaman",
+   "Notes": "- This area was planned to be available in the Southern Barrens warfront."
+  },
+  "links": [
+   "Bristleback tribe",
+   "quilboar",
+   "Red Cloud Mesa",
+   "Chief Sharptusk Thornmantle",
+   "Cataclysm (event)",
+   "Garrosh Hellscream",
+   "Baine Bloodhoof",
+   "As Our Fathers Before Us",
+   "tauren",
+   "Thornsnarl",
+   "\"Squealer\" Thornmantle",
+   "Bristleback Quilboar",
+   "Bristleback Battleboar",
+   "Bristleback Shaman",
+   "Southern Barrens warfront"
+  ],
+  "categories": [
+   "Quilboar territories",
+   "Valleys"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 148076,
+   "revid": 6348345,
+   "timestamp": "2025-06-08T06:42:54Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "camp_narache",
+  "title": "Camp Narache",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "infobox town",
+  "info": {
+   "faction": "Horde",
+   "name": "Camp Narache",
+   "type": "Village",
+   "government": "Tribal",
+   "leader": "Chief Hawkwind",
+   "language": "Taur-ahe",
+   "affiliation": "United tauren tribes",
+   "loc": "Southern Mulgore",
+   "facilities": "yes",
+   "mailbox": "yes",
+   "trainers": "yes",
+   "class": "yes",
+   "status": "Active"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Camp Narache is the starting town for the tauren, which is located in southern Mulgore at the northern edge of the Red Cloud Mesa. Camp Narache is the main village of the Hawkwind Tribe, and its Chief gives the first quest for tauren. It has five buildings: the main tent (where several wounded braves rest), a spirit lounge, a bakery tent, an armory tent and a simple trader's tent. The class trainers are gathered in a circle around the center of the village, paying respect to the fallen matriarch Greatmother Hawkwind.\n\nShortly before the shattering of the world, the camp was attacked by a fire and a centaur. Muln and his shaman could do nothing but retreat. However, Shotoa took care of it.",
+   "Inhabitants": "- Chief Hawkwind\n\nClass trainers\n- Hunter Trainer\n- Warrior Trainer\n- Druid Trainer\n- Shaman Trainer\n- Priest Trainer\n- Paladin Trainer\n- Monk Trainer\n\nVendors\n- Armorer & Shieldcrafter\n- Weaponsmith\n- Leather Armor Merchant\n- Baker\n- General Goods\n\nGuards\n- Brave Windfeather\n- Brave Greathoof\n- Brave Lightninghorn\n- Brave Proudsnout\n- Brave Running Wolf\n- Wounded Braves",
+   "Notes": "- Previously, tauren shaman would find their first totem quest here for the Earth Totem.\n- As of Cataclysm, Grull Hawkwind has moved to an area east of the camp.\n- This area was planned to be available in the Southern Barrens warfront."
+  },
+  "links": [
+   "tauren",
+   "Mulgore",
+   "Red Cloud Mesa",
+   "Chief Hawkwind",
+   "Greatmother Hawkwind",
+   "Muln",
+   "Shotoa",
+   "Shaman (manga)",
+   "Battleboar Pen",
+   "Brambleblade Ravine",
+   "Fargaze Mesa",
+   "Thornmantle's Hideout",
+   "Thornsnarl",
+   "totem",
+   "Earth Totem",
+   "Cataclysm",
+   "Southern Barrens warfront"
+  ],
+  "categories": [
+   "Horde settlements",
+   "Starting areas",
+   "Tauren territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 235350,
+   "revid": 6865444,
+   "timestamp": "2026-09-08T04:12:33Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "camp_sungraze",
+  "title": "Camp Sungraze",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "infobox town",
+  "info": {
+   "faction": "Horde",
+   "name": "Camp Sungraze",
+   "type": "Camp",
+   "government": "Tribal",
+   "language": "Taur-ahe",
+   "affiliation": "United tauren tribes",
+   "loc": "Northeastern Mulgore",
+   "status": "Active"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Camp Sungraze is a small Horde camp and quest hub in Mulgore located northeast of Thunder Bluff.",
+   "NPCs": "- Skorn Whitecloud\n- Lorekeeper Raintotem\n- Eyahn Eagletalon\n- Una Wildmane"
+  },
+  "links": [
+   "Horde",
+   "camp",
+   "Mulgore",
+   "Thunder Bluff"
+  ],
+  "categories": [
+   "Camps",
+   "Tauren territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 462695,
+   "revid": 6669214,
+   "timestamp": "2026-03-10T03:37:50Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "fargaze_mesa",
+  "title": "Fargaze Mesa",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Fargaze Mesa is a tall mesa in southwestern Mulgore, west of Red Cloud Mesa and northeast of Thornmantle's Hideout. A path leads to the top of it from west of Camp Narache.\n\nDyami Windsoar resides here, guiding young tauren from Red Cloud Mesa out into the rest of Mulgore. \n\nThe mesa is a sacred place for spiritwalkers. They commune with tauren ancestors here. Spiritwalker Ussoh sits within the stone ring."
+  },
+  "links": [
+   "Mulgore",
+   "Red Cloud Mesa",
+   "Thornmantle's Hideout",
+   "Camp Narache",
+   "Dyami Windsoar",
+   "spiritwalker",
+   "Spirit Guide (quest)",
+   "Spiritwalker Ussoh"
+  ],
+  "categories": [
+   "Mesas",
+   "Tauren territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 487833,
+   "revid": 6865445,
+   "timestamp": "2026-09-08T04:12:41Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "golden_plains",
+  "title": "Golden Plains",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 50.0,
+    "y": 33.0,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "__NOTOC__\n\nThe Golden Plains are a large basin surrounding Thunder Bluff on the southeast. These plains are one of the most treasured parts of the tauren homeland, and are one of the tauren people's favorite hunting grounds. Large numbers of kodo congregate here, and it is said that the famous Arra'chea also dwells in the shifting green sea of grass.",
+   "In the RPG": "The Golden Plains are a wide, flat, grassy expanse that stretches between Bloodhoof Village and Thunder Bluff, and host herds of grazing kodo.",
+   "Notes": "- This area was planned to be available in the Southern Barrens warfront."
+  },
+  "links": [
+   "Thunder Bluff",
+   "tauren",
+   "kodo",
+   "Arra'chea",
+   "Bloodhoof Village",
+   "Lands of Mystery",
+   "Southern Barrens warfront"
+  ],
+  "categories": [
+   "Flats",
+   "Lands of Mystery",
+   "Tauren territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 446326,
+   "revid": 6865449,
+   "timestamp": "2026-09-08T04:13:36Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "great_gate",
+  "title": "Great Gate",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "The Great Gate (or the Mulgore Gates) is a tauren fortification constructed at the entrance to their homeland of Mulgore, separating it from the Southern Barrens in response to the Alliance's destruction of the nearby Camp Taurajo, as well as to shelter the tribes in the wake of the Cataclysm.\n\nThe Northwatch forces have setup several siege weapons near the gate in order to destroy it, but they were repelled by the tauren of Vendetta Point and Warlord Bloodhilt, an orcish general sent by Garrosh Hellscream.\n\nAfter the death of Deathwing, Northwatch soldiers were still stationed at the other side of the gate. Tauren and Darkspear tribe trolls led by Vol'jin and a reluctant Baine attacked the humans and dwarves there. After this, the Horde army marched east, passing through the Ruins of Taurajo and the Fields of Blood towards Northwatch Hold.\n\nDuring the Fourth War, the Alliance besieged the gate.\n\nAccording to Zekhan's report after the war, the gate still stands and protects tauren tribes from quilboar moving into Mulgore and the Alliance's many needling strikes.",
+   "Notes and trivia": "- On the Southern Barrens side, a peon that lived in the small camp near the entrance was killed and his body lies within the burned down camp.\n- The Moonkin Stone, once used by druids to learn Bear Form, is still near here.\n- There is a slight gap between the northern edge of the wall and the rocks through which players (hostile or otherwise) can pass.\n- In Cataclysm, it was initially planned for Baine Bloodhoof to appear at the Great Gate to defend it and attack human invaders from the Southern Barrens.\n- Ironically the later novel, Jaina Proudmoore: Tides of War, had Baine expell the tauren of Vendetta Point from Thunder Bluff for fighting the Northwatch expedition.\n- This area was planned to be available in the Southern Barrens warfront."
+  },
+  "links": [
+   "Exploring Azeroth: Kalimdor",
+   "Siegebreaker (quest)",
+   "tauren",
+   "Mulgore",
+   "Southern Barrens",
+   "Alliance",
+   "Camp Taurajo",
+   "Cataclysm (event)",
+   "World of Warcraft: Exploring Azeroth: Kalimdor",
+   "Northwatch Expeditionary Unit",
+   "Vendetta Point",
+   "Warlord Bloodhilt",
+   "orc",
+   "Garrosh Hellscream",
+   "Deathwing",
+   "Tauren",
+   "Darkspear tribe",
+   "Jungle troll",
+   "Vol'jin",
+   "human",
+   "Dwarf",
+   "Ruins of Taurajo",
+   "Fields of Blood",
+   "Northwatch Hold",
+   "Jaina Proudmoore: Tides of War",
+   "Fourth War",
+   "Great Gate of Mulgore (Horde)",
+   "peon",
+   "Moonkin Stone",
+   "Bear Form",
+   "World of Warcraft: Cataclysm",
+   "Baine Bloodhoof",
+   "Southern Barrens warfront"
+  ],
+  "categories": [
+   "Doors"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 309122,
+   "revid": 6534572,
+   "timestamp": "2025-11-03T21:01:49Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "kodo_rock",
+  "title": "Kodo Rock",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 54.0,
+    "y": 80.0,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "Kodo Rock was a natural monument near Camp Narache that tauren shaman needed to go to for one of their early quests. The rock could only be seen from a short distance so one needed to pay attention.\n\nTo get there, one could travel from Camp Narache directly towards the Brambleblade Ravine and it would be located about halfway along the direct line. A small dirt area would be seen on the minimap to pinpoint it.\n\nThe Kodo Rock disappeared after the Cataclysm."
+  },
+  "links": [
+   "Camp Narache",
+   "tauren",
+   "shaman",
+   "Brambleblade Ravine",
+   "Cataclysm (event)"
+  ],
+  "categories": [
+   "Classic subzones",
+   "Shaman",
+   "Tauren territories",
+   "Temples"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 383661,
+   "revid": 6865446,
+   "timestamp": "2026-09-08T04:12:47Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "palemane_rock",
+  "title": "Palemane Rock",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 35.0,
+    "y": 64.0,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "Palemane Rock is a cave in western Mulgore inhabited by gnolls of the Palemane tribe. They are aggressive creatures and will attack any who wander too close.\n\nThe gnolls live both inside the cave and in a camp outside, and the cave itself stretches fairly deep into the mountainside."
+  },
+  "links": [
+   "Mulgore",
+   "gnoll",
+   "Palemane tribe"
+  ],
+  "categories": [
+   "Caves",
+   "Gnoll territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 243603,
+   "revid": 6865440,
+   "timestamp": "2026-09-08T04:11:49Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "ravaged_caravan",
+  "title": "Ravaged Caravan",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 54.0,
+    "y": 48.0,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "__NOTOC__\n\nThe Ravaged Caravan is a ruined Venture Company camp on the northeastern shore of Stonebull Lake. The caravan is what's left of a conflict between the tauren and the Venture Co. after the tauren saw them traveling throughout Mulgore. The caravan's initial goal was to deliver more supplies to Supervisor Fizsprocket's mining endeavor. It now sits on a mound, spewing out black smoke. The remaining company aggressively defends the smoldering remains of their precious cargo.",
+   "Inhabitants": "- -",
+   "Notes": "- This area was planned to be available in the Southern Barrens warfront."
+  },
+  "links": [
+   "Venture Company",
+   "Stonebull Lake",
+   "caravan",
+   "tauren",
+   "Mulgore",
+   "The Ravaged Caravan (Horde) (1)",
+   "Supervisor Fizsprocket",
+   "Venture Co. Documents",
+   "Southern Barrens warfront"
+  ],
+  "categories": [
+   "Goblin territories",
+   "Venture Company"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 265298,
+   "revid": 6428982,
+   "timestamp": "2025-08-03T13:05:13Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "red_cloud_mesa",
+  "title": "Red Cloud Mesa",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nRed Cloud Mesa is the name for the rolling plains atop the high cliffs in southern Mulgore. Here, young tauren adventurers prove themselves by helping drive back the invading Bristleback quilboars. Camp Narache in the northwest portion of the Mesa is the last safe area on the mesa.\n\nOnce known for being a place of peaceful, serene beauty, Red Cloud Mesa has suffered visibly after coming under siege by the Bristleback quilboar. The quilboar spread out from their home of Brambleblade Ravine in the northeast, growing twisting, thorned vines on every piece of new territory they snatched. Burned out tauren huts line the warzone in which they fight against the tauren braves, and the water well formerly used in the area has been destroyed.\n\nAt the southwest corner, the former pass out of the mesa has been destroyed by a landslide and taken over by the leader of the quilboar, who created it into an area now known as Thornmantle's Hideout. A new exit leading down from the mesa was carved out of the hillside just north of Camp Narache. There is also a path leading up from the graveyard west of Camp Narache, to the top of Fargaze Mesa.",
+   "In the RPG": "Redrock Mesa is a training ground found along Mulgore's northern border in the foothills of the Stonetalon Mountains. It is used to train young tauren in hunting skills and combat to make them prominent warriors within tauren society."
+  },
+  "links": [
+   "Cataclysm",
+   "Mulgore",
+   "Bristleback tribe",
+   "quilboar",
+   "Camp Narache",
+   "Brambleblade Ravine",
+   "Thornmantle's Hideout",
+   "Fargaze Mesa",
+   "Stonetalon Mountains",
+   "tauren",
+   "Warcraft: The Roleplaying Game",
+   "The World of Warcraft Townhall/Races of Azeroth",
+   "Southern Barrens warfront"
+  ],
+  "categories": [
+   "Mesas",
+   "RPG locations",
+   "Tauren territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 501225,
+   "revid": 6865442,
+   "timestamp": "2026-09-08T04:12:17Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "red_rocks",
+  "title": "Red Rocks",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 62.0,
+    "y": 21.0,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "__NOTOC__\n\nRed Rocks is a naturally occurring formation of red sandstone located in northeastern Mulgore. It is a peaceful and reflective site where one can step out of the world of Thunder Bluff into a place serving as a transition between that world and the next.\n\nRed Rocks is a sacred burial ground for the tauren tribes, where fallen heroes of the tauren are sent to the Earth Mother and Sky Father via cleansing flame. Only the most valiant tauren are laid to rest at Red Rocks. It is an honor bestowed upon the great warriors who helped found and defend Thunder Bluff and those who have given their lives for the greater good of their tribes and chieftains. Red Rocks isn't just a place for death, but for life and its greatest journeys too. Tauren braves fulfill their rites to enter adulthood, listening for the wisdom and blessings of their ancestors on the winds.\n\nRecently, a group of Bristleback quilboar invaded Red Rocks and defiled the holy place with their filth, which has greatly enraged the tauren of Thunder Bluff.\n\nThe top area of Red Rocks is also used for ceremonies. At the start of the war against the Lich King, Hamuul Runetotem performed a ceremony atop Red Rocks for a deceased female tauren and her son. The Bristleback quilboar attacked him there, but he defeated them. Valeera Sanguinar and Rehgar Earthfury flew there to meet with Hamuul and to invite him to Theramore and the New Council of Tirisfal.\n\nRed Rocks was also the place where Cairne Bloodhoof was cremated. Kador Cloudsong summoned his spirit to speak with Baine at the beginning of the trial of Garrosh Hellscream.",
+   "Quests": "- Rite of Wisdom ends here.\n- A Sacred Burial starts and ends here from Lorekeeper Raintotem.",
+   "Notes": "- On the cliffs above the Red Rocks you can find a small hut with a cave below it.\n- This area was planned to be available in the Southern Barrens warfront."
+  },
+  "links": [
+   "War Crimes",
+   "Mulgore",
+   "Thunder Bluff",
+   "tauren",
+   "tribe",
+   "A Sacred Burial",
+   "Earth Mother",
+   "Sky Father",
+   "brave",
+   "World of Warcraft: Exploring Azeroth: Kalimdor",
+   "Bristleback tribe",
+   "quilboar",
+   "war against the Lich King",
+   "Hamuul Runetotem",
+   "Valeera Sanguinar",
+   "Rehgar Earthfury",
+   "Theramore Isle",
+   "New Council of Tirisfal",
+   "World of Warcraft: The Comic",
+   "The Gathering",
+   "Cairne Bloodhoof",
+   "The Fallen Chieftain",
+   "Kador Cloudsong",
+   "Baine Bloodhoof",
+   "Garrosh Hellscream",
+   "Rite of Wisdom",
+   "Lorekeeper Raintotem",
+   "Mulgore cave",
+   "Southern Barrens warfront"
+  ],
+  "categories": [
+   "Burial sites",
+   "Quilboar territories",
+   "Tauren territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 369793,
+   "revid": 6865451,
+   "timestamp": "2026-09-08T04:13:47Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "rolling_plains",
+  "title": "Rolling Plains",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 61.0,
+    "y": 68.0,
+    "map": "Mulgore"
+   },
+   {
+    "x": 65.0,
+    "y": 69.0,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "The Rolling Plains cover much of southern Mulgore, stretching from Bloodhoof Village to the Barrens border. It is inhabited by many species of animal; wolves, kodo, tallstriders and cougars can all be found here. This is also the only place in all Mulgore where centaurs have been able to penetrate - their outriders have been known to wander the grassy fields. A nest of Windfury harpies can be found in the eastern part of the region.",
+   "Notes": "- This area was planned to be available in the Southern Barrens warfront."
+  },
+  "links": [
+   "Mulgore",
+   "Bloodhoof Village",
+   "Barrens",
+   "wolf",
+   "kodo",
+   "tallstrider",
+   "cougar",
+   "centaur",
+   "Windfury harpies",
+   "Southern Barrens warfront"
+  ],
+  "categories": [
+   "Flats",
+   "Tauren territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 280338,
+   "revid": 6865452,
+   "timestamp": "2026-09-08T04:13:55Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "stonebull_lake",
+  "title": "Stonebull Lake",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "__NOTOC__\n\nStonebull Lake is a long horseshoe-shaped lake that surrounds Bloodhoof Village in central Mulgore on three sides. It is known for its abundant fish, and many an hour is spent casting lines into the cool water. A bridge spans the lake at its narrowest point. The road that crosses this bridge connects Thunder Bluff to Bloodhoof Village.",
+   "In the RPG": "The area is known as Lake Stonebull.\nMulgore is home to the only major source of water in western Kalimdor. The lake is named after the mighty tauren hero who fell battling the Burning Legion. Water fills the lake from underground rivers stretching as far north as the Ashenvale Forest.",
+   "Notes": "- This area was planned to be available in the Southern Barrens warfront."
+  },
+  "links": [
+   "Bloodhoof Village",
+   "Mulgore",
+   "Thunder Bluff",
+   "Kalimdor",
+   "Ashenvale Forest",
+   "Warcraft: The Roleplaying Game",
+   "Southern Barrens warfront"
+  ],
+  "categories": [
+   "Lakes",
+   "Tauren territories",
+   "Warcraft: The Roleplaying Game"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 381817,
+   "revid": 6865453,
+   "timestamp": "2026-09-08T04:14:02Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "stonetalon_pass_mulgore",
+  "title": "Stonetalon Pass (Mulgore)",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Stonetalon Pass is a small quest area where Horde players battle the Grimtotem. It is located to the northwest of Thunder Bluff in Mulgore. The path ends at a painted rock on a high plateau.\n\nHowever, intrepid explorers can fall to Boulderslide Ravine or Malaka'jin in Stonetalon Mountains if they head northeast (almost due east) from the top of the path. Walking along the rim of Mulgore can get one to the High Road, used by Horde players to travel between Stonetalon and the Southern Barrens while skirting the Alliance forces at Honor's Stand.",
+   "Notes": "- In Forever, this area is named Skywatcher Plateau.\n- It is possible to achieve Explore Mulgore without exploring Stonetalon Pass, despite the noticeable empty space this leaves on the zone map. \n- At the summit one can find a large number of critters, which occasionally grow in size and don weapons. Prairie Dogs wear an acorn helmet and wield a dagger, rabbits hold a one-handed axe in their mouths, and mice wear a skull helmet and wield two shotguns. The purpose of these critters (if any, probably not) is currently unknown.\n\nFile:Stonetalon Pass Mouse.jpg\nFile:Stonetalon Pass Prairie Dog.jpg\nFile:Stonetalon Pass Rabbit.jpg",
+   "Speculation": "The Grimtotem have appeared to build up a small settlement here, it's possible this is where they traveled to when exiled from Thunder Bluff."
+  },
+  "links": [
+   "Horde",
+   "Grimtotem tribe",
+   "Thunder Bluff",
+   "Mulgore",
+   "Boulderslide Ravine",
+   "Malaka'jin",
+   "Stonetalon Mountains",
+   "High Road",
+   "Southern Barrens",
+   "Honor's Stand",
+   "Forever",
+   "Skywatcher Plateau",
+   "Explore Mulgore",
+   "exploration",
+   "map",
+   "Prairie Dog",
+   "Rabbit (critter)",
+   "Mouse (critter)"
+  ],
+  "categories": [
+   "Passes"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 37537,
+   "revid": 6879386,
+   "timestamp": "2026-09-19T11:21:30Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "thornmantles_hideout",
+  "title": "Thornmantle's Hideout",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Thornmantle's Hideout is a small enclave in the southwestern corner of Mulgore. The ground is covered with vines, and the quilboar have grown massive thorns so that the area resembles a cave. It is inhabited by the leader of the Bristleback tribe, Chief Squealer Thornmantle, and two Thornguards. They are surrounded by the burning corpses of tauren braves that have fallen against them.",
+   "History": "Before being destroyed in a landslide (presumably during the Cataclysm) and taken over by the Bristlebacks, this was the main exit out of Red Cloud Mesa. Tauren that had completed their questing in nearby Camp Narache would walk through this pass on their way to Bloodhoof Village."
+  },
+  "links": [
+   "Mulgore",
+   "quilboar",
+   "Bristleback tribe",
+   "Chief Squealer Thornmantle",
+   "Thornguard (quilboar)",
+   "Fledgling Brave",
+   "tauren",
+   "brave",
+   "Cataclysm (event)",
+   "Red Cloud Mesa",
+   "Camp Narache",
+   "Bloodhoof Village"
+  ],
+  "categories": [
+   "Quilboar territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 59171,
+   "revid": 6865447,
+   "timestamp": "2026-09-08T04:12:54Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "thornsnarl",
+  "title": "Thornsnarl",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "The Thornsnarl is an area in southern Mulgore where Fledgling Braves fight against Bristleback Invaders seeking to claim new land from the tauren.\n\nOther quilboar inhabitants include Bristleback Gun Thieves, Bristleback Thorncallers and Young Battleboars.\n\nCaptured Braves can be found in the northern portion of this subzone and are rescued as part of a tauren starting quest.\n\nAs a result of the Cataclysm, there is a lake in the southern part of this area. However, it is not included in any subzone.",
+   "Notes": "- This area was planned to be available in the Southern Barrens warfront."
+  },
+  "links": [
+   "Mulgore",
+   "Fledgling Brave",
+   "Bristleback Invader",
+   "tauren",
+   "quilboar",
+   "Bristleback Gun Thief",
+   "Bristleback Thorncaller",
+   "Young Battleboar",
+   "Captured Brave",
+   "Cataclysm (event)",
+   "Southern Barrens warfront"
+  ],
+  "categories": [
+   "Quilboar territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 457466,
+   "revid": 6865448,
+   "timestamp": "2026-09-08T04:13:02Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "thunderhorn_water_well",
+  "title": "Thunderhorn Water Well",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 44.0,
+    "y": 46.0,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "The Thunderhorn Water Well is located in the midst of the grasslands in Mulgore, by the north road between Thunder Bluff and Bloodhoof Village.\n\nThis well had been taken over by the Venture Company in order to control the water supply but were run off by the tauren.\n\n \nShortly before the Cataclysm, the well was destroyed by a turmoil of the elements. The tauren shaman Muln Earthfury and the Earthen Ring tried to stop the disaster by asking help from the elements, in vain, until the mysterious Shotoa achieved this by forcing the elements to obey him.\n\nThunderhorn Water Well comic.jpg|Thunderhorn Water Well in World of Warcraft: Shaman.\nThunderhorn Water Well comic 2.jpg|Thunderhorn Water Well after the disaster.\n\n \nFollowing the Cataclysm, the well was rebuilt. At some point, the Grimtotem tribe have been tainting the water supply as payback for being exiled from Thunder Bluff."
+  },
+  "links": [
+   "Mulgore",
+   "Thunder Bluff",
+   "Bloodhoof Village",
+   "Venture Company",
+   "Cataclysm (event)",
+   "shaman",
+   "Muln Earthfury",
+   "Earthen Ring",
+   "Shotoa",
+   "Shaman (manga)",
+   "Grimtotem tribe"
+  ],
+  "categories": [
+   "Tauren territories",
+   "Wells"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 227979,
+   "revid": 6473634,
+   "timestamp": "2025-09-15T17:46:21Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "venture_co_mine",
+  "title": "Venture Co. Mine",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 61.0,
+    "y": 47.0,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "The Venture Co. Mine (also spelled Venture Company Mine) is an enormous mine run by the Venture Company in the eastern cliffs of Mulgore. The mine has three entrance points. The first is the main entrance where Supervisor Fizsprocket resides—it is the only entrance accessible on foot. Fizsprocket is the goblin in charge of Venture Co. operations in the tauren homeland. The second entrance is a cliff, and the third entrance is a small lumber camp.",
+   "History": "The Venture Co. was refused mining rights in Mulgore, but they would not take no for an answer. Furthermore, Mogul Razdunk and the advisory board were encouraging Fizsprocket to expand Mulgore operations to lumber harvesting as well. Thus, the board was going to provide the supervisor with several of their newest model shredders and raw materials to construct a mill.\n\nUnsurprisingly, their activity angered the tauren. When a caravan carrying mining supplies traveling under guard on the northern shore of Stonebull Lake was found by them, the Outrunners were quick to attack and lay waste to it. The tauren left their supply crates, thinking that their torches would destroy anything of value, but they later observed Venture Co. salvagers at the site.\n\nAdventurers were later sent to investigate the caravan, and subsequently attack the Venture Co. members in the mine as a warning to the company.",
+   "Inhabitants": "- - - -",
+   "Notes": "- An engineering trainer, Twizwick Sprocketgrind can be found after walking through the mine and through the lumber camp.\n- This area was planned to be available in the Southern Barrens warfront."
+  },
+  "links": [
+   "mine",
+   "Venture Company",
+   "Mulgore",
+   "Supervisor Fizsprocket",
+   "The Venture Co.",
+   "Mogul Razdunk",
+   "Venture Co. Documents",
+   "Ravaged Caravan",
+   "Stonebull Lake",
+   "Outrunner",
+   "The Ravaged Caravan (Horde) (1)",
+   "Supervisor Fizsprocket (Classic)",
+   "engineering trainer",
+   "Twizwick Sprocketgrind",
+   "Southern Barrens warfront"
+  ],
+  "categories": [
+   "Goblin territories",
+   "Mines",
+   "Venture Company"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 36582,
+   "revid": 6528641,
+   "timestamp": "2025-10-28T23:57:09Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "wildmane_water_well",
+  "title": "Wildmane Water Well",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 43.0,
+    "y": 13.0,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "The Wildmane Water Well is located just north of Thunder Bluff. It is the northernmost of the tauren people's sacred water wells. This well had been taken over by the Venture Company in order to control the water supply but were run off by the tauren. Recently the Grimtotem tribe have been tainting the water supply as payback for being exiled from Thunder Bluff."
+  },
+  "links": [
+   "Thunder Bluff",
+   "Venture Company",
+   "Grimtotem tribe"
+  ],
+  "categories": [
+   "Tauren territories",
+   "Wells"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 44409,
+   "revid": 6865455,
+   "timestamp": "2026-09-08T04:14:15Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "windfury_ridge",
+  "title": "Windfury Ridge",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 51.0,
+    "y": 10.0,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "Windfury Ridge is a dangerous place to travel for those who are not aware of its inhabitants. Furious harpies swoop down to capture or kill those who come too near to their nests, and the hills are also dotted with wild cougars and wolves.\n\nThe Windfury harpies are often hunted for their brilliant feathers, which the tauren of Thunder Bluff appropriate for decoration in weddings and feasts.",
+   "Notes": "- This area was planned to be available in the Southern Barrens warfront."
+  },
+  "links": [
+   "harpies",
+   "cougar",
+   "Wolf",
+   "Windfury harpies",
+   "tauren",
+   "Thunder Bluff",
+   "Southern Barrens warfront"
+  ],
+  "categories": [
+   "Harpy territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 90656,
+   "revid": 6865456,
+   "timestamp": "2026-09-08T04:14:21Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "winterhoof_water_well",
+  "title": "Winterhoof Water Well",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "mulgore",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 53.0,
+    "y": 66.0,
+    "map": "Mulgore"
+   }
+  ],
+  "sections": {
+   "Description": "The Winterhoof Water Well is located at the edge of the Rolling Plains in southern Mulgore.\n\nYears after the Third War, the well was taken and poisoned over by the Venture Company in order to control the water supply, but they were eventually run off by the tauren adventurers, while Mull Thunderhorn created a totem to cleanse the waters.\n\nFollowing the Cataclysm, the Grimtotem tribe have been tainting the water supply as payback for being exiled from Thunder Bluff. Ultimately, Mull Thunderhorn and the Horde adventurers purified it once again.",
+   "Notes": "- This area was planned to be available in the Southern Barrens warfront."
+  },
+  "links": [
+   "Rolling Plains",
+   "Mulgore",
+   "Third War",
+   "Venture Company",
+   "tauren",
+   "adventurer",
+   "Poison Water (Classic)",
+   "Mull Thunderhorn",
+   "Thunderhorn Totem (Classic)",
+   "Cataclysm (event)",
+   "Grimtotem tribe",
+   "Thunder Bluff",
+   "Winterhoof Cleansing",
+   "Horde",
+   "Thunderhorn Totem",
+   "Southern Barrens warfront"
+  ],
+  "categories": [
+   "Tauren territories",
+   "Wells"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 147411,
+   "revid": 6193451,
+   "timestamp": "2024-12-12T20:19:50Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "cat_and_the_shaman",
+  "title": "Cat and the Shaman",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "The Cat and the Shaman is an inn in Thunder Bluff owned by Innkeeper Pala."
+  },
+  "links": [
+   "inn",
+   "Thunder Bluff",
+   "Innkeeper Pala"
+  ],
+  "categories": [
+   "Inns"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 314709,
+   "revid": 5758101,
+   "timestamp": "2023-11-22T19:40:48Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "elder_rise",
+  "title": "Elder Rise",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Elder Rise is directly east of the central bluff and is the home of the Cenarion Circle in Thunder Bluff. Many tauren druids and priests reside here and provide training. The Arch Druid Hamuul Runetotem resides here. Before her exile, the leader of the Grimtotem tribe, Magatha Grimtotem, used to inhabit the hut between the two bridges. Elder Rise connects to high rise and middle rise by separate rope bridges.\n\nElder Rise holds the governing Council of Elders and also members of the Cenarion Circle.\n\nDuring Saurfang's rebellion, Elder Rise was defended by Highmountain tauren led by Mayla Highmountain as well as Huojin and Tushui pandaren led by Ji Firepaw and Aysa Cloudsinger respectively.\n\nAfter the Fourth War, Rexxar and Zekhan visited the rise and met with the trainers. They were happy to hear that the Horde Council wished them health and safety, and the elders stated few needs from their people, in addition of healing.",
+   "Buildings": "- Elder Rise Drums\n- Hall of Elders",
+   "NPCs": "Excludes the above areas.\n- - - Elder Crone\n- Cor Grimtotem\n- Gorm Grimtotem\n- Magatha's Servant"
+  },
+  "links": [
+   "Cenarion Circle",
+   "Thunder Bluff",
+   "tauren",
+   "druid",
+   "priest",
+   "trainer",
+   "Hamuul Runetotem",
+   "Grimtotem tribe",
+   "Magatha Grimtotem",
+   "high rise",
+   "middle rise",
+   "Elder Council",
+   "Ultimate Visual Guide",
+   "Varok Saurfang",
+   "Battle at the Gates of Orgrimmar",
+   "Highmountain tauren",
+   "Mayla Highmountain",
+   "Huojin Pandaren",
+   "Tushui Pandaren",
+   "pandaren",
+   "Ji Firepaw",
+   "Aysa Cloudsinger",
+   "Fourth War",
+   "Rexxar",
+   "Zekhan",
+   "Horde Council",
+   "World of Warcraft: Exploring Azeroth: Kalimdor",
+   "Elder Rise Drums",
+   "Hall of Elders"
+  ],
+  "categories": [
+   "Druids",
+   "Tauren territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 310134,
+   "revid": 6348606,
+   "timestamp": "2025-06-08T07:20:18Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "high_rise",
+  "title": "High Rise",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "The High Rise (or the high rise) is the top of Thunder Bluff's central mesa and contains the home of High Chieftain Baine Bloodhoof. Outside of the High Chieftain's quarters, Thunder Bluff's populace can witness important decisions and fateful events in an open-air auditorium.\n\nIt contains a crude amphitheater around a bonfire. Professional trainers for cooking and fishing can also be found here. It connects to the middle rise and lower rise through the wind rider roost, and to Hunter Rise and Elder Rise by separate rope bridges. This is the only one of the three central rises to not contain a lift to the plains of Mulgore below.",
+   "Buildings": "- Rainsticks\n- Aska's Kitchen\n- Ragetotem Arms\n- Thunderhoof's Firearms\n- Kodo Steak and Ribs\n- Winterhoof Totems\n- Mountaintop Bait & Tackle",
+   "NPCs": "Excludes the above areas.\n- High Chieftain\n- Prairie Dog Vendor\n- Kroksy the Impregnable\n- War Harness Vendor\n- Zangen Stonehoof\n\n- High Chieftain"
+  },
+  "links": [
+   "The Shattering: Prelude to Cataclysm",
+   "Bluffwatcher",
+   "Thunder Bluff",
+   "central mesa",
+   "Baine Bloodhoof",
+   "Ultimate Visual Guide",
+   "cooking",
+   "fishing",
+   "middle rise",
+   "lower rise",
+   "wind rider",
+   "Wind Rider Roost",
+   "Hunter Rise",
+   "Elder Rise",
+   "Mulgore",
+   "Rainsticks",
+   "Aska's Kitchen",
+   "Ragetotem Arms",
+   "Thunderhoof's Firearms",
+   "Kodo Steak and Ribs",
+   "Winterhoof Totems",
+   "Mountaintop Bait & Tackle"
+  ],
+  "categories": [
+   "Tauren territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 135290,
+   "revid": 6348894,
+   "timestamp": "2025-06-08T07:34:00Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "hunter_rise",
+  "title": "Hunter Rise",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Located to the south of the main bluff in Thunder Bluff, Hunter Rise is the home of the hunters, warriors, and paladins of the tauren. Others who call this area home are trappers, trackers, and tanners. The trainers for these groups reside within the renowned Hunter's Hall and the Sunwalker Lodge. Outside, training dummies are provided for practicing fighters, and battlemasters seek recruits for attacks against the Alliance. Hunter Rise connects to lower rise and high rise by separate rope bridges.\n\nAfter the Fourth War, the rise was visited by Rexxar and Zekhan. Many begged Rexxar for advice or stories from his travels.",
+   "Buildings": "- Sunwalker Lodge\n- Hunter's Hall",
+   "NPCs": "Excludes the above areas.\n- Henen Ragetotem\n- Pet Trainer\n- - - - Battlemaster\n- Battlemaster\n\n- Eye of the Storm Battlemaster\n- Arathi Basin Battlemaster\n\n- Warsong Gulch Battlemaster\n- Alterac Valley Battlemaster\n\n- Arena Battlemaster\n\n- Horde Warbringer",
+   "In the RPG": "Warriors and hunters travel here from all across the land to sharpen their skills and further their training. Like elves, tauren tend to prefer bows and other simple weapons to rifles."
+  },
+  "links": [
+   "Thunder Bluff",
+   "hunter",
+   "warrior",
+   "paladin",
+   "tauren",
+   "trapper",
+   "tracker",
+   "World of Warcraft: Exploring Azeroth: Kalimdor",
+   "trainer",
+   "battlemaster",
+   "lower rise",
+   "high rise",
+   "Fourth War",
+   "Rexxar",
+   "Zekhan",
+   "Sunwalker Lodge",
+   "Hunter's Hall (Thunder Bluff)",
+   "Lands of Mystery"
+  ],
+  "categories": [
+   "Hunters",
+   "Tauren territories",
+   "Warriors"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 319378,
+   "revid": 6353374,
+   "timestamp": "2025-06-11T17:49:00Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "pools_of_vision",
+  "title": "Pools of Vision",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [
+   {
+    "x": 23.0,
+    "y": 21.0,
+    "map": "Thunder Bluff"
+   },
+   {
+    "x": 30.0,
+    "y": 30.0,
+    "map": "Thunder Bluff"
+   }
+  ],
+  "sections": {
+   "Description": "The Pools of Vision are located within a tunnel system just below the cap of Spirit Rise, and serve as the Forsaken base of operations at Thunder Bluff.\n\nThe entrance to pools of vision is at the right-hand side of the bridge from low rise to spirit rise. The end of the bridge is at , and the entrance to the cave is at .\n\nYou can fish the waters here; the catches are the same for all the major cities except for Dalaran.",
+   "History": "Forsaken adventuring on Kalimdor find a center for both mages and priests in the Pools of Vision. An emissary for the Forsaken Defilers also seeks recruits for battle.\n\nMages teleporting to Thunder Bluff appear here, as does any character taking the portals in Dalaran or Shattrath.\n\nAround the time of the invasion of Outland, the Pools of Vision were mysteriously being haunted by a powerful earth elemental. Cairne Bloodhoof was hesitant to drive it away because he wanted to understand what has disturbed it first, so as to discover what has disturbed the natural balance of Azeroth. The gladiator champion named Lo'Gosh was able to defeat it and cleanse the Pools of Vision. Magatha Grimtotem glorified Lo'Gosh's victory in order to discredit Cairne for being unable to cleanse the elemental from the Pools of Vision.\n\nSome time later the pools were used by Stasia Fallshadow to reveal the location of Med'an.\n\nFollowing the Argus Campaign, Warchief Sylvanas wanted to visit the Pools of Vision and ask the Forsaken living there if they and the pools could be of any assistance to the tauren in their effort to heal Azeroth.",
+   "In the RPG": "It is said that the misty, luminous pools reveal visions to those who can channel their energies and that the pools deliver messages from the dead. Here the Forsaken collect and study items of arcane power. The Forsaken can be seen practicing their trademark talent of alchemy as well. The tauren are not thrilled with the presence of the Forsaken at Thunder Bluff. They only grudgingly tolerate them due to their alliance. The tauren place a strong emphasis on the value of life, and the unlife of the Forsaken stands as an affront to their beliefs.",
+   "NPCs": "- Royal Apothecary Society\n- Mage Trainer\n- Portal Trainer\n- - Warlock Trainer\n- Priest Trainer\n- Warlock Trainer\n- Larkspur Sparkmane\n- Leila Startotem\n- Priest Trainer\n- Inscription Supplies\n- Priest Trainer\n- Warlock Trainer\n- Petunia Glimmerhoof\n- Inscription Trainer\n- Seer Shinetotem\n- Mage Trainer\n- Mage Trainer\n- Se'tah Bloodtotem",
+   "Speculation": "All of the Forsaken in Thunder Bluff are stationed in this dark, secluded area. Though members of the Horde, their exclusion from the rises may indicate the overall tauren distrust of the undead. Alternatively, these Forsaken may have simply chosen to reside within this area and are not excluded from rest of the city. The only confirmed Forsaken that see the light of day are the Defilers Emissaries during an Arathi Basin holiday weekend and Forsaken adventures."
+  },
+  "links": [
+   "Spirit Rise",
+   "Forsaken",
+   "Thunder Bluff",
+   "Kalimdor",
+   "mage",
+   "priest",
+   "Forsaken Defilers",
+   "invasion of Outland",
+   "earth elemental",
+   "Cairne Bloodhoof",
+   "Varian Wrynn",
+   "Magatha Grimtotem",
+   "Stasia Fallshadow",
+   "Med'an",
+   "Destiny Awaits!",
+   "Argus Campaign",
+   "Sylvanas",
+   "Azeroth",
+   "Before the Storm",
+   "arcane",
+   "alchemy",
+   "Lands of Mystery",
+   "Horde",
+   "tauren",
+   "undead",
+   "Defilers Emissary",
+   "Arathi Basin",
+   "Battlegrounds Holiday",
+   "Undead (playable)",
+   "mount"
+  ],
+  "categories": [
+   "Forsaken territories",
+   "Mages",
+   "Pools",
+   "Priests",
+   "Tauren territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 441672,
+   "revid": 6434469,
+   "timestamp": "2025-08-10T18:23:24Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "spirit_rise",
+  "title": "Spirit Rise",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "",
+  "info": {},
+  "coords": [],
+  "sections": {
+   "Description": "Spirit Rise is situated to the northwest of the central bluff and is the center for shamanistic studies in Thunder Bluff. The Skychaser tribe holds great influence here. Below the surface of the mesa are the steamy Pools of Vision. It connects to lower rise and middle rise by separate rope bridges. There is also a zeppelin dock that players can use to travel to Orgrimmar.",
+   "Subzones": "- Pools of Vision",
+   "Buildings": "- Spiritual Healing\n- Hall of Spirits",
+   "NPCs": "Excludes the above areas.\n- Pawe Mistrunner\n- Orgrimmar Zeppelin Master"
+  },
+  "links": [
+   "shaman",
+   "Thunder Bluff",
+   "Skychaser tribe",
+   "Pools of Vision",
+   "lower rise",
+   "middle rise",
+   "zeppelin",
+   "Orgrimmar",
+   "Spiritual Healing (Thunder Bluff)",
+   "Hall of Spirits"
+  ],
+  "categories": [
+   "Tauren territories"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 5425,
+   "revid": 6041954,
+   "timestamp": "2024-05-15T11:06:48Z",
+   "license": "CC BY-SA"
+  }
+ },
+ {
+  "id": "thunder_bluff",
+  "title": "Thunder Bluff",
+  "kind": "subzone",
+  "aggro": {},
+  "zone": "thunder_bluff",
+  "removed": false,
+  "infobox": "infobox zone",
+  "info": {
+   "name": "Thunder Bluff",
+   "faction": "Horde",
+   "type": "Capital city",
+   "government": "Chiefdom; Spiritual hierarchy",
+   "rulers": "High Chieftain Baine Bloodhoof",
+   "frulers": "High Chieftain Cairne Bloodhoof",
+   "languages": "Taur-ahe, Orcish, Thalassian, Zandali, Goblin",
+   "faiths": "Earth Mother, An'she, Shamanism, Druidism",
+   "affiliation": "United tauren tribes, Horde",
+   "loc": "Northern Mulgore",
+   "territory": "Horde",
+   "status": "Active"
+  },
+  "coords": [],
+  "sections": {
+   "Description": "Thunder Bluff (sometimes spelled as Thunderbluff) is the tauren capital city located in the northern part of the region of Mulgore on the continent of Kalimdor. The entire city is built on bluffs several hundred feet above the surrounding landscape and is accessible by elevators on the southwestern and northeastern sides. Established by the wise chieftain Cairne Bloodhoof and his stalwart tribe, Thunder Bluff overlooks the verdant land of Mulgore from atop a series of windswept mesas. Prior to the construction of the capital, the tauren had lived as nomads for countless generations, often under attack by marauding bands of centaur. With Thunder Bluff’s founding, however, the proud and good-spirited race was finally granted a permanent home.\n\nThe city of many tribes is a hub for tauren, welcoming tradesfolk and artisans of every kind.",
+   "History": "The centaur were driving the tauren out of their homeland around the time of the Third War. When Thrall and his Horde arrived on the continent, an alliance was forged between the Horde and the tauren. Following the defeat of Archimonde and the end of the war, Thrall helped the tauren rout the centaur and reclaim their land. Shortly thereafter the tauren founded the city of Thunder Bluff and began the process of settling into their old surroundings and repairing the ecological damage the centaur had wrought. Thunder Bluff grows and expands at a tremendous rate.\n\nThe city was described as being built atop a near-impenetrable mesa deep in the south of Mulgore. The weather is almost always warm and sunny, with intermittent breezes carried in from The Barrens.",
+   "Founding": "During the Third War in 21 ADP, Cairne and his Bloodhoof tribe received help from Warchief Thrall and the New Horde, and were eventually able to drive back the centaur and claim the grasslands of Mulgore for their own. For the first time in hundreds of years, the tauren had a land to call their own. Upon the windswept mesa of Thunder Bluff, Cairne built a refuge for his people, where tauren of every tribe are welcome. Over time, the scattered tauren tribes united under Cairne's rule. There are a few tribes who disagree about the direction their new nation should take, but all agree that Cairne is the wisest and best suited to lead them towards the future.\n\nAfter the Battle of Mount Hyjal, Rexxar and his companions were tasked by Tagar with driving the Stonetalon harpies away from the tauren's kodo herds, for the foul creatures were slaughtering them and leaving their bodies to rot. Mulgore was also home to a large group of centaur, who had captured Baine Bloodhoof and thrown his father Cairne into despair. With the help of Bovan Windtotem, Rexxar rescued Baine and brought the tauren back into the Horde.",
+   "World of Warcraft": "The city of Thunder Bluff lies atop a series of mesas that overlook the verdant grasslands of Mulgore. Once a nomadic people, the tauren recently established the city as a center for trade caravans, traveling artisans, and inventors of every kind. The proud city also stands as a refuge for the many hunters who stalk their dangerous prey through the Barrens and its surrounding areas. Long bridges of wood and rope span the chasms between the mesas, and each mesa is topped with tents, longhouses, colorfully painted totems, and spirit lodges. The mighty chief, Cairne Bloodhoof, presides over the bustling city, ensuring that the united tauren tribes live in peace and security.\n\nIn order to gain access to Thunder Bluff, visitors must either ride wyverns to the top of one of the four towering mesas, use the zeppelin from Orgrimmar or be lifted via rope and wood elevators from the foot of the bluffs, an invention unique to the tauren.",
+   "The Comic": "Prior to the war against the Lich King, Thunder Bluff's Pools of Vision became haunted by an element rumored to be summoned by Magatha Grimtotem. The city was later visited by Rehgar Earthfury and his two gladiators - Broll and Lo'Gosh who destroyed the element and eventually escaped from slavery. A human assassin from the Stormwind Assassin's Guild also visited Magatha in order to learn the location of Lo'Gosh.",
+   "Stormrage": "During the War Against the Nightmare in 27 ADP, Thunder Bluff was enveloped by the mists of the Emerald Nightmare, but Malfurion Stormrage was able to find Baine in the city and recruit him into the dreamform army.",
+   "Elemental Unrest": "During the Elemental Unrest, the city was attacked by furious water and wind elementals, until Baine Bloodhoof and his forces repelled them with the Horde adventurers.",
+   "The Shattering": "Following Cairne's death in a duel with Warchief Garrosh Hellscream, Thunder Bluff was briefly seized in a coup by Magatha Grimtotem and elements of her tribe. The capital was later assaulted by the Grimtotem assassins who mainly targeted experts in weapons, powerful druids, or shaman. They also slaughtered the Skychaser tribe at the Spirit Rise, killed many hunters at the Hunter Rise, and even some others who could lift a weapon only to strike fear into the remaining tauren. Only the Forsaken were spared from casualties since they were supporting the Grimtotem.\n\nThanks to the efforts of Jevan Grimtotem and Jaina Proudmoore, Baine was eventually able to rally an army and buy weapons needed to defeat the Grimtotem. In retaliation, Baine launched a brilliant counterattack using a fleet of zeppelins. After he strategically divided Magatha's forces, Thunder Bluff was recaptured, and Baine assumed his role as the high chieftain of the tauren tribes. In the aftermath, Magatha and her loyalists were sent to exile, while Jevan became the leader of the Grimtotem who remained with the Horde and Thunder Bluff.",
+   "Cataclysm": "Following the Cataclysm in 28 ADP, having recovered from the recent unrest, the capital was once again a bastion of peace and security for Kalimdor's tauren. As a shamanistic tribe, the Cloudsong tribe replaced the murdered Skychaser tribe. When the Camp Taurajo fell, Baine had a gate separating the Barrens and Mulgore constructed. Some tauren were content with that decision and did not burn for revenge, but the Grimtotem who disagreed, and others who chose to strike back at the Alliance from Vendetta Point, were expelled from Thunder Bluff, though suffered no other repercussions.",
+   "Legion": "During the third invasion of the Burning Legion in 32 ADP, Thunder Bluff was under attack by infernals, which were eventually destroyed by the Earthen Ring.\n\nThunder Bluff also appeared in the Emerald Nightmare with the rises being shattered and the city floating on its side.",
+   "Before the Storm": "After the Argus Campaign and the Orgrimmar parade, Thunder Bluff hosted Warchief Sylvanas Windrunner and several representatives of other Horde races to speak about the tragedy in Silithus on the behest of Archdruid Hamuul Runetotem. Soon after, they were joined by Magni Bronzebeard who warned the Horde about the injuries of Azeroth.",
+   "Thunder Bluff's feast": "Prior to the Fourth War, Thunder Bluff held a feast for the Highmountain tauren from Highmountain on the Broken Shore. The whole city was celebrating with fireworks until it was attacked by Uul'gyneth who sensed Spiritwalker Ebonhorn having left Highmountain and thus the protection of the wards. They trapped the city civilians with the void power turning them unresponsive. The city was defended by Horde adventurers, Baine Bloodhoof, his personal guards, as well as the city guards who killed the void minions and their leader, Qy'telek.\n\nFile:Thunder Bluff feast 1.jpg|Thunder Bluff feast.\nFile:Thunder Bluff feast 2.jpg\nFile:Thunder Bluff feast 3.jpg\nFile:Thunder Bluff feast 4.jpg\nFile:Thunder Bluff feast 5.jpg|A drinking Bluffwatcher.",
+   "Battle for Azeroth": "During the course of the Fourth War in 33 ADP, tauren warbraves were sent from the city into the Barrens. Alliance champions were sent to hold them at the Great Gate of Mulgore and encountered Kary Thunderhorn among them at the Ruins of Taurajo.\n\nAfter Baine was rescued from the Underhold by Thrall and Jaina Proudmoore, they feared Sylvanas Windrunner would burn Thunder Bluff like she did Teldrassil. Baine later called for tauren champions who had proven their worth to return at Thunder Bluff at once, for the spiritwalkers had whispered their name with urgency. When Thunder Bluff came under attack by a Malevolent Spirit from the Shadowlands, Baine rallied the tauren forces in defending the city.\n\nBy the end of the war, the citizens of Thunder Bluff supported Varok Saurfang in his revolution against Sylvanas, though Baine's wounds would force him to remain within the city rather than march to Orgrimmar. In case the Banshee Queen would launch a counterattack, Ji Firepaw, Aysa Cloudsinger, Mayla Highmountain, and their forces reinforced the city's defenses. After the battle at the Gates of Orgrimmar, during which Saurfang died in mak'gora against Sylvanas to a Mak'gora, a stunned Lor'themar ordered for champions to report what had transpired to Baine. With Thunder Bluff no longer under the threat of an attack, the reinforcements left the city as Baine, Ji, and Mayla traveled to Orgrimmar to attend the funeral of Saurfang.",
+   "Shadowlands": "In Year 35 ADP, Baine Bloodhoof and Mayla Highmountain were in the city when the Mawsworn attacked and captured Baine.",
+   "Geography": "Thunder Bluff is located in the far north of Mulgore, among the sprawling flatlands of the Golden Plains. The city is composed of four towering mesas or rises. The only entrances from the plains below are elevators leading to the central platform. The central rise is connected to the others through large wooden bridges.",
+   "Rises": "The various rises in Thunder Bluff act a bit like neighborhoods or quarters in a human city, or the valleys and keeps of the orcish city Orgrimmar.\n\nThunder Bluff has a central mesa divided into three rises, surrounded by three additional mesas with distinct names:\n- Central mesa - In the game is split into the lower rise, the middle rise, and the high rise.\n- Lower rise - Located near the southwestern lifts from the main north road.\n- Middle rise - Located near the northeastern lifts from the plains.\n- High Rise - Located east from the wind rider roost.\n- Elder Rise - Located across the rope bridges from the middle or the high rise.\n- Hunter Rise - Located across the rope bridges from lower and high rise.\n- Spirit Rise - Located across the rope bridges from lower and middle rise.\n- The Pools of Vision - The cave entrance is found in the Spirit Rise.",
+   "Points of interest": "- The Bank is on the southeastern side of the Lower rise.\n- The top of the Wind Rider Roost in the central totem pole houses Wind Rider Master Tal, the Flight master, and Brave Tuho, the Thunder Bluff Quartermaster.\n- The inn is on the southern part of the lower rise.\n- The Auction House is located on the lower rise, just west of the entrance to the wind rider roost.\n- The mailbox is located just outside the bank. (There's only one mailbox in TB.)\n- The fishing hole is located in the center of the lower rise.\n- The zeppelin dock is located on the west of Spirit Rise.",
+   "Other locations": "- Goblin Bazaar",
+   "Notable characters": "The new Chief of the Bloodhoof clan, Baine Bloodhoof has become the High Chieftain of the tauren race in wake of his father's death. He watches over Thunder Bluff, and over his people in an ever-darkening world. Baine can be found in the chieftain's tent in the eastern main city and is accompanied by his Honor Guards. \n\nHamuul Runetotem is the elder druid of Thunder Bluff, and a childhood friend of Cairne. Although he at one point left to fight on Mount Hyjal, he can always be found on Elder Rise.",
+   "Flight": "Orgrimmar\nSun Rock Retreat\nThe Crossroads\nShadowprey Village\nBrackenwall Village\nCamp Mojache\nFreewind Post\nGadgetzan",
+   "Zeppelin": "Orgrimmar",
+   "People and culture": "Although some of the historically nomadic tauren probably miss their itinerant lifestyle, they are intensely proud of their permanent home and spend much of their time trying to make it better. They gladly accept the help of the orcs and trolls that help them, but are somewhat less enthusiastic at the presence of the Forsaken, whom they only grudgingly tolerate because of their membership in the Horde. Tauren place a strong emphasis on the value of life, and the unlife of the Forsaken stands as an affront to their beliefs, not to mention the less than honorable activities the Forsaken carry out.",
+   "Notes and trivia": "- At some point, Thunder Bluff was caught ablaze.\n- Galena Stormspear's mother has a tavern in the city.\n- Occasionally, some Darkspear trolls travel to Thunder Bluff to live with the tauren and adopt their ways. Chen Stormstout refers to these trolls as \"blue tauren\".\n- Thunder Bluff's elevators and windmills are kept in working order by Engineer Palehoof.\n- The diamond Magni Bronzebeard was so heavy that the lifts were not able to carry him.\n- Daily fishing and cooking quests that give Thunder Bluff reputation are offered from Kah Mistrunner and Aska Mistrunner on the High Rise.\n- It's a bad idea to jump from the top of one of the bluffs, as the fall is generally fatal without some sort of slowing effect. If you want to save time, you can jump on the platform under the main elevators. The fall damage may not kill you, but will reduce your health significantly.\n- Sunwalker Dezco claims to have fallen off the Thunder Bluff elevators on more than one occasion.\n- Thunder Bluff is most likely the optimal place for flying in Kalimdor for the Horde, as it is located in almost the center of the continent.\n- Thunder Bluff is the only capital city in which player duels are permitted, becoming available when within the Hunter Rise.\n- Strangely, while The Shattering: Prelude to Cataclysm describes \"hundreds of corpses\" in the city after the battle for Thunder Bluff, the only in-game change the city received in Cataclysm was the replacement of the Skychasers, most of whom were killed during the events of the novel.\n- Thunder Bluff is a Rare Location card in the World of Warcraft: Trading Card Games Drums of War set.\n- In , the Thunder Bluff was rewarded for achieving Rank 20 in Ranked Season 23, which took place during February 2016. The flavor text reads: \"Unofficial slogan: \"Great warriors come from happy Tauren tribes. Happy Tauren come from Thunder Bluff!\"\"\n- During the development of the original World of Warcraft, Thunder Bluff was one of the easiest racial capital cities to create, taking about two weeks of modeling."
+  },
+  "links": [
+   "Horde",
+   "A Fair Trade (Orgrimmar)",
+   "Sacred Fire",
+   "Stay of Execution",
+   "Shadows Rising",
+   "tauren",
+   "city",
+   "Mulgore",
+   "Kalimdor",
+   "Cairne Bloodhoof",
+   "centaur",
+   "World of Warcraft: Exploring Azeroth: Kalimdor",
+   "Third War",
+   "ADP",
+   "Bloodhoof tribe",
+   "Warchief",
+   "Thrall",
+   "New Horde",
+   "Battle of Mount Hyjal",
+   "Rexxar",
+   "Tagar (tauren)",
+   "Stonetalon Mountains",
+   "Harpy",
+   "kodo",
+   "Baine Bloodhoof",
+   "Bovan Windtotem",
+   "Old Hatreds (WC3 Orc)",
+   "World of Warcraft: Game Manual",
+   "wyvern",
+   "Orgrimmar",
+   "World of Warcraft: The Comic",
+   "war against the Lich King",
+   "Pools of Vision",
+   "Magatha Grimtotem",
+   "Rehgar Earthfury",
+   "Broll",
+   "Lo'Gosh",
+   "slavery",
+   "Destiny Awaits!",
+   "Stormwind Assassin's Guild",
+   "Balancing the Scales (comic)",
+   "War Against the Nightmare",
+   "Emerald Nightmare",
+   "Malfurion Stormrage",
+   "dreamform army",
+   "Stormrage",
+   "Elemental Unrest",
+   "elemental",
+   "adventurer",
+   "Garrosh Hellscream",
+   "Grimtotem tribe",
+   "assassin",
+   "druid",
+   "shaman",
+   "Skychaser tribe",
+   "Spirit Rise",
+   "Hunter Rise",
+   "Forsaken",
+   "Jevan Grimtotem",
+   "Jaina Proudmoore",
+   "The Shattering: Prelude to Cataclysm",
+   "Cataclysm (event)",
+   "Cloudsong tribe",
+   "Camp Taurajo",
+   "Jaina Proudmoore: Tides of War",
+   "third invasion of the Burning Legion",
+   "infernal",
+   "Earthen Ring",
+   "A Ring Unbroken",
+   "Emerald Nightmare (instance)",
+   "Argus Campaign",
+   "Sylvanas Windrunner",
+   "Silithus",
+   "Archdruid Hamuul Runetotem",
+   "Magni Bronzebeard",
+   "Azeroth (titan)",
+   "Before the Storm",
+   "Highmountain Pathfinder",
+   "Fourth War",
+   "Highmountain tauren",
+   "Highmountain",
+   "Broken Shore",
+   "Uul'gyneth",
+   "Spiritwalker Ebonhorn",
+   "Qy'telek",
+   "A Feast for Our Kin",
+   "Shadow Over Thunder Bluff",
+   "Dark Forces",
+   "Bluffwatcher",
+   "Battle at the Gates of Orgrimmar",
+   "warbrave",
+   "Barrens",
+   "Great Gate of Mulgore (Alliance)",
+   "Alliance",
+   "Great Gate",
+   "Kary Thunderhorn",
+   "Ruins of Taurajo",
+   "Underhold",
+   "Teldrassil",
+   "spiritwalker",
+   "When Spirits Whisper",
+   "Malevolent Spirit",
+   "Shadowlands",
+   "Answer the Call",
+   "Varok Saurfang",
+   "Ji Firepaw",
+   "Aysa Cloudsinger",
+   "Mayla Highmountain",
+   "Strategic Deployment",
+   "battle at the Gates of Orgrimmar",
+   "mak'gora",
+   "Mak'gora",
+   "Lor'themar Theron",
+   "Adventurer",
+   "The Price of Victory",
+   "Mawsworn",
+   "Cause for Distraction",
+   "Golden Plains",
+   "Central mesa",
+   "Lower rise",
+   "Middle rise",
+   "High Rise",
+   "Elder Rise",
+   "Bank",
+   "Wind Rider Roost",
+   "Wind Rider",
+   "Tal",
+   "Flight master",
+   "Brave Tuho",
+   "Quartermaster",
+   "inn",
+   "Auction House",
+   "mailbox",
+   "zeppelin",
+   "Goblin Bazaar",
+   "Hamuul Runetotem",
+   "Mount Hyjal",
+   "Sun Rock Retreat",
+   "The Crossroads",
+   "Shadowprey Village",
+   "Brackenwall Village",
+   "Camp Mojache",
+   "Freewind Post",
+   "Gadgetzan",
+   "continent",
+   "Archimonde",
+   "Lands of Mystery",
+   "Warcraft: The Roleplaying Game",
+   "orc",
+   "troll",
+   "Hearthstone (game)",
+   "Galena Stormspear",
+   "Traveler: The Shining Blade",
+   "Darkspear tribe",
+   "jungle troll",
+   "Chen Stormstout",
+   "Vol'jin: Shadows of the Horde",
+   "Engineer Palehoof",
+   "Thunder Bluff (faction)",
+   "reputation",
+   "Kah Mistrunner",
+   "Aska Mistrunner",
+   "Sunwalker Dezco",
+   "Herbal Remedies",
+   "duel",
+   "battle for Thunder Bluff",
+   "World of Warcraft: Cataclysm",
+   "Thunder Bluff (Drums of War)",
+   "World of Warcraft: Trading Card Game",
+   "Drums of War (TCG)",
+   "Exploring Azeroth: Kalimdor",
+   "3.2.0",
+   "Cataclysm",
+   "Warcraft III"
+  ],
+  "categories": [
+   "Cities",
+   "Horde settlements",
+   "Lands of Mystery",
+   "Tauren territories",
+   "Thunder Bluff"
+  ],
+  "source": {
+   "wiki": "warcraft.wiki.gg",
+   "pageid": 27719,
+   "revid": 6644005,
+   "timestamp": "2026-02-08T13:24:11Z",
+   "license": "CC BY-SA"
+  }
+ }
+]
