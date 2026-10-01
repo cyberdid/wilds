@@ -179,18 +179,26 @@ def build_structures(world: "ZoneWorld") -> list[Structure]:
     return out
 
 
+def _wall_span(world: "ZoneWorld", start: Pos, sign: int, limit: int = 36) -> int | None:
+    """Tiles a wall can run from ``start`` along the screen-horizontal diagonal before it meets rock (None: never)."""
+    for k in range(1, limit):
+        if world.terrain.tile(start[0] + sign * k, start[1] - sign * k) in (Terrain.MOUNTAIN, Terrain.CLIFF, Terrain.VOID):
+            return k - 1
+    return None
+
+
 def _gate_wall(world: "ZoneWorld", built: list[Structure]) -> list[Structure]:
-    """The Great Gate's log palisade, running from the gate on both sides until it meets the mountains."""
+    """The Great Gate's log palisade: from the gate on both sides, flush into the mountains that close the pass."""
     gate = next((s for s in built if s.sprite == "az.obj.great_gate"), None)
     if gate is None:
         return []
     wall: list[Structure] = []
     for sign in (1, -1):
-        for k in range(5, 40):  # the gate itself spans about 4 tiles across the pass (screen-horizontal)
+        reach = _wall_span(world, gate.pos, sign)
+        for k in range(3, (reach if reach is not None else 3) + 1):  # the gate spans about 4 tiles; the wall starts beside it
             p = (gate.pos[0] + sign * k, gate.pos[1] - sign * k)
-            if not _free(world, p):
-                break
-            wall.append(Structure("az.obj.palisade", p, 1))
+            if _free(world, p):
+                wall.append(Structure("az.obj.palisade", p, 1))
     return wall
 
 
