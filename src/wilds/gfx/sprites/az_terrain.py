@@ -45,6 +45,8 @@ _ramp("azt_gran", "#2f2b27", "#4a433b", "#665c50", "#7d7163", "#8e8172", "#a99b8
 # fine ramps (small steps) for the broad patches of the ground textures: low contrast on purpose
 _ramp("azt_lawn", "#7c9631", "#859d34", "#8ea437", "#97ab3a", "#a0b13e", "#aab644", "#b5ba4d")
 _ramp("azt_stubble", "#a08d3e", "#ab9744", "#b6a14b", "#c0aa52", "#c9b35a", "#d2bc63", "#dbc66f")
+_ramp("azt_pool", "#367d89", "#3c838f", "#438995", "#4a8f9a", "#52959f")
+_ramp("azt_slab", "#978a76", "#9e907b", "#a59781", "#ac9e87", "#b3a48d", "#baab93", "#8a9063", "#979c6d")
 _ramp("azt_pine", "#18261c", "#223522", "#2e4729", "#3d5b31", "#5a6f48")
 _ramp("azt_sstone", "#4a3330", "#6b4a42", "#8c6656", "#a9806b", "#c29a84", "#d6b39c", "#e6cbb6")
 _ramp("azt_band", "#7a3a1e", "#a5532a", "#c8703a", "#e08f52", "#efb07a")
@@ -63,18 +65,19 @@ MEAD, HAY, TRAIL = "αβγδεζ", "ηθικλμ", "νξοπρστ"
 GRAN, PINE, SAND = "ΑΒΓΔΕΖΗΘ", "ΙΚΛΜΝ", "абвгдеж"
 SST, BAND = "зийклмн", "фхцчш"
 LAWN, STUB = "уъыьэюя", "ЁЂЃЄЅІЇ"
+POOL, SLAB = "ЉЊЋЌЍ", "ЎЏБГДЖЗИ"  # SLAB[6:8]: grey-green lichen as light as the rock
 TER = {**_chars(GRASS_CH, "azt_grass"), **_chars(STRAW_CH, "azt_straw"), **_chars(SOIL_CH, "azt_soil"),
        **_chars(ROCK_CH, "azt_rock"), **_chars(LAKE_CH, "azt_lake"), **_chars(SHOAL_CH, "azt_shoal"),
        **_chars(MEAD, "azt_mead"), **_chars(HAY, "azt_hay"), **_chars(TRAIL, "azt_trail"),
        **_chars(GRAN, "azt_gran"), **_chars(PINE, "azt_pine"), **_chars(SAND, "azt_sand"),
        **_chars(SST, "azt_sstone"), **_chars(BAND, "azt_band"), **_chars(LAWN, "azt_lawn"),
-       **_chars(STUB, "azt_stubble"),
+       **_chars(STUB, "azt_stubble"), **_chars(POOL, "azt_pool"), **_chars(SLAB, "azt_slab"),
        "z": "ink:72", "y": "ink:40"}
 
 
 def _step(ch: str, k: int) -> str:
     """The same material ``k`` steps lighter (k > 0) or darker along its ramp."""
-    for ramp in (MEAD, HAY, TRAIL, GRAN, PINE, SAND, SST, BAND, LAWN, STUB, GRASS_CH, STRAW_CH, SOIL_CH, ROCK_CH):
+    for ramp in (MEAD, HAY, TRAIL, GRAN, PINE, SAND, SST, BAND, LAWN, STUB, POOL, SLAB[:6], GRASS_CH, STRAW_CH, SOIL_CH, ROCK_CH):
         i = ramp.find(ch)
         if i >= 0:
             return ramp[max(0, min(len(ramp) - 1, i + k))]
@@ -372,7 +375,7 @@ def _lake_frames(seed: int) -> list:
     rng = random.Random(seed)
     base = Canvas(T, T)
     swell = _mix((0.6, fbm(T, T, seed, 2, 2)), (0.4, _emboss(fbm(T, T, seed + 1, 2, 2), 0, 1)))
-    _quantize(base, swell, "IJK", [20, 60, 20])
+    _quantize(base, swell, POOL[:4], [18, 36, 32, 14])
     _despeckle(base)
     glints = [(rng.randrange(T), rng.randrange(T), k % 4) for k in range(4)]
     frames = []
@@ -439,26 +442,27 @@ def _rock_height(seed: int, n: int, stretch: float, cap: float) -> Field:
 
 def _mountain_top(seed: int) -> Canvas:
     """The rim's plateau seen from above: broad, softly lit pale beige-grey rock, a fine
-    crack or two, a soft patch of olive moss and grass and a tuft of grass. Calm on purpose - on the
-    diamond it covers whole mountainsides."""
+    crack or two, a soft mat of grey-green lichen and a tuft of grass. Calm on purpose - on
+    the diamond it covers whole mountainsides."""
     rng = random.Random(seed)
-    c = _patches(seed, GRAN[4:7], [15, 68, 17], lumps=5)
+    c = _patches(seed, SLAB[1:5], [18, 36, 32, 14], lumps=5)
     moss = fbm(T, T, seed + 8, 2, 1)
     cut = sorted(v for row in moss for v in row)
-    lo, mid = cut[int(T * T * 0.88)], cut[int(T * T * 0.97)]
+    lo, mid = cut[int(T * T * 0.86)], cut[int(T * T * 0.95)]
     for y in range(T):  # one soft mat of moss per tile (the same share on every variant)
         for x in range(T):
             if moss[y][x] >= lo:
-                c.px[y][x] = PINE[4] if moss[y][x] < mid else MEAD[1]
+                c.px[y][x] = SLAB[7] if moss[y][x] < mid else SLAB[6]
     _despeckle(c, 2)
     taken: set = set()
     for _k in range(2):  # hairline cracks, short, running down-right on screen (texture x)
         x, y = _free(rng, taken, gap=4)
         for i in range(rng.randrange(3, 6)):
-            if c.px[y][(x + i) % T] in GRAN:
-                c.px[y][(x + i) % T] = GRAN[3]
-                c.px[(y + 1) % T][(x + i) % T] = _step(c.px[(y + 1) % T][(x + i) % T], 1) \
-                    if c.px[(y + 1) % T][(x + i) % T] in GRAN else c.px[(y + 1) % T][(x + i) % T]
+            xx, below = (x + i) % T, (y + 1) % T
+            if c.px[y][xx] in SLAB[:6]:
+                c.px[y][xx] = GRAN[4]
+                if c.px[below][xx] in SLAB[:6]:
+                    c.px[below][xx] = _step(c.px[below][xx], 2)
             if rng.random() < 0.3:
                 y = (y + 1) % T
     x, y = _free(rng, taken, gap=4)  # a tuft of grass

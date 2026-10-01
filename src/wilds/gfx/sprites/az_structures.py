@@ -420,11 +420,11 @@ class Scene:
                 self.col[iy][ix], self.dep[iy][ix], self.oid[iy][ix] = c, d, oid
 
     def lathe(self, cx: float, cy: float, prof: Sequence[tuple[float, float]], mat: Callable,
-              ds: float = 0.25, k: float = 1.0, z0: float = 0.0) -> None:
+              ds: float = 0.25, k: float = 1.0, lift: float = 0.0) -> None:
         """Surface of revolution through profile points (z, r), listed from the bottom outward/up.
         ``mat(th, z, r, v, ix, iy)`` returns a palette name (``th`` = angle, FRONT faces the viewer).
         Rasterised column by column, so the angle is exact for each pixel column and seams and
-        patterns come out as clean lines. ``k`` squashes the depth (oval plan), ``z0`` lifts it."""
+        patterns come out as clean lines. ``k`` squashes the depth (oval plan), ``lift`` raises it."""
         oid = self.new_id()
         samples = []
         for (z0, r0), (z1, r1) in zip(prof, prof[1:]):
@@ -449,7 +449,7 @@ class Scene:
                     c, s = dx / r if r else 0.0, y / r if r else 0.0
                     v = shade3(nr * c, nr * s / k, nz)
                     y *= k
-                    zz = z + z0
+                    zz = z + lift
                     iy = int(math.floor(self.oy + (cy + y) * 0.5 - zz))
                     d = 2 * (cy + y) + zz
                     rows = [iy]
@@ -1801,65 +1801,6 @@ def _log_wall(p: Pic, x0: int, y0: int, x1: int, y1: int, vertical: bool, dark: 
             p.set(x, y, c)
 
 
-def _great_gate() -> None:
-    frames = []
-    W, H = 64, 48
-    for fr in range(2):
-        p = Pic(W, H)
-        for tx in (1, 47):  # towers: log walls on a stone footing, hide cone roofs
-            _log_wall(p, tx, 12, tx + 15, 37, False, dark=0.35)
-            _stone_blocks(p, tx, 36, tx + 15, 46, lit=0.85)
-            for x0, y0, x1, y1 in ((tx + 3, 10, tx + 9, 0), (tx + 12, 10, tx + 6, 0)):
-                pole(p, x0, y0, x1, y1)
-            p.poly([(tx + 7.5, 2), (tx - 0.8, 13), (tx + 16.8, 13)],
-                   lambda x, y, tx=tx: tone(HIDE[1:5], 0.95 - (x - tx) * 0.05, x, y, 0.1))
-            p.hline(tx - 1, tx + 16, 13, HIDE[1])
-            for x in range(tx + 1, tx + 15, 3):
-                p.set(x, 12, RED[2])
-            # a hanging Horde banner on each tower
-            p.rect(tx + 4, 15, 8, 16, lambda x, y, tx=tx: RED[2] if x < tx + 10 else RED[1])
-            p.hline(tx + 3, tx + 12, 14, WOOD[4])
-            for i in range(4):
-                p.clear(tx + 4 + i, 30 - (3 - i) if i < 4 else 30)
-                p.clear(tx + 11 - i, 30 - (3 - i))
-            p.stamp(HORDE, {}, tx + 5, 19)
-        # the gate: a lintel beam and two doors of upright logs, iron bands, a skull emblem
-        p.rect(15, 11, 34, 4, lambda x, y: [WOOD[4], WOOD[3], WOOD[2], WOOD[1]][y - 11])
-        _log_wall(p, 18, 15, 45, 46, True)
-        for x in range(18, 46):
-            p.set(x, 15, WOOD[1])
-            if (x - 18) % 3 == 1:
-                p.set(x, 16, WOOD[5])  # sharpened tops catching the light
-        p.vline(31, 16, 46, "ink")
-        p.vline(32, 16, 46, WOOD[1])
-        for by in (23, 38):
-            p.hline(18, 45, by, STEEL[3])
-            p.hline(18, 45, by + 1, STEEL[1])
-            for x in range(19, 46, 4):
-                p.set(x, by, STEEL[5])
-        skull(p, 32, 26)
-        # tusks rising either side of the doors
-        for i in range(30):
-            t = i / 29
-            off = round(math.sin(t * math.pi * 0.8) * 3)
-            y = 46 - i
-            p.set(17 - off, y, BONE[4])
-            p.set(46 + off, y, BONE[3])
-            if i < 20:
-                p.set(16 - off, y, BONE[3])
-                p.set(47 + off, y, BONE[2])
-        # torches on the towers' inner faces, flickering
-        for tx in (14, 49):
-            p.vline(tx, 19, 23, WOOD[2])
-            p.stamp(["ab.", ".c.", ".b."] if fr == 0 else [".ba", ".c.", ".b."],
-                    {"a": FIRE[3], "b": FIRE[4], "c": FIRE[5]}, tx - 1, 16)
-            p.set(tx, 15, FIRE[2] if fr == 0 else None)
-        p.outline(skip=FIRE[2:])
-        p.shadow(32, 47, 32, 1)
-        frames.append(p)
-    register("az.obj.great_gate", _art(frames, fps=4, note="the Great Gate: log towers, tusks, banners, torches"))
-
-
 # --- Venture Co. ------------------------------------------------------------------------------------
 
 
@@ -2173,63 +2114,6 @@ def _scaffold() -> None:
     p.outline()
     p.shadow(15, 31.5, 15, 1)
     register("az.obj.scaffold", _art(p, note="wooden excavation scaffold with ladder and hoist"))
-
-
-def _wagon() -> None:
-    W, H = 40, 24
-    p = Pic(W, H)
-
-    def bed(x: float) -> int:
-        return 13 + int((x - 3) * 4 // 31)
-    # canvas cover over hoops, a hole torn in it; the last two hoops stand bare
-    for x in range(5, 25):
-        hoop = (x - 5) % 7
-        top = bed(x) - 9 + (1 if hoop in (3, 4) else 0) + (1 if x in (5, 24) else 0)
-        for y in range(top, bed(x)):
-            t = (y - top) / 9
-            c = tone(BONE[1:], 0.95 - t * 0.55 - (x - 5) * 0.01, x, y, 0.08)
-            if hoop == 0 and y > top:
-                c = step(BONE, c, -1)  # the hoop under the cloth
-            p.set(x, y, c)
-    for y in range(bed(17) - 7, bed(17) - 3):
-        for x in range(15, 21):
-            if abs(x - 17.5) + abs(y - (bed(17) - 5)) * 0.8 < 3.2:
-                p.set(x, y, DEEP)
-    for hx in (27, 32):  # bare hoops
-        for a in range(0, 25):
-            t = a / 24 * math.pi
-            x = round(hx + 2.5 - math.cos(t) * 2.5)
-            y = round(bed(hx) - math.sin(t) * 8)
-            p.set(x, y, WOOD[3] if x <= hx + 2 else WOOD[2])
-    for x, ln in ((24, 3), (22, 2), (26, 4)):  # tatters of cloth
-        p.vline(x, bed(x) - 8, bed(x) - 8 + ln, BONE[2])
-    # the bed, sagging to the right where the wheel broke off
-    for x in range(3, 35):
-        y = 13 + (x - 3) * 4 // 31
-        p.set(x, y, WOOD[4])
-        p.set(x, y + 1, WOOD[3])
-        p.set(x, y + 2, WOOD[1])
-    # intact wheel
-    p.ellipse(10, 18.5, 5, 5, WOOD[2])
-    for y in range(p.h):
-        for x in range(p.w):
-            d = math.hypot(x + 0.5 - 10, y + 0.5 - 18.5)
-            if 3.2 < d <= 3.8:
-                p.clear(x, y)
-    p.line(10, 14, 10, 23, WOOD[3])
-    p.line(5, 18, 15, 18, WOOD[3])
-    p.line(7, 15, 13, 21, WOOD[2])
-    p.line(13, 15, 7, 21, WOOD[2])
-    p.set(10, 18, WOOD[5])
-    # the broken wheel on the ground and spilled cargo
-    p.ellipse(33, 22, 5.5, 1.6, WOOD[2])
-    p.ellipse(33, 22, 3.5, 0.8, WOOD[0])
-    p.rect(27, 17, 5, 4, lambda x, y: WOOD[4] if y == 17 else WOOD[3])
-    p.ellipse(22.5, 21, 3, 2, lambda x, y: SAND[3] if x < 23 else SAND[2])
-    p.line(33, 15, 36, 20, WOOD[3])  # snapped axle
-    p.outline()
-    p.shadow(20, 23, 19, 1)
-    register("az.obj.wagon", _art(p, note="ravaged caravan wagon: torn cover, lost wheel, spilled cargo"))
 
 
 # --- gathering nodes ------------------------------------------------------------------------------
@@ -2821,7 +2705,474 @@ def _dressing() -> None:
     _kodo_saddle_rack()
 
 
+# --- well-totem, hide lodge, windbreaks -------------------------------------------------------------
+
+BEAST_FACE = [
+    "hhhhhhhhhhd",
+    "hTTmmmmmTTd",
+    "htTTmmmTTtd",
+    "hmookmookmd",
+    "hmmmmhmmmmd",
+    "hmmmhHhmmmd",
+    "hmrmmhmmrmd",
+    "hrkkkkkkkrd",
+    "hkwkwkwkwkd",
+    "hrkkkkkkkrd",
+    "hmrrrrrrrmd",
+    "ddddddddddd",
+]
+
+
+def stone_dais(th, z, r, v, ix, iy):
+    """Low round dais of fitted grey stones (lathe material)."""
+    if z > 3.4:   # the top: worn flat stones in rings
+        return STONE[2] if int(r) % 5 == 0 else tone(STONE[2:], v, ix, iy, 0.15)
+    if abs(z - 1.8) < 0.45 or (th * r / 4.5 + (0.5 if z > 1.8 else 0)) % 1.0 < 0.12:
+        return STONE[1]
+    return tone(STONE[1:], v, ix, iy, 0.15)
+
+
+def _water_well() -> None:
+    """The tauren well-totem: a round stone dais, four splayed log legs holding a carved
+    beast-face box over a small drum, a wide shallow hide canopy with a spiky fringe, and a
+    cross-pole on top with two dark hides hanging."""
+    W, H = 48, 80
+    cx = 24.0
+    sc = Scene(W, H, 0, 68)
+    sc.lathe(cx, 0, [(0, 19.5), (3.4, 19.2), (3.8, 18.0), (3.8, 0)], stone_dais)
+    sc.lathe(cx, 0, [(8, 3.8), (13, 3.8), (13, 0)],
+             lambda th, z, r, v, ix, iy: PAINT_RED[2] if 9.5 < z < 10.5 else tone(CANVAS, v, ix, iy, 0.1))
+    for a in (0.785, 2.356, 3.927, 5.498):
+        sc.rod((cx + 8 * math.cos(a), 8 * math.sin(a), 3.8), (cx + 3 * math.cos(a), 3 * math.sin(a), 27), 1.1, WOOD[1:])
+    # the carved box: face toward the viewer, a shaded right side, a lit top
+    sc.quad((cx - 5.5, 4.5, 15), (11, 0, 0), (0, 0, 12), decal(BEAST_FACE, _FACE_LG))
+    sc.quad((cx + 5.5, 4.5, 15), (0, -9, 0), (0, 0, 12), lambda u, w, lv, ix, iy: tone(DRIFT[1:], lv, ix, iy, 0.1))
+    sc.quad((cx - 5.5, -4.5, 27), (11, 0, 0), (0, 9, 0), lambda u, w, lv, ix, iy: DRIFT[4])
+    # canopy: shallow hide cone, a teal band near the rim, a spiky red-brown fringe hanging below
+    hide = canvas(12, 0.5, ramp=HIDE[1:], bands=((31.8, 33.2, lambda th, t, r, v, ix, iy: TEAL[2] if v < 0.5 else TEAL[3]),))
+
+    def canopy(th, z, r, v, ix, iy):
+        if z < 31.2:
+            ph = (th * r / 2.6) % 1.0
+            if (31.2 - z) > (1 - abs(ph - 0.5) * 2) * 3.4:
+                return None
+            return PAINT_RED[1] if v < 0.45 else PAINT_RED[2]
+        return hide(th, z, r, v, ix, iy)
+    sc.lathe(cx, 0, [(27.6, 22.2), (31.2, 22.0), (31.6, 21.6), (38.5, 1.2), (38.6, 0)], canopy)
+    # cross-pole with two hides
+    sc.rod((cx, 0, 37), (cx, 0, 62), 1.0, WOOD[1:])
+    sc.rod((cx - 10, 0.5, 58), (cx + 10, 0.5, 58), 0.8, WOOD[1:])
+    for x0 in (cx - 9, cx + 2.5):
+        sc.quad((x0, 1.5, 44), (6.5, 0, 0), (0, 0, 13.5), lambda u, w, lv, ix, iy, x0=x0: (
+            None if w < 0.1 and int(u * 6) % 2 else
+            BONE[3] if abs(u - 0.5) < 0.2 and abs(w - 0.55) < 0.12 else
+            HIDE[1] if x0 < cx else HIDE[0]))
+    p = sc.pic()
+    register("az.obj.water_well", _art(finish(p, 24, 77, 23, 2.5),
+             note="tauren well-totem: stone dais, splayed legs, beast-face box, fringed hide canopy, hanging hides"))
+
+
+def _hide_longhouse() -> None:
+    """A long low lodge of brown hide stretched over arched poles, rounded ends, a doorway in
+    the middle of the long side and crossed poles over both ends."""
+    W, H = 96, 48
+    sc = Scene(W, H, 0, 38)
+    phi = 0.08
+    P = box_frame(phi)
+    cx, cy, L, R, HH = 48.0, -3.0, 30.0, 12.0, 14.0
+    c, s = math.cos(phi), math.sin(phi)
+
+    def hide(a, th, lv, ix, iy):
+        rib = ((a + L) / 6.0) % 1.0
+        z = HH * math.sin(th)
+        if abs(a) < 4.2 and th < 1.25 and z < 10:
+            if abs(a) > 3.2 or z > 9:
+                return HIDE[4] if a < 0 else WOOD[1]
+            return DEEP if z > 1.5 else FIRE[2]
+        if rib < 0.12:
+            return HIDE[0] if lv < 0.5 else HIDE[1]
+        if rib < 0.26:
+            lv += 0.12
+        for sz in (0.55, 1.25):   # stitched seams along the lodge
+            if abs(th - sz) * R < 0.55:
+                return cord(lv) if int(a * 1.0) % 3 else HIDE[1]
+        if -20 < a < -12 and 0.7 < th < 1.05 or 14 < a < 21 and 0.25 < th < 0.55:
+            return tone(HIDE[2:], lv + 0.1, ix, iy, 0.1)   # lighter patches
+        return tone(HIDE[0:5], lv, ix, iy, 0.12)
+
+    def vault(u, w):
+        a, th = -L + 2 * L * u, math.pi * w
+        b, z = R * math.cos(th), HH * math.sin(th)
+        nb, nz = math.cos(th) / R, math.sin(th) / HH
+        return P(cx, cy, a, b, z), (-nb * s, nb * c, nz)
+    sc.surface(vault, int(2 * L / 0.3), int(math.pi * R / 0.3),
+               lambda u, w, lv, ix, iy: hide(-L + 2 * L * u, math.pi * w, lv, ix, iy))
+    for end in (-1, 1):
+        ex, ey, _ = P(cx, cy, end * L, 0, 0)
+        prof = [(HH * math.sin(t * math.pi / 2 / 12), R * math.cos(t * math.pi / 2 / 12)) for t in range(13)]
+        sc.lathe(ex, ey, prof, lambda th, z, r, v, ix, iy: (HIDE[1] if (th * 6 / math.pi) % 1.0 < 0.1
+                                                             else tone(HIDE[0:5], v, ix, iy, 0.12)))
+        for db in (-3.5, 3.5):
+            sc.rod(P(cx, cy, end * (L + 2), 0, HH - 3), P(cx, cy, end * (L + 6), db, HH + 5), 0.7, WOOD[1:])
+    # stakes pinning the hide hem along the front
+    for a in range(-int(L) - 4, int(L) + 6, 7):
+        sc.rod(P(cx, cy, a, R + 1, 0), P(cx, cy, a, R + 1, 2.2), 0.5, WOOD[2:])
+    p = sc.pic()
+    register("az.obj.hide_longhouse", _art(finish(p, 48, 45, 44, 3), note="long low lodge of brown hide over arched poles"))
+
+
+def _windbreak(v: int) -> None:
+    """Brown hide screens laced between poles (two or three poles)."""
+    W, H = 48, 32
+    sc = Scene(W, H, 0, 29)
+    poles = [(5, -2), (43, 2)] if v == 0 else [(4, -3), (24, 0), (44, 3)]
+    for x, y in poles:
+        sc.rod((x, y, 0), (x, y, 25), 0.9, WOOD[1:])
+        sc.put(x - 0.5, y, 25.5, WOOD[5], sc.new_id(), bias=2)
+    for i, ((x0, y0), (x1, y1)) in enumerate(zip(poles, poles[1:])):
+        ramp = HIDE[0:5] if (v + i) % 2 == 0 else HIDE[1:]
+
+        def sheet(u, w, x0=x0, y0=y0, x1=x1, y1=y1):
+            top = 21 - 2.5 * math.sin(math.pi * u)
+            z = 3 + (top - 3) * w
+            bulge = 1.6 * math.sin(math.pi * u) * math.sin(math.pi * w)
+            return (x0 + 1.2 + (x1 - x0 - 2.4) * u, y0 + (y1 - y0) * u + bulge, z), (-0.1, 1.0, 0.25 * (w - 0.5))
+
+        def mat(u, w, lv, ix, iy, ramp=ramp, i=i):
+            if u < 0.04 or u > 0.96:
+                return cord(lv) if int(w * 18) % 2 else None   # lacing to the poles
+            if w > 0.94 or w < 0.05:
+                return ramp[1]
+            if v == 0 and abs(u - 0.5) * 3 + abs(w - 0.55) * 2.2 < 0.42:
+                return TEAL[3] if abs(u - 0.5) * 3 + abs(w - 0.55) * 2.2 < 0.28 else PAINT_RED[2]
+            if v == 1 and i == 1 and 0.2 < u < 0.42 and 0.3 < w < 0.6:
+                return CANVAS[3] if (u * 40) % 3 > 0.6 else cord(lv)   # a stitched patch
+            return tone(ramp, lv + 0.05 * math.sin(u * 20), ix, iy, 0.12)
+        sc.surface(sheet, 120, 60, mat)
+    p = sc.pic()
+    register(f"az.obj.windbreak@{v}", _art(finish(p, 24, 29.5, 22, 2),
+             note=["hide windbreak on two poles, painted diamond", "hide windbreak on three poles, patched"][v]))
+
+
+# --- Palemane, Kodo Rock, stakes, thorn vines ---------------------------------------------------------
+
+
+def boulder(sc: Scene, x: float, y: float, r: float, h: float, z0: float = 0.0, seed: int = 0) -> None:
+    """A rounded blue-grey boulder with a few cracks."""
+    prof = [(0, r * 0.8), (h * 0.3, r), (h * 0.7, r * 0.78), (h * 0.95, r * 0.3), (h, 0)]
+
+    def mat(th, z, rr, v, ix, iy):
+        if int(th * rr * 0.9 + seed * 3 + z * 0.4) % 7 == 0 and z < h * 0.85:
+            return SLATE[1]
+        return tone(SLATE, v + (bayer(ix + seed, iy) - 0.5) * 0.12, ix, iy, 0.15)
+    sc.lathe(x, y, prof, mat, k=0.85, lift=z0)
+
+
+def _cave_mouth() -> None:
+    """Palemane Rock: a dark cave in the foot of a pale streaked cliff, framed by blue-grey boulders."""
+    W, H = 64, 48
+    sc = Scene(W, H, 0, 44)
+    cx, cy, RX, RY, RZ = 32.0, -8.0, 31.0, 10.0, 40.0
+
+    def cliff(u, w):
+        th, ph = math.pi * u, math.pi / 2 * w
+        x, y, z = math.cos(th) * math.cos(ph), math.sin(th) * math.cos(ph), math.sin(ph)
+        x *= 1 + 0.08 * math.sin(th * 7) * (1 - w)
+        return (cx + RX * x, cy + RY * y, RZ * z ** 1.3), (x / RX, y / RY, z / RZ * 1.4)
+
+    def rockface(u, w, lv, ix, iy):
+        streak = ((ix * 7919) % 13) / 13.0 - 0.5
+        return tone(PALE, lv + streak * 0.18 - 0.05, ix, iy, 0.1)
+    sc.surface(cliff, 300, 160, rockface)
+    p0 = sc.pic()
+    # the cave: a dark arch with a dim floor
+    for y in range(H):
+        for x in range(W):
+            dx, dy = (x + 0.5 - 32) / 9.5, (y + 0.5 - 43) / 17
+            if dy < 0 and dx * dx + dy * dy < 1 and sc.col[y][x]:
+                sc.col[y][x] = DEEP if dx * dx + dy * dy < 0.82 else PALE[0]
+                sc.dep[y][x] -= 0.5
+    for bx, by, r, h, z0, sd in ((-13, 5, 6.5, 11, 0, 1), (-20, 8, 5, 7, 0, 2), (-9, 10, 4, 5, 0, 3),
+                                 (13, 5, 7, 12, 0, 4), (20, 9, 5.5, 7, 0, 5), (8, 11, 4, 4.5, 0, 6),
+                                 (-4, 3, 6, 6, 15.5, 7), (5, 2, 5, 5, 15, 8), (-26, 4, 4, 5, 0, 9)):
+        boulder(sc, cx + bx, by, r, h, z0, sd)
+    p = sc.pic()
+    del p0
+    tufts(p, [(x, y) for y in range(H) for x in range(W) if p.px[y][x] in PALE], 61, 0.06)
+    register("az.obj.cave_mouth", _art(finish(p, 32, 45, 31, 2.5),
+             note="Palemane Rock: cave mouth in a pale cliff framed by blue-grey boulders"))
+
+
+RUNES = [
+    ".s.s.",
+    "s.s.s",
+    ".sss.",
+    "..s..",
+    ".sss.",
+    "s...s",
+    ".....",
+    "..s..",
+    ".s.s.",
+]
+
+
+def _standing_stone() -> None:
+    """Kodo Rock: a single dark blue-grey standing stone with faint carved symbols."""
+    W, H = 16, 32
+    sc = Scene(W, H, 0, 29)
+
+    def mat(th, z, r, v, ix, iy):
+        u = wrap(th - FRONT) * r
+        col, row = int(u + 2.5), int(20 - z)
+        if 0 <= col < 5 and 0 <= row < len(RUNES) and RUNES[row][col] == "s":
+            return SLATE[3] if v > 0.4 else SLATE[2]
+        return tone(SLATE[:5], v - 0.05 + (0.08 if int(z * 0.7 + th * 2) % 5 == 0 else 0), ix, iy, 0.15)
+    sc.lathe(8.0, 0.0, [(0, 5.2), (5, 5.6), (15, 5.0), (21, 4.0), (24.5, 2.4), (25.5, 0)], mat, k=0.6)
+    p = sc.pic()
+    tufts(p, [(x, y) for y in range(24, H) for x in range(W) if p.px[y][x]], 63, 0.5)
+    register("az.obj.standing_stone", _art(finish(p, 8, 30, 7, 1.6),
+             note="Kodo Rock: dark blue-grey standing stone with faint carved runes"))
+
+
+def _stake_row(v: int) -> None:
+    """A row of crooked sharpened stakes angled outward (Grimtotem / quilboar barricades)."""
+    W, H = 32, 16
+    sc = Scene(W, H, 0, 13)
+    r = rng_for("stakes", v)
+    sc.rod((1, -2, 1.2), (31, -2, 1.2), 1.1, DRIFT[1:])     # the log they are lashed to
+    xs = [3.5 + i * 4.2 for i in range(7)]
+    for i, x in enumerate(xs):
+        broken = v == 1 and i in (2, 5)
+        h = 7.5 if broken else 11 + r.uniform(-1.2, 1.2)
+        lean = r.uniform(-1.5, 1.5) if v == 1 else r.uniform(-0.5, 0.5)
+        top = (x + lean, 3.5, h)
+        sc.rod((x, -1, 0), top, 0.9, DRIFT[1:])
+        if not broken:
+            tip = (x + lean * 1.25, 4.2, h + 2.6)
+            sc.rod(top, tip, 0.4, DRIFT[3:])
+    if v == 0:
+        sc.rod((2, 0.6, 4), (30, 0.6, 4), 0.35, HIDE[2:])   # rope binding
+    p = sc.pic()
+    register(f"az.obj.stake_row@{v}", _art(finish(p, 16, 14, 15, 1.5),
+             note=["row of sharpened stakes lashed to a log", "crooked broken stake row"][v]))
+
+
+VINES = [
+    [[(-13, 2, 0), (-14, 1, 12), (-9, 0, 25), (0, -1, 35), (10, 0, 35), (15, 1, 26), (11, 2, 18), (4, 2, 20),
+      (3, 2, 27), (8, 2, 29), (10, 2, 24), (7, 2, 23)]],
+    [[(12, 2, 0), (15, 1, 14), (9, 0, 30), (-3, 0, 40), (-13, 1, 37), (-16, 2, 27), (-12, 3, 20), (-8, 3, 24)]],
+    [[(-14, 2, 0), (-8, 0, 17), (4, 0, 30), (14, 1, 38), (18, 2, 32)],
+     [(14, 4, 0), (7, 3, 13), (-5, 2, 24), (-14, 2, 28), (-17, 3, 21)]],
+]
+
+
+def _thorn_vine(v: int) -> None:
+    """Giant coiled olive-brown thorn vines with big hooked thorns (the quilboar blight)."""
+    W, H = 48, 64
+    sc = Scene(W, H, 24, 60)
+    spikes = []
+    for k, pts in enumerate(VINES[v]):
+        r0 = 5.0 if k == 0 else 3.8
+        samples = sc.tube(pts, r0, 1.0, lambda lv, s, ix, iy: (
+            VINE[1] if s % 4.5 < 0.9 else tone(VINE, lv + (0.06 if s % 9 < 4.5 else 0), ix, iy, 0.14)))
+        spikes += [(q, samples[i - 1]) for i, q in enumerate(samples) if i and i % 9 == 4]
+    p = sc.pic()
+    for (x, y, z, r, _), (px, py, pz, _, _) in spikes:
+        sx, sy = 24 + x, 60 + y * 0.5 - z
+        dx, dy = sx - (24 + px), sy - (60 + py * 0.5 - pz)
+        ln = math.hypot(dx, dy) or 1.0
+        nx, ny = -dy / ln, dx / ln
+        for side in (1, -1):
+            for t in range(1, 4):
+                ex, ey = sx + side * nx * (r + t - 0.5) - dx / ln * t * 0.6, sy + side * ny * (r + t - 0.5) - dy / ln * t * 0.6
+                c = BONE[3] if t == 3 else VINE[3] if side * nx - side * ny > 0 else VINE[2]
+                if p.get(int(ex), int(ey)) is None or t == 1:
+                    p.set(int(ex), int(ey), c)
+    register(f"az.obj.thorn_vine@{v}", _art(finish(p, 24, 61, 20, 2.5),
+             note=["giant thorn vine arching into a coil", "giant thorn vine hooked over", "two crossing thorn vines"][v]))
+
+
+# --- the Great Gate: all carved wood ------------------------------------------------------------------
+
+DIAMOND = [
+    "....r....",
+    "...rtr...",
+    "..rtTtr..",
+    ".rtToTtr.",
+    "rtToooTtr",
+    ".rtToTtr.",
+    "..rtTtr..",
+    "...rtr...",
+    "....r....",
+]
+
+
+def fur_roof(sc: Scene, cx: float, cy: float, z: float, r0: float, r1: float, rise: float, fringe: float) -> None:
+    """A pagoda-like tier: shallow hide cone with a teal band and a shaggy fur fringe below."""
+    def mat(th, zz, r, v, ix, iy):
+        if zz < z:
+            ph = (th * r / 2.0) % 1.0
+            if (z - zz) > fringe * (0.55 + 0.45 * math.sin(ph * math.pi)):
+                return None
+            return HIDE[0] if v < 0.4 else HIDE[1] if v < 0.65 else HIDE[2]
+        if zz < z + 1.2:
+            return TEAL[3] if v > 0.5 else TEAL[1]
+        return tone(HIDE[0:4], v + (0.1 if (th * r / 3) % 1.0 < 0.3 else 0), ix, iy, 0.15)
+    sc.lathe(cx, cy, [(z - fringe, r0 + 0.3), (z, r0), (z + rise, r1), (z + rise, 0)], mat)
+
+
+def gate_tower(sc: Scene, cx: float, cy: float) -> None:
+    def column(th, z, r, v, ix, iy):
+        u = wrap(th - FRONT) * r
+        if 9 <= z < 18 and abs(u) < 4.5:
+            row = DIAMOND[int(17.99 - z)]
+            ch = row[int(u + 4.5)]
+            if ch != ".":
+                return {"r": PAINT_RED[2], "t": TEAL[3], "T": TEAL[1], "o": CANVAS[4]}[ch]
+        if 4 <= z < 5 or 22 <= z < 23:
+            return PAINT_RED[2] if v > 0.4 else PAINT_RED[1]
+        if 5 <= z < 6 or 21 <= z < 22:
+            return TEAL[3] if v > 0.5 else TEAL[1]
+        return tone(DRIFT[1:], v + (0.06 if int(th * r / 2.5) % 2 else 0), ix, iy, 0.12)
+    sc.lathe(cx, cy, [(0, 9.0), (27, 8.5), (27, 0)], column)
+    fur_roof(sc, cx, cy, 30.5, 16, 6, 9, 4.5)
+    sc.lathe(cx, cy, [(38, 5.5), (56, 5.0), (56, 0)], totem_mat([(41, 53, "hex")]))
+    fur_roof(sc, cx, cy, 58.5, 12, 4.5, 7, 3.5)
+    sc.lathe(cx, cy, [(64, 4.0), (72, 3.8), (72, 0)], totem_mat([(64, 65, "red")]))
+
+
+def _great_gate() -> None:
+    """The Great Gate: a gate of tall rope-bound sharpened stakes with a carved eagle, two
+    tower-totems with fur-fringed pagoda roofs and spread-winged eagles, two flaming torch
+    totems with a rope of talismans between them, and the log palisade on either side."""
+    W, H = 128, 112
+    frames = []
+    for fr in range(2):
+        sc = Scene(W, H, 0, 104)
+        # palisade: stacked horizontal logs and tall sharpened posts
+        for x0, x1 in ((0, 30), (98, 128)):
+            for z in range(2, 24, 3):
+                sc.rod((x0, -7, z), (x1, -7, z), 1.4, WOOD[1:])
+            for x in range(x0 + 4, x1, 9):
+                sc.rod((x, -5, 0), (x, -5, 28), 1.8, WOOD[1:])
+                sc.rod((x, -5, 28), (x, -5, 32), 0.6, WOOD[3:])
+                sc.rod((x - 2, -3.6, 21), (x + 2, -3.6, 21), 0.4, HIDE[2:])
+        # the stake gate
+        for i, x in enumerate(range(47, 83, 3)):
+            h = 42 + (3 if i % 2 else 0) - abs(i - 5.5) * 0.4
+            sc.rod((x, -1, 0), (x, -1, h), 1.3, WOOD[1:])
+            sc.rod((x, -1, h), (x, -1, h + 3.5), 0.5, WOOD[3:])
+        for z in (8, 30):
+            sc.rod((46, 0.5, z), (83, 0.5, z), 0.7, HIDE[2:])
+        # torch totems (behind the towers, beside the gate)
+        for x in (44, 84):
+            sc.lathe(x, 1, [(0, 3.0), (54, 2.6), (54, 3.8), (57, 3.8), (57, 0)],
+                     lambda th, z, r, v, ix, iy: (STONE[1] if z > 53.9 else
+                                                  totem_mat([(8, 20, "hex"), (30, 31, "red"), (36, 48, "hex")])(th, z, r, v, ix, iy)))
+        for x in (30, 98):
+            gate_tower(sc, x, 3)
+        p = sc.pic()
+        # talisman rope sagging between the torch tops
+        for x in range(45, 84):
+            t = (x - 44) / 40
+            y = int(round(104 - 55 + math.sin(t * math.pi) * 9))
+            p.set(x, y, HIDE[1])
+            if x % 5 == 2:
+                c = [TEAL[3], PAINT_RED[2], BONE[4]][(x // 5) % 3]
+                p.vline(x, y + 1, y + 2 + (x // 5) % 2, c)
+        # carved eagle on the gate, eagles on the towers
+        for ex, ey, dy in ((64, 70, 56), (30, 16, 2), (98, 16, 2)):
+            tip = 2.0 if fr == 0 or ex == 64 else 5.0
+            eagle_wing(p, ex - 1, -1, tip, True, dy=dy)
+            eagle_wing(p, ex, 1, tip + 0.5, False, dy=dy)
+            p.stamp(EAGLE[:13], {**_FACE_LG, "c": CANVAS[5], "C": CANVAS[3], "b": "gold2", "B": "gold1"}, ex - 5, dy + 3)
+        # flames on the torch totems
+        for x in (44, 84):
+            flames(p, x + 0.3, 104 - 57, 3.2, 9, fr, 2, 90 + x)
+        p.outline(skip=FIRE[2:])
+        p.shadow(64, 106, 63, 4)
+        frames.append(p)
+    register("az.obj.great_gate", _art(frames, fps=4, note="the Great Gate: carved wooden eagle towers, stake gate, torch totems, palisade"))
+
+
+# --- goblin wagon ------------------------------------------------------------------------------------
+
+
+def _wagon() -> None:
+    """A ravaged goblin caravan wagon: a boxy dark timber body, a rusty shingle roof with a
+    hole, big iron-rimmed wheels (one torn off and lying in the grass), the shaft dropped."""
+    W, H = 40, 24
+    sc = Scene(W, H, 0, 20)
+    P = box_frame(0.15)
+    cx, cy, A, B = 17.0, -2.0, 10.0, 4.5
+
+    def at(a, b, z):
+        return P(cx, cy, a, b, z)
+
+    def vec(a, b, z):
+        return P(0, 0, a, b, z)
+
+    def boards(u, w, lv, ix, iy):
+        return WOOD[0] if (w * 9) % 3 < 0.9 else (WOOD[2] if lv > 0.45 else WOOD[1])
+    sc.quad(at(-A, B, 4), vec(2 * A, 0, 0), (0, 0, 8), lambda u, w, lv, ix, iy: (
+        DEEP if 0.62 < u < 0.8 and 0.3 < w < 0.75 else boards(u, w, lv, ix, iy)))
+    sc.quad(at(A, B, 4), vec(0, -2 * B, 0), (0, 0, 8), boards)
+    sc.quad(at(A, B, 12), vec(0, -2 * B, 0), (vec(0, -B, 0)[0], vec(0, -B, 0)[1], 4.5),
+            lambda u, w, lv, ix, iy: WOOD[1], tri=True)
+
+    def shingles(u, w, lv, ix, iy):
+        if 0.25 < u < 0.42 and 0.3 < w < 0.75:
+            return DEEP   # the hole torn in the roof
+        row = int(w * 4)
+        if (w * 4) % 1.0 < 0.22 or (u * 12 + row * 0.5) % 1.0 < 0.1:
+            return RUST[1]
+        return tone(RUST[1:], lv + (0.08 if (int(u * 12 + row * 0.5)) % 3 == 0 else 0), ix, iy, 0.12)
+    for side in (1, -1):
+        sc.quad(at(-A - 1, side * (B + 1), 11.2), vec(2 * A + 2, 0, 0),
+                (vec(0, -side * (B + 1), 0)[0], vec(0, -side * (B + 1), 0)[1], 5.3), shingles)
+    # chassis beam and wheels: iron rims, wooden spokes
+    sc.rod(at(-A, B - 0.5, 3.6), at(A, B - 0.5, 3.6), 0.6, WOOD[0:3])
+
+    def wheel(wx, wy, wz, radius):
+        def fn(u, w):
+            a, rr = u * math.tau, w * radius
+            return (wx + math.cos(a) * rr, wy, wz + math.sin(a) * rr), (0, 1, 0)
+
+        def mat(u, w, lv, ix, iy):
+            if w > 0.78:
+                return STEEL[3] if w > 0.9 and u < 0.5 else STEEL[2]
+            if w < 0.25:
+                return STEEL[2]
+            return WOOD[2] if (u * 8) % 1.0 < 0.22 else None
+        sc.surface(fn, 80, 16, mat)
+    wx, wy, _ = at(-A + 3, B + 0.8, 0)
+    wheel(wx, wy, 4.2, 4.2)
+    # the torn-off wheel lying flat in the grass on the right, the shaft on the left
+    lx, ly = cx + 15, 4.0
+    sc.surface(lambda u, w: ((lx + math.cos(u * math.tau) * w * 4, ly + math.sin(u * math.tau) * w * 4, 0.4), (0, 0, 1)),
+               80, 16, lambda u, w, lv, ix, iy: STEEL[3] if w > 0.8 else (STEEL[2] if w < 0.25 else
+                                                                         WOOD[3] if (u * 8) % 1.0 < 0.25 else None))
+    sc.rod(at(-A - 1, B - 2, 2), at(-A - 7, B + 3, 0.5), 0.6, WOOD[1:])
+    sc.rod(at(-A + 7, B + 0.8, 4.2), at(-A + 7, B + 0.8, 0.5), 0.6, WOOD[0:3])   # a prop where the wheel was
+    p = sc.pic()
+    register("az.obj.wagon", _art(finish(p, 20, 21, 19, 2),
+             note="ravaged goblin wagon: dark timber box, rusty shingle roof torn open, a wheel lost"))
+
+
+def _extras() -> None:
+    _water_well()
+    _hide_longhouse()
+    for v in range(2):
+        _windbreak(v)
+        _stake_row(v)
+    _cave_mouth()
+    _standing_stone()
+    for v in range(3):
+        _thorn_vine(v)
+
+
 _buildings()
 _camp()
 _wilds()
 _dressing()
+_extras()
