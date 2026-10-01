@@ -34,7 +34,8 @@ AZEROTH_MODULES = (
     "az_items",
     "az_fx",
 )
-AZEROTH_DONE: tuple[str, ...] = AZEROTH_MODULES
+# structures: the Great Gate log wall (az.obj.log_wall, log_wall_post) is being drawn
+AZEROTH_DONE: tuple[str, ...] = tuple(m for m in AZEROTH_MODULES if m != "az_structures")
 
 
 def load(module: str) -> None:

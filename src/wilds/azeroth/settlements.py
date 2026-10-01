@@ -67,7 +67,7 @@ RECIPES: dict[str, tuple[int, Recipe]] = {
     "Red Rocks": (22, [("az.rock.dome", 5, 2, 20, 4), ("az.rock.hoodoo", 4, 4, 20, 3), ("az.tb.pine", 3, 8, 22, 2)]),
     "Ravaged Caravan": (14, [("az.obj.wagon", 2, 0, 8, 5), ("az.obj.crate@0", 3, 3, 10, 1),
                               ("az.obj.barrel@1", 2, 3, 10, 1)]),
-    "Great Gate": (8, [("az.obj.great_gate", 1, 0, 1, 8)]),
+    "Great Gate": (8, [("az.obj.great_gate", 1, 0, 0, 8)]),
     "Stonetalon Pass (Mulgore)": (8, [("az.obj.stonetalon_pass", 1, 0, 1, 6)]),
     "Thunderhorn Water Well": (8, [("az.obj.water_well", 1, 0, 1, 4)]),
     "Wildmane Water Well": (8, [("az.obj.water_well", 1, 0, 1, 4)]),
@@ -179,27 +179,38 @@ def build_structures(world: "ZoneWorld") -> list[Structure]:
     return out
 
 
-def _wall_span(world: "ZoneWorld", start: Pos, sign: int, limit: int = 36) -> int | None:
-    """Tiles a wall can run from ``start`` along the screen-horizontal diagonal before it meets rock (None: never)."""
-    for k in range(1, limit):
-        if world.terrain.tile(start[0] + sign * k, start[1] - sign * k) in (Terrain.MOUNTAIN, Terrain.CLIFF, Terrain.VOID):
-            return k - 1
-    return None
+GATE_WALL = 12  # tiles of log wall on each side of the Great Gate (the wall runs screen-horizontally)
+
+
+def gate_line(world: "ZoneWorld") -> tuple[Pos, list[Pos]] | None:
+    """The Great Gate's position and the tiles of its wall (both sides, nearest first), stopping at obstacles."""
+    place = next((p for p in world.placements if p.title == "Great Gate"), None)
+    if place is None:
+        return None
+    gate = world.nearest_passable(place.pos, 30) or place.pos
+    tiles: list[Pos] = []
+    for sign in (1, -1):
+        for k in range(3, GATE_WALL + 3):  # the gate itself spans about 4 tiles; the wall starts beside it
+            p = (gate[0] + sign * k, gate[1] - sign * k)
+            if not _free(world, p):
+                break
+            tiles.append(p)
+    return gate, tiles
 
 
 def _gate_wall(world: "ZoneWorld", built: list[Structure]) -> list[Structure]:
-    """The Great Gate's log palisade: from the gate on both sides, flush into the mountains that close the pass."""
-    gate = next((s for s in built if s.sprite == "az.obj.great_gate"), None)
-    if gate is None:
+    """A continuous log wall either side of the Great Gate, closed by a tall post at each end."""
+    line = gate_line(world)
+    if line is None:
         return []
-    wall: list[Structure] = []
+    gate, tiles = line
+    out = [Structure("az.obj.log_wall", p, 1) for p in tiles]
     for sign in (1, -1):
-        reach = _wall_span(world, gate.pos, sign)
-        for k in range(3, (reach if reach is not None else 3) + 1):  # the gate spans about 4 tiles; the wall starts beside it
-            p = (gate.pos[0] + sign * k, gate.pos[1] - sign * k)
-            if _free(world, p):
-                wall.append(Structure("az.obj.palisade", p, 1))
-    return wall
+        side = [p for p in tiles if (p[0] - gate[0]) * sign > 0]
+        if side:
+            far = max(side, key=lambda p: abs(p[0] - gate[0]))
+            out.append(Structure("az.obj.log_wall_post", (far[0] + sign, far[1] - sign), 1))
+    return out
 
 
 def bridges(world: "ZoneWorld") -> list[tuple[Pos, Pos]]:

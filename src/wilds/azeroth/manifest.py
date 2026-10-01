@@ -240,6 +240,10 @@ def structures() -> list[Need]:
         Need("az.obj.great_gate", "<=128x112", frames=2, note="Great Gate: ALL CARVED WOOD, no stone: a gate of tall rope-bound sharpened stakes "
              "(~10 yd) between two tall tower-totems with fur-fringed pagoda roofs and a spread-winged eagle on top, flaming torches, "
              "a rope of hanging talismans; palisade of horizontal logs with sharp posts on both sides"),
+        Need("az.obj.log_wall", "32x32", variants=3, note="CONTINUOUS wall of tall vertical carved logs with sharpened tops: art runs edge to edge "
+             "with no transparent margin so a row of pieces joins into one unbroken fence; two painted bands (teal and red) and a rope lashing; "
+             "base in shadow; each variant joins any other"),
+        Need("az.obj.log_wall_post", "<=16x48", note="tall carved end post of the Great Gate wall: thick log, painted bands, horned or feathered top"),
         Need("az.obj.water_well", "<=48x80", note="tauren well-totem: low round grey stone dais, four splayed log legs holding a carved beast-face box "
              "and a small drum, a wide shallow conical hide canopy with a spiky red-brown fringe, a cross-pole with two dark hides hanging"),
         Need("az.obj.hide_longhouse", "<=96x48", note="long low lodge of brown hide stretched over arched poles, a few stitched seams, a doorway"),

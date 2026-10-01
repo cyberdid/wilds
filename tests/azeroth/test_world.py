@@ -83,16 +83,17 @@ def test_roads_are_laid_between_settlements():
     assert any(w.tile(a[0] + dx, a[1] + dy) is Terrain.ROAD for dx in range(-60, 60, 2) for dy in range(-60, 60, 2))
 
 
-def test_the_great_gate_has_a_palisade_either_side():
+def test_the_great_gate_has_an_unbroken_log_wall_either_side():
     from wilds.azeroth import settlements
 
     world = ZoneWorld(PACK, seed=3)
     built = settlements.build_structures(world)
     gate = next(s for s in built if s.sprite == "az.obj.great_gate")
-    wall = [s for s in built if s.sprite == "az.obj.palisade" and abs((s.pos[0] - gate.pos[0]) + (s.pos[1] - gate.pos[1])) == 0]
-    left = [s for s in wall if s.pos[0] < gate.pos[0]]
-    right = [s for s in wall if s.pos[0] > gate.pos[0]]
-    assert len(left) >= 3 and len(right) >= 3
+    wall = {s.pos for s in built if s.sprite == "az.obj.log_wall"}
+    for sign in (1, -1):
+        run = [(gate.pos[0] + sign * k, gate.pos[1] - sign * k) for k in range(3, 3 + settlements.GATE_WALL)]
+        assert all(p in wall for p in run), "the wall has a gap"
+    assert sum(1 for s in built if s.sprite == "az.obj.log_wall_post") == 2
 
 
 def test_the_explore_brain_keeps_the_hero_standing_and_alive():

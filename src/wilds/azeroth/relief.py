@@ -34,6 +34,9 @@ class Relief:
         self.bridges = settlements.bridge_tiles(world)
         self.flat = [(world.nearest_passable(p.pos, 30) or p.pos, settlements.RECIPES[p.title][0])
                      for p in world.placements if p.title in settlements.RECIPES]  # villages sit on level ground
+        line = settlements.gate_line(world)  # the gate's wall needs level ground along its whole length
+        if line:
+            self.flat += [(c, 5) for c in (line[0], *line[1][::4])]
         self._heights: dict[tuple[int, int, str], int] = {}
         self._vertices: dict[tuple[int, int], int] = {}
 
