@@ -420,11 +420,11 @@ class Scene:
                 self.col[iy][ix], self.dep[iy][ix], self.oid[iy][ix] = c, d, oid
 
     def lathe(self, cx: float, cy: float, prof: Sequence[tuple[float, float]], mat: Callable,
-              ds: float = 0.25, k: float = 1.0, lift: float = 0.0) -> None:
+              ds: float = 0.25, squash: float = 1.0, lift: float = 0.0) -> None:
         """Surface of revolution through profile points (z, r), listed from the bottom outward/up.
         ``mat(th, z, r, v, ix, iy)`` returns a palette name (``th`` = angle, FRONT faces the viewer).
         Rasterised column by column, so the angle is exact for each pixel column and seams and
-        patterns come out as clean lines. ``k`` squashes the depth (oval plan), ``lift`` raises it."""
+        patterns come out as clean lines. ``squash`` flattens the depth (oval plan), ``lift`` raises it."""
         oid = self.new_id()
         samples = []
         for (z0, r0), (z1, r1) in zip(prof, prof[1:]):
@@ -447,8 +447,8 @@ class Scene:
                     y = sgn * math.sqrt(r * r - dx * dx)
                     th = math.atan2(y, dx) % math.tau
                     c, s = dx / r if r else 0.0, y / r if r else 0.0
-                    v = shade3(nr * c, nr * s / k, nz)
-                    y *= k
+                    v = shade3(nr * c, nr * s / squash, nz)
+                    y *= squash
                     zz = z + lift
                     iy = int(math.floor(self.oy + (cy + y) * 0.5 - zz))
                     d = 2 * (cy + y) + zz
@@ -2865,7 +2865,7 @@ def boulder(sc: Scene, x: float, y: float, r: float, h: float, z0: float = 0.0, 
         if int(th * rr * 0.9 + seed * 3 + z * 0.4) % 7 == 0 and z < h * 0.85:
             return SLATE[1]
         return tone(SLATE, v + (bayer(ix + seed, iy) - 0.5) * 0.12, ix, iy, 0.15)
-    sc.lathe(x, y, prof, mat, k=0.85, lift=z0)
+    sc.lathe(x, y, prof, mat, squash=0.85, lift=z0)
 
 
 def _cave_mouth() -> None:
@@ -2927,7 +2927,7 @@ def _standing_stone() -> None:
         if 0 <= col < 5 and 0 <= row < len(RUNES) and RUNES[row][col] == "s":
             return SLATE[3] if v > 0.4 else SLATE[2]
         return tone(SLATE[:5], v - 0.05 + (0.08 if int(z * 0.7 + th * 2) % 5 == 0 else 0), ix, iy, 0.15)
-    sc.lathe(8.0, 0.0, [(0, 5.2), (5, 5.6), (15, 5.0), (21, 4.0), (24.5, 2.4), (25.5, 0)], mat, k=0.6)
+    sc.lathe(8.0, 0.0, [(0, 5.2), (5, 5.6), (15, 5.0), (21, 4.0), (24.5, 2.4), (25.5, 0)], mat, squash=0.6)
     p = sc.pic()
     tufts(p, [(x, y) for y in range(24, H) for x in range(W) if p.px[y][x]], 63, 0.5)
     register("az.obj.standing_stone", _art(finish(p, 8, 30, 7, 1.6),

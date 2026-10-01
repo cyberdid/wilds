@@ -45,6 +45,7 @@ _ramp("azt_gran", "#2f2b27", "#4a433b", "#665c50", "#7d7163", "#8e8172", "#a99b8
 # fine ramps (small steps) for the broad patches of the ground textures: low contrast on purpose
 _ramp("azt_lawn", "#7c9631", "#859d34", "#8ea437", "#97ab3a", "#a0b13e", "#aab644", "#b5ba4d")
 _ramp("azt_stubble", "#a08d3e", "#ab9744", "#b6a14b", "#c0aa52", "#c9b35a", "#d2bc63", "#dbc66f")
+_ramp("azt_dune", "#a98e5e", "#b09463", "#b79a68", "#bea06e", "#c5a775")
 _ramp("azt_pool", "#367d89", "#3c838f", "#438995", "#4a8f9a", "#52959f")
 _ramp("azt_slab", "#978a76", "#9e907b", "#a59781", "#ac9e87", "#b3a48d", "#baab93", "#8a9063", "#979c6d")
 _ramp("azt_pine", "#18261c", "#223522", "#2e4729", "#3d5b31", "#5a6f48")
@@ -65,19 +66,20 @@ MEAD, HAY, TRAIL = "αβγδεζ", "ηθικλμ", "νξοπρστ"
 GRAN, PINE, SAND = "ΑΒΓΔΕΖΗΘ", "ΙΚΛΜΝ", "абвгдеж"
 SST, BAND = "зийклмн", "фхцчш"
 LAWN, STUB = "уъыьэюя", "ЁЂЃЄЅІЇ"
-POOL, SLAB = "ЉЊЋЌЍ", "ЎЏБГДЖЗИ"  # SLAB[6:8]: grey-green lichen as light as the rock
+POOL, SLAB, DUNE = "ЉЊЋЌЍ", "ЎЏБГДЖЗИ", "ЙЛПФЦ"  # SLAB[6:8]: grey-green lichen as light as the rock
 TER = {**_chars(GRASS_CH, "azt_grass"), **_chars(STRAW_CH, "azt_straw"), **_chars(SOIL_CH, "azt_soil"),
        **_chars(ROCK_CH, "azt_rock"), **_chars(LAKE_CH, "azt_lake"), **_chars(SHOAL_CH, "azt_shoal"),
        **_chars(MEAD, "azt_mead"), **_chars(HAY, "azt_hay"), **_chars(TRAIL, "azt_trail"),
        **_chars(GRAN, "azt_gran"), **_chars(PINE, "azt_pine"), **_chars(SAND, "azt_sand"),
        **_chars(SST, "azt_sstone"), **_chars(BAND, "azt_band"), **_chars(LAWN, "azt_lawn"),
        **_chars(STUB, "azt_stubble"), **_chars(POOL, "azt_pool"), **_chars(SLAB, "azt_slab"),
+       **_chars(DUNE, "azt_dune"),
        "z": "ink:72", "y": "ink:40"}
 
 
 def _step(ch: str, k: int) -> str:
     """The same material ``k`` steps lighter (k > 0) or darker along its ramp."""
-    for ramp in (MEAD, HAY, TRAIL, GRAN, PINE, SAND, SST, BAND, LAWN, STUB, POOL, SLAB[:6], GRASS_CH, STRAW_CH, SOIL_CH, ROCK_CH):
+    for ramp in (MEAD, HAY, TRAIL, GRAN, PINE, SAND, SST, BAND, LAWN, STUB, POOL, SLAB[:6], DUNE, GRASS_CH, STRAW_CH, SOIL_CH, ROCK_CH):
         i = ramp.find(ch)
         if i >= 0:
             return ramp[max(0, min(len(ramp) - 1, i + k))]
@@ -314,7 +316,7 @@ def _sand(seed: int) -> Canvas:
     """The lake shore: soft pale tan sand and mud, calm, a slightly darker damp patch, a
     couple of pebbles."""
     rng = random.Random(seed)
-    c = _patches(seed, SAND[3:6], [22, 60, 18], lumps=4)
+    c = _patches(seed, DUNE, [12, 26, 32, 20, 10], lumps=4)
     taken: set = set()
     for k in range(2):
         x, y = _free(rng, taken, margin=1, gap=4)
@@ -556,9 +558,9 @@ def _mesa_lip(c: Canvas, seed: int) -> None:
         c.set(x, 0, GRAN[7] if n[x] > 0.5 else GRAN[6])
         c.set(x, 1, GRAN[6] if n[(x + 7) % T] > 0.4 else GRAN[5])
         c.set(x, 2, GRAN[3] if n[(x + 3) % T] > 0.45 else GRAN[4])
-        c.set(x, T - 1, GRAN[2])
-        if (x * 5) % 3:
-            c.set(x, T - 2, GRAN[3])
+        c.set(x, T - 1, GRAN[3])
+        if n[(x + 9) % T] > 0.5:
+            c.set(x, T - 2, GRAN[4])
 
 
 def _mesa_face(seed: int) -> Canvas:
@@ -679,7 +681,7 @@ def _boulders() -> None:
                     c.set(x + 1, y, _step(c.get(x + 1, y), 1))
             x += rng.choice((0, 0, 1))
             y += 1
-        _moss_cap(c, rock, 910 + i, 2.0 if i != 2 else 2.8)
+        _moss_cap(c, rock, 910 + i, 1.2 if i != 2 else 1.6)
         _outline(c)
         # grass tufts at the foot soften the contact with the ground
         for gx in (2, 13) if i != 1 else (13,):
@@ -781,7 +783,7 @@ def _edge(kind: str, where: str, fr: int = 0) -> Canvas:
     return c
 
 
-SHORE_MAT = _patches(37, SAND[3:6], [24, 56, 20])
+SHORE_MAT = _patches(37, DUNE, [12, 26, 32, 20, 10])
 SURF = fbm(T, T, 77, 1, 4)
 
 
