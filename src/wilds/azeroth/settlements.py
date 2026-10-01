@@ -121,9 +121,12 @@ STREET: list[tuple[str, int, float, float, int]] = [
 ]
 
 
+STREET_DENSITY = 0.3  # Thunder Bluff is airy tents on grass between pines, not a crowded town
+
+
 def _street(plat: Platform) -> Recipe:
     k = plat.radius / 46
-    return [(sprite, max(1, round(count * k * k)), max(2, int(lo * plat.radius)), int(hi * plat.radius), size)
+    return [(sprite, max(1, round(count * k * k * STREET_DENSITY)), max(2, int(lo * plat.radius)), int(hi * plat.radius), size)
             for sprite, count, lo, hi, size in STREET]
 
 

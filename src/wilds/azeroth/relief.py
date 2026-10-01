@@ -22,7 +22,7 @@ PLATFORM_HEIGHT = 72  # the rises stand on sheer cliffs
 BRIDGE_HEIGHT = 68
 CLIFF_BASE, CLIFF_VAR = 14, 10
 MOUNTAIN_BASE, MOUNTAIN_VAR = 30, 38
-HILL_GAIN, HILL_STEP = 150, 8  # the prairie rolls up to ~45 px in 8 px terraces
+HILL_GAIN = 280  # the prairie swells up to ~90 px (11 yards) over tens of tiles
 STEP = 4  # heights are quantised so the block cache stays small
 
 
@@ -35,6 +35,7 @@ class Relief:
         self.flat = [(world.nearest_passable(p.pos, 30) or p.pos, settlements.RECIPES[p.title][0])
                      for p in world.placements if p.title in settlements.RECIPES]  # villages sit on level ground
         self._heights: dict[tuple[int, int, str], int] = {}
+        self._vertices: dict[tuple[int, int], int] = {}
 
     def kind(self, x: int, y: int, terr: Terrain) -> str:
         """ground | mesa | cliff | mountain | platform | bridge | void"""
@@ -62,19 +63,37 @@ class Relief:
             h = self._heights[key] = self._height(x, y, kind)
         return h
 
-    def hill(self, x: int, y: int) -> int:
-        """Rolling prairie: broad low swells, levelled around villages."""
-        n = self.noise.fractal(x / 60 + 7, y / 60 + 7, 3)
-        lift = max(0.0, n - 0.40) * HILL_GAIN
+    def vertex(self, vx: int, vy: int) -> int:
+        """Ground height (px) at a tile corner: smooth rolling swells, level around villages, flat at lakes.
+
+        Corners are shared by the four tiles around them, so the land has no seams."""
+        key = (vx, vy)
+        h = self._vertices.get(key)
+        if h is None:
+            if len(self._vertices) > 600_000:
+                self._vertices.clear()
+            h = self._vertices[key] = self._vertex(vx, vy)
+        return h
+
+    def _vertex(self, vx: int, vy: int) -> int:
+        tiles = ((vx - 1, vy - 1), (vx, vy - 1), (vx - 1, vy), (vx, vy))
+        if any(self.world.terrain.tile(*t) in (Terrain.WATER, Terrain.SHALLOWS, Terrain.VOID) for t in tiles):
+            return 0
+        n = 0.7 * self.noise.fractal(vx / 55 + 7, vy / 55 + 7, 2) + 0.3 * self.noise.fractal(vx / 22 + 70, vy / 22 + 11, 2)
+        lift = max(0.0, n - 0.38) * HILL_GAIN
         for (cx, cy), r in self.flat:
-            d = math.hypot(x - cx, (y - cy) / 0.75)
+            d = math.hypot(vx - cx, (vy - cy) / 0.75)
             if d < r + 14:
                 lift *= max(0.0, (d - r * 0.8) / (r * 0.2 + 14))
-        return self._q(lift, HILL_STEP)
+        return int(lift)
+
+    def corners(self, x: int, y: int) -> tuple[int, int, int, int]:
+        """Heights of a tile's north, east, south and west corners (screen top, right, bottom, left)."""
+        return self.vertex(x, y), self.vertex(x + 1, y), self.vertex(x + 1, y + 1), self.vertex(x, y + 1)
 
     def _height(self, x: int, y: int, kind: str) -> int:
         if kind == "ground":
-            return self.hill(x, y)
+            return sum(self.corners(x, y)) // 4
         if kind == "platform":
             return PLATFORM_HEIGHT
         if kind == "bridge":
