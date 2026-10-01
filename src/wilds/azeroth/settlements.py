@@ -86,42 +86,38 @@ RISES = (("High Rise", 46.5, 50.0, 46), ("Spirit Rise", 25.7, 21.0, 30), ("Elder
          ("Hunter Rise", 57.0, 84.6, 32))
 PLAZA_RADIUS = 9  # tiles around a rise's centre paved with the painted inlay
 RISE_BUILDINGS = {
-    "High Rise": [("az.tb.lodge@1", 0, -6, 12), ("az.tb.totem_tall", -16, 4, 4), ("az.tb.totem_tall", 18, 6, 4),
-                  ("az.tb.tent_row@0", -24, -14, 10), ("az.tb.tent_row@1", 22, -16, 10), ("az.tb.lift", 0, 24, 6),
-                  ("az.obj.banner", -8, 14, 2), ("az.obj.banner", 8, 14, 2), ("az.obj.bonfire", 0, 14, 2),
-                  ("az.tb.brazier", -8, 0, 2), ("az.tb.brazier", 8, 0, 2), ("az.tb.brazier", -30, 6, 2),
-                  ("az.tb.brazier", 30, 8, 2), ("az.tb.drum", -4, 6, 2), ("az.tb.drum", 5, 7, 2),
-                  ("az.tb.hanging_hides", -30, -4, 4), ("az.tb.hanging_hides", 28, -2, 4),
-                  ("az.tb.pot", -12, 10, 1), ("az.tb.pot", 13, 11, 1), ("az.tb.banner_pole", -18, -10, 2),
-                  ("az.tb.banner_pole", 18, -12, 2), ("az.tb.prayer_flags", 0, 30, 4), ("az.tb.stairs", -38, 10, 1)],
+    "High Rise": [("az.tb.tower_totem", 0, -8, 6), ("az.tb.longhouse@0", -14, 4, 12), ("az.tb.longhouse@1", 14, 6, 12),
+                  ("az.tb.longhouse@2", 0, 16, 12), ("az.tb.lift_tower", -34, 16, 4), ("az.tb.lift_tower", 6, -34, 4),
+                  ("az.tb.totem_tall", -9, 2, 4), ("az.tb.totem_tall", 9, 2, 4), ("az.obj.bonfire", 0, 4, 2),
+                  ("az.tb.brazier", -6, 8, 2), ("az.tb.brazier", 6, 8, 2), ("az.tb.drum", -4, 10, 2),
+                  ("az.tb.drum", 5, 10, 2), ("az.tb.banner_pole", -18, -6, 2), ("az.tb.banner_pole", 18, -6, 2)],
     "Spirit Rise": [("az.tb.spirit_pool", 0, 2, 7), ("az.tb.totem_tall", -10, -6, 4), ("az.tb.totem_tall", 12, -4, 4),
                     ("az.obj.bonfire", 0, 14, 2), ("az.tb.brazier", -8, 10, 2), ("az.tb.brazier", 9, 10, 2),
-                    ("az.tb.prayer_flags", -4, -14, 4), ("az.tb.pot", 6, -8, 1), ("az.obj.stone_circle", 0, -16, 6)],
-    "Elder Rise": [("az.tb.lodge@0", 0, -4, 12), ("az.tb.totem_tall", -14, 6, 4), ("az.obj.banner", 10, 10, 2),
-                   ("az.obj.bonfire", -4, 12, 2), ("az.tb.brazier", -8, 8, 2), ("az.tb.brazier", 8, 8, 2),
-                   ("az.tb.drum", 0, 10, 2), ("az.tb.hanging_hides", 16, -2, 4), ("az.tb.banner_pole", -16, -6, 2),
-                   ("az.tb.prayer_flags", 0, 20, 4), ("az.tb.pot", 12, 12, 1)],
-    "Hunter Rise": [("az.tb.warrior_hall", 0, -4, 12), ("az.tb.totem_tall", 14, 6, 4),
-                    ("az.tb.tent_row@1", -16, 8, 10), ("az.obj.training_dummy", 6, 14, 2),
-                    ("az.obj.training_dummy", -4, 16, 2), ("az.tb.brazier", -8, 6, 2), ("az.tb.brazier", 10, 4, 2),
-                    ("az.tb.hanging_hides", 20, 10, 4), ("az.tb.banner_pole", -20, 0, 2), ("az.obj.training_dummy", 0, 18, 2),
-                    ("az.tb.drum", 4, 8, 2), ("az.tb.pot", -10, 14, 1)],
+                    ("az.tb.windmill_totem", -14, 4, 2), ("az.tb.windmill_totem", 14, 6, 2), ("az.obj.stone_circle", 0, -14, 6)],
+    "Elder Rise": [("az.tb.round_tent", 0, -2, 14), ("az.tb.totem_tall", -16, 6, 4), ("az.tb.totem_tall", 16, 6, 4),
+                   ("az.tb.windmill_totem", -12, -8, 2), ("az.tb.windmill_totem", 12, -8, 2),
+                   ("az.tb.brazier", -8, 10, 2), ("az.tb.brazier", 8, 10, 2), ("az.tb.drum", 0, 12, 2),
+                   ("az.tb.banner_pole", -20, 0, 2), ("az.tb.banner_pole", 20, 0, 2)],
+    "Hunter Rise": [("az.tb.warrior_hall", 0, -4, 12), ("az.tb.totem_tall", 14, 6, 4), ("az.tb.totem_tall", -14, 6, 4),
+                    ("az.tb.windmill_totem", -18, -4, 2), ("az.tb.windmill_totem", 18, -4, 2),
+                    ("az.obj.training_dummy", 6, 14, 2), ("az.obj.training_dummy", -4, 16, 2), ("az.obj.training_dummy", 0, 18, 2),
+                    ("az.tb.brazier", -8, 8, 2), ("az.tb.brazier", 10, 8, 2), ("az.tb.drum", 4, 10, 2),
+                    ("az.tb.banner_pole", -22, 2, 2), ("az.tb.banner_pole", 22, 2, 2)],
 }
 
-
 # Street life of a rise, per 46 tiles of radius (scaled down for smaller rises): sprite, count, min/max radius
-# as a share of the platform radius, footprint in tiles.
+# as a share of the platform radius, footprint in tiles. Tall hide tents, teal-roofed longhouses, wind totems.
 STREET: list[tuple[str, int, float, float, int]] = [
-    ("az.obj.hut_large", 10, 0.30, 0.86, 6), ("az.obj.hut_small", 26, 0.22, 0.90, 4), ("az.obj.tent", 18, 0.25, 0.90, 3),
-    ("az.tb.tent_row", 6, 0.35, 0.85, 10), ("az.tb.totem_tall", 6, 0.20, 0.85, 4), ("az.obj.totem_pole", 6, 0.20, 0.90, 3),
-    ("az.tb.brazier", 14, 0.10, 0.92, 2), ("az.obj.torch", 34, 0.10, 0.95, 1), ("az.obj.bonfire", 5, 0.15, 0.80, 2),
-    ("az.tb.pot", 26, 0.10, 0.95, 1), ("az.obj.barrel", 16, 0.10, 0.95, 1), ("az.obj.crate", 12, 0.10, 0.95, 1),
+    ("az.tb.tent_tall", 46, 0.22, 0.86, 3), ("az.tb.longhouse", 8, 0.30, 0.80, 12), ("az.tb.windmill_totem", 14, 0.20, 0.90, 2),
+    ("az.tb.totem_tall", 6, 0.20, 0.85, 4), ("az.obj.totem_pole", 6, 0.20, 0.90, 3),
+    ("az.tb.brazier", 10, 0.10, 0.92, 2), ("az.obj.torch", 26, 0.10, 0.95, 1), ("az.obj.bonfire", 4, 0.15, 0.80, 2),
+    ("az.tb.pot", 22, 0.10, 0.95, 1), ("az.obj.barrel", 14, 0.10, 0.95, 1), ("az.obj.crate", 10, 0.10, 0.95, 1),
     ("az.obj.drying_rack", 9, 0.25, 0.90, 2), ("az.obj.hide_stretcher", 7, 0.25, 0.90, 2),
-    ("az.tb.hanging_hides", 12, 0.20, 0.92, 3), ("az.tb.drum", 8, 0.10, 0.85, 2), ("az.obj.banner", 10, 0.15, 0.95, 1),
-    ("az.tb.banner_pole", 8, 0.20, 0.95, 2), ("az.tb.prayer_flags", 8, 0.20, 0.90, 4), ("az.obj.signpost", 4, 0.15, 0.80, 1),
+    ("az.tb.hanging_hides", 8, 0.20, 0.92, 3), ("az.tb.drum", 6, 0.10, 0.85, 2), ("az.obj.banner", 8, 0.15, 0.95, 1),
+    ("az.tb.banner_pole", 8, 0.20, 0.95, 2), ("az.tb.prayer_flags", 6, 0.20, 0.90, 4), ("az.obj.signpost", 4, 0.15, 0.80, 1),
     ("az.obj.well", 3, 0.25, 0.75, 2), ("az.obj.anvil", 2, 0.30, 0.80, 1), ("az.obj.forge", 2, 0.30, 0.80, 2),
-    ("az.obj.kodo_saddle_rack", 3, 0.30, 0.85, 2), ("az.obj.haystack", 4, 0.30, 0.85, 2), ("az.obj.cooking_pot", 6, 0.15, 0.80, 1),
-    ("az.obj.wagon", 2, 0.35, 0.85, 3),
+    ("az.obj.kodo_saddle_rack", 3, 0.30, 0.85, 2), ("az.obj.haystack", 4, 0.30, 0.85, 2),
+    ("az.obj.cooking_pot", 6, 0.15, 0.80, 1),
 ]
 
 
@@ -169,6 +165,13 @@ def build_structures(world: "ZoneWorld") -> list[Structure]:
         center = world.nearest_passable(p.pos, 30) or p.pos
         out += _scatter(world, random.Random(rng.random()), center, radius, recipe, out)
     bridge = bridge_tiles(world)
+    rise_radius = {p.center: p.radius for p in platforms(world)}
+    for a, b in bridges(world):  # a wooden gatehouse where each bridge meets a rise
+        for here, there in ((a, b), (b, a)):
+            d = math.hypot(there[0] - here[0], there[1] - here[1]) or 1.0
+            k = rise_radius[here] * 0.9 / d
+            out.append(Structure("az.tb.gatehouse", (round(here[0] + (there[0] - here[0]) * k),
+                                                     round(here[1] + (there[1] - here[1]) * k)), 4))
     for plat in platforms(world):
         for sprite, dx, dy, size in RISE_BUILDINGS.get(plat.name, []):
             out.append(Structure(sprite, (plat.center[0] + dx, plat.center[1] + dy), size))

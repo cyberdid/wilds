@@ -521,6 +521,8 @@ class AzApp:
                 if kind == "ground":
                     self._scatter(f, terr, x, y, gxw, gyw, seed, now)
                 elif kind in ("mesa", "platform"):
+                    if kind == "platform":
+                        self._scatter_top(f, x, y, gxw, gyw, hgt, seed, now)
                     if kind == "mesa" and terr is Terrain.MESA:
                         self._scatter_mesa(f, x, y, gxw, gyw, hgt, seed, now)
                 if terr is Terrain.BOULDER and hgt == 0:
@@ -537,11 +539,47 @@ class AzApp:
             face = v("az.mesa.face", x, y)
             return v("az.ground.mesa", x, y), face if face in self.bank else v("az.cliff.face", x, y)
         if kind == "platform":
-            plat = settlements.on_platform(self.world, (x, y), self.relief.platforms)
-            inlay = plat is not None and math.hypot(x - plat.center[0], (y - plat.center[1]) / 0.75) <= settlements.PLAZA_RADIUS and (x + y) % 3 == 0
-            top = v("az.tb.platform.inlay" if inlay and "az.tb.platform.inlay" in self.bank.registry._variants else "az.tb.platform", x, y)
-            return top, v("az.tb.platform.edge", x, y)
+            face = v("az.tb.cliff.face", x, y)
+            return self._plateau_top(x, y), face if face in self.bank else v("az.tb.platform.edge", x, y)
         return v("az.tb.bridge", x, y), v("az.tb.platform.edge", x, y)
+
+    def _plateau_cell(self, x: int, y: int) -> str:
+        """What lies on a Thunder Bluff rise at (x, y): cobble | road | grass | dry."""
+        plat = settlements.on_platform(self.world, (x, y), self.relief.platforms)
+        if plat is None:
+            return "grass"
+        dx, dy = x - plat.center[0], (y - plat.center[1]) / 0.75
+        d = math.hypot(dx, dy) + 2.2 * (self.relief.noise.fractal(x / 7 + 3, y / 7 + 3, 2) - 0.5)
+        plaza = settlements.PLAZA_RADIUS
+        if d <= plaza:
+            return "cobble"
+        ring = plat.radius * 0.55
+        spoke = abs(math.sin(math.atan2(dy, dx) * 3 + 0.6)) * d / 3.0  # three roads out from the plaza
+        if abs(d - ring) < 1.5 or d < plaza + 1.5 or (d < ring + 4 and spoke < 0.75):
+            return "road"
+        return "dry" if tile_hash(x // 6, y // 6) % 5 == 0 else "grass"
+
+    def _plateau_top(self, x: int, y: int) -> str:
+        cell = self._plateau_cell(x, y)
+        if cell == "cobble" and "az.tb.cobble" in self.bank.registry._variants:
+            return self.painter.variant("az.tb.cobble", x, y)
+        return self.painter.variant({"cobble": GROUND[Terrain.ROAD], "road": GROUND[Terrain.ROAD],
+                                     "dry": GROUND[Terrain.DRY_GRASS]}.get(cell, GROUND[Terrain.GRASS]), x, y)
+
+    def _scatter_top(self, f: Frame, x: int, y: int, gx: float, gy: float, z: float, seed: int, now: float) -> None:
+        """Pines, tufts and flowers on a rise's grass (never on roads or the plaza)."""
+        if self._plateau_cell(x, y) not in ("grass", "dry"):
+            return
+        h = tile_hash(x, y, seed)
+        v = self.painter.variant
+        if h % 17 == 0 and "az.tb.pine" in self.bank.registry._variants:
+            f.sprite(v("az.tb.pine", x, y), gx, gy, z=z, shadow=18)
+        elif h % 29 == 0:
+            f.sprite(v("az.plant.bush", x, y), gx, gy, z=z, shadow=8)
+        elif h % 9 == 0:
+            f.sprite(v("az.plant.grass_clump", x, y), gx, gy, now + (h % 11) * 0.27, z=z, solid=False)
+        elif h % 13 == 0:
+            f.sprite(v("az.plant.wildflowers", x, y), gx, gy, now + (h % 7) * 0.3, z=z, solid=False)
 
     def _scatter(self, f: Frame, terr: Terrain, x: int, y: int, gx: float, gy: float, seed: int, now: float) -> None:
         """Plants, flowers and stones on open ground, deterministic per tile."""

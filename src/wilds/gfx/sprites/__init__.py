@@ -34,7 +34,8 @@ AZEROTH_MODULES = (
     "az_items",
     "az_fx",
 )
-AZEROTH_DONE: tuple[str, ...] = AZEROTH_MODULES
+# thunder_bluff v4 (grassy rises, tents, totem towers) is being drawn: held out until complete
+AZEROTH_DONE: tuple[str, ...] = tuple(m for m in AZEROTH_MODULES if m != "az_thunder_bluff")
 
 
 def load(module: str) -> None:

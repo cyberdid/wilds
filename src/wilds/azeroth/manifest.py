@@ -263,6 +263,25 @@ def thunder_bluff() -> list[Need]:
         Need("az.tb.spirit_pool", "<=32x24", frames=3, note="Pools of Vision"),
         Need("az.tb.lift", "<=32x24", frames=2, note="the rope elevator"),
         Need("az.tb.warrior_hall", "<=64x48", note="Hunter Rise / warrior hall"),
+        # v4, from the reference pictures: the rises are grassy mesa tops with dirt roads and pines over
+        # sheer pale cliffs, and the city is tall hide tents, teal-roofed longhouses and painted totem towers
+        Need("az.tb.cliff.face", "16x16", variants=6, note="sheer pale tan-grey cliff wall, bold VERTICAL streaks and "
+             "crevices, a few moss ledges; stretched vertically to 40-80 px by the client, seamless sideways"),
+        Need("az.tb.cobble", "16x16", variants=4, note="light cobblestone paving for plazas; tiles seamlessly"),
+        Need("az.tb.tent_tall", "<=32x48", variants=4, note="tall conical hide tent, stitched seams, crossed horn "
+             "finial on top, painted bands in red / teal / cream (a different colour scheme per variant)"),
+        Need("az.tb.longhouse", "<=64x40", variants=3, note="long low tauren hall: tan hide walls, sloped TEAL wooden "
+             "roof panels with ridge poles, red-and-cream trim, a stepped doorway"),
+        Need("az.tb.tower_totem", "<=32x96", note="the High Rise tower: tall cylinder, bands of red, teal hexagons and "
+             "cream, a carved bull head with horns at the top"),
+        Need("az.tb.windmill_totem", "<=24x40", frames=4, note="wind totem: carved pole with a spinning four-blade pinwheel"),
+        Need("az.tb.round_tent", "<=64x48", note="Elder Rise druid hall: big round white canvas tent held by tall "
+             "carved posts and rope lashings, red trim"),
+        Need("az.tb.lift_tower", "<=32x80", frames=2, note="the rope elevator: very tall carved pole with a small cab, "
+             "round wooden landing disc at its foot with a ramp"),
+        Need("az.tb.gatehouse", "<=48x32", variants=2, note="wooden gatehouse block at the end of a rope bridge, teal roof"),
+        Need("az.tb.pine", "<=24x56", variants=4, note="tall dark-green mountain pine / fir, layered boughs, "
+             "golden sunlit tips (Thunder Bluff is full of them)"),
     ]
 
 

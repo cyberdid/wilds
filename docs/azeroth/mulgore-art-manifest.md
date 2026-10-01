@@ -440,6 +440,16 @@ One tile = 16 px = 2 yards.
 | `az.tb.spirit_pool` | <=32x24 | 3 |  | Pools of Vision |
 | `az.tb.lift` | <=32x24 | 2 |  | the rope elevator |
 | `az.tb.warrior_hall` | <=64x48 | 1 |  | Hunter Rise / warrior hall |
+| `az.tb.cliff.face` | 16x16 | 1 | 6 | sheer pale tan-grey cliff wall, bold VERTICAL streaks and crevices, a few moss ledges; stretched vertically to 40-80 px by the client, seamless sideways |
+| `az.tb.cobble` | 16x16 | 1 | 4 | light cobblestone paving for plazas; tiles seamlessly |
+| `az.tb.tent_tall` | <=32x48 | 1 | 4 | tall conical hide tent, stitched seams, crossed horn finial on top, painted bands in red / teal / cream (a different colour scheme per variant) |
+| `az.tb.longhouse` | <=64x40 | 1 | 3 | long low tauren hall: tan hide walls, sloped TEAL wooden roof panels with ridge poles, red-and-cream trim, a stepped doorway |
+| `az.tb.tower_totem` | <=32x96 | 1 |  | the High Rise tower: tall cylinder, bands of red, teal hexagons and cream, a carved bull head with horns at the top |
+| `az.tb.windmill_totem` | <=24x40 | 4 |  | wind totem: carved pole with a spinning four-blade pinwheel |
+| `az.tb.round_tent` | <=64x48 | 1 |  | Elder Rise druid hall: big round white canvas tent held by tall carved posts and rope lashings, red trim |
+| `az.tb.lift_tower` | <=32x80 | 2 |  | the rope elevator: very tall carved pole with a small cab, round wooden landing disc at its foot with a ramp |
+| `az.tb.gatehouse` | <=48x32 | 1 | 2 | wooden gatehouse block at the end of a rope bridge, teal roof |
+| `az.tb.pine` | <=24x56 | 1 | 4 | tall dark-green mountain pine / fir, layered boughs, golden sunlit tips (Thunder Bluff is full of them) |
 
 ## items
 

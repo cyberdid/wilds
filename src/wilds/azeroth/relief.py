@@ -18,8 +18,8 @@ if TYPE_CHECKING:
     from .world import ZoneWorld
 
 MESA_HEIGHT = 20
-PLATFORM_HEIGHT = 34
-BRIDGE_HEIGHT = 30
+PLATFORM_HEIGHT = 72  # the rises stand on sheer cliffs
+BRIDGE_HEIGHT = 68
 CLIFF_BASE, CLIFF_VAR = 14, 10
 MOUNTAIN_BASE, MOUNTAIN_VAR = 30, 38
 STEP = 4  # heights are quantised so the block cache stays small
