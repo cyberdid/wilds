@@ -1498,59 +1498,118 @@ def _cobble() -> None:
         register(f"az.tb.cobble@{i}", art(c.grid(), legend=COBBLE, note="light cobblestone paving"))
 
 
-PINE = {**{str(i): f"azb_pine{i}" for i in range(6)}, "t": "azb_wood1", "T": "azb_wood2", "u": "azb_wood3",
-        "z": "ink:96"}
+# The Mulgore pine (v5): olive / yellow-green boughs, sunlit gold on the upper-left tips, and
+# a red-brown trunk. Deliberately warmer and yellower than the dark azb_pine of the cliffs.
+_ramp("azb_olive", "#20250f", "#313b16", "#46541c", "#5f7224", "#7d912e", "#a4ad3b", "#d8c95c")
+_ramp("azb_bark", "#2a1510", "#45231a", "#633424", "#81492f", "#9e623f", "#b97f55")
+PINE = {**{str(i): f"azb_olive{i}" for i in range(7)}, **{"abcdef"[i]: f"azb_bark{i}" for i in range(6)},
+        "z": "ink:70", "y": "ink:36"}
 
 
 def _pine() -> None:
-    """Tall dark mountain pines: a straight trunk under tiers of drooping boughs. Each
-    tier is a fan of twigs spreading out and down from the trunk: lit on the upper left,
-    dark underneath, the outer tips hanging lower and catching golden sunlight; tiers
-    vary in width so the outline is ragged, and the trunk shows between the lowest."""
-    for i, (h, w, tiers) in enumerate(((56, 24, 8), (54, 22, 7), (48, 21, 6), (42, 24, 5))):
-        rng = random.Random(7000 + i)
-        c = Canvas(24, h)
-        cx = 11.5
-        base = h - 2
-        trunk_top = base - 8
-        for y in range(4, base + 1):  # trunk, mostly hidden by the boughs
-            c.set(11, y, "u")
-            c.set(12, y, "T")
-        c.set(12, base, "t")
-        top = 1
-        span = trunk_top - top
-        tiers_y = [top + round(span * (k / tiers) ** 0.95) for k in range(tiers + 1)]
-        for k in reversed(range(tiers)):  # the bottom tier first: upper tiers overlap it
-            ty0 = tiers_y[k]
-            ty1 = min(base - 4, tiers_y[k + 1] + 2)
-            hw_max = (2.0 + (w / 2 - 2.0) * ((k + 1) / tiers) ** 0.8) * rng.uniform(0.85, 1.05)
-            th = max(2, ty1 - ty0)
-            for x in range(24):
-                u = (x + 0.5 - cx) / hw_max
-                if abs(u) > 1:
-                    continue
-                droop = round(2.2 * u * u)  # the outer twigs hang lower
-                yb = ty0 + th + droop + (x + k) % 2  # a ragged, drooping hem
-                ytop = ty0 + round(th * 0.85 * abs(u) ** 1.4)
-                for y in range(ytop, min(base - 2, yb) + 1):
-                    r = (y - ytop) / max(1, yb - ytop)
-                    v = 0.65 - 0.45 * u - 0.6 * r + (bayer(x, y) - 0.5) * 0.3
-                    ch = "4" if v > 0.62 else "3" if v > 0.32 else "2" if v > 0.02 else "1"
-                    if y >= yb - 1:  # the dark underside of the tier, two rows deep
-                        ch = "0" if y == yb or u > 0.2 else "1"
-                    c.set(x, y, ch)
-                if (x + k * 2) % 4 == 0 and abs(u) > 0.3:
-                    c.set(x, yb, ".")  # notches between twig tips along the hem
-                if u < 0.1 and (x + k) % 2 == 0:
-                    c.set(x, ytop, "5")  # sunlit twig tips on the lit side
-                    if ytop + 1 < base:
-                        c.set(x, ytop + 1, "4")
-                elif u >= 0.1 and (x + k) % 3 == 0:
-                    c.set(x, ytop, "4")
-        c.set(11, 0, "4")
-        c.set(12, 0, "3")
-        g = _finish(c, (12, h - 1.2, 7, 1.2))
-        register(f"az.tb.pine@{i}", art(g.grid(), legend=PINE, note="tall dark mountain pine"))
+    """The pine of all Mulgore, 15-25 yd tall: a tall straight red-brown trunk, flared at the
+    root and bare for the lower third, under tiers of DROOPING boughs with gaps between them
+    where the trunk shows. Each tier is a pair of boughs leaving the trunk and arching down,
+    hung with a ragged curtain of needles: lit along the top, dark underneath, golden at the
+    upper-left tips. Tier widths, lengths and droop vary per side so no two trees match.
+    Anchor = the trunk base centre; only a faint contact smudge (the ground is lit in code)."""
+    bark = "abcdef"
+    for i, (w, h, seed) in enumerate(((24, 64, 11), (28, 76, 23), (30, 86, 37), (32, 96, 41))):
+        rng = random.Random(7100 + seed)
+        c = Canvas(w, h)
+        tx = w // 2  # trunk centre column (the anchor)
+        base = h - 2  # the lowest bark row; the ink outline closes it on row h-1
+        crown_bot = base - round(h * 0.34)  # the trunk is bare below the lowest tier
+        top = 2
+        tw = 4 if h >= 80 else 3  # trunk width in the bare part
+
+        # -- trunk: straight, tapering upward, flared at the root, lit from the left
+        for y in range(top, base + 1):
+            f = (base - y) / (base - top)
+            wid = tw if f < 0.4 else max(1, round(tw - (f - 0.4) * tw * 1.5))
+            fl = base - y
+            x0 = tx - (tw + 1) // 2 + (1 if wid < tw - 1 else 0)
+            x1 = x0 + wid - 1
+            if fl < 3:  # the flare: roots spread, a little further on the right
+                x0 -= (2, 1, 0)[fl]
+                x1 += (2, 1, 1)[fl]
+            for x in range(x0, x1 + 1):
+                t = (x - x0 + 0.5) / (x1 - x0 + 1)
+                v = 4 if t < 0.25 else 3 if t < 0.55 else 2 if t < 0.8 else 1
+                if y < crown_bot + 4:  # in the canopy's shadow
+                    v = max(0, v - (2 if y < crown_bot + 1 else 1))
+                c.set(x, y, bark[v])
+        for _ in range(h // 5):  # bark furrows: short dark vertical seams
+            x = tx - (tw + 1) // 2 + rng.randrange(tw)
+            y0 = rng.randrange(crown_bot, base - 1)
+            for y in range(y0, min(base, y0 + rng.randint(2, 5))):
+                ch = c.get(x, y)
+                if ch in "cde":
+                    c.set(x, y, bark[bark.index(ch) - 1 - (ch == "e")])
+
+        # -- tiers: positions top to bottom, drawn bottom first so upper tiers overlap
+        n = max(5, round((crown_bot - top) / 8))
+        ys = [top + 2 + round((crown_bot - top - 7) * (k / n) ** 0.85) + (rng.choice((-1, 0, 1)) if 0 < k < n else 0)
+              for k in range(n + 1)]
+        hw_max = w / 2 - 1.0
+        tiers = []
+        for k in range(n):
+            g = ((k + 1) / n) ** 0.75
+            hw = 2.5 + (hw_max - 2.5) * g
+            if k == n - 1:
+                hw *= rng.uniform(0.85, 0.97)  # the lowest bough pair is a little shorter
+            sides = {s: min(hw_max - (0 if s < 0 else 0.6), hw * rng.uniform(0.68, 1.1)) for s in (-1, 1)}
+            tiers.append((k, ys[k], ys[k + 1] - ys[k], sides))
+        k, a, sp, sides = tiers[rng.randrange(n // 2, n - 1)]  # one bough reaches out further
+        sides[rng.choice((-1, 1))] = hw_max
+        for k, a, sp, sides in reversed(tiers):
+            upper = k < n * 0.55
+            for s, hw in sides.items():
+                droop = sp * rng.uniform(0.9, 1.3) + 1.5  # how far the tip hangs below the root
+                curtain = max(2.0, sp * rng.uniform(0.65, 0.85))
+                for x in range(w):
+                    d = (x + 0.5 - tx) * s
+                    if d < -0.6 or d > hw:
+                        continue
+                    u = max(0.0, d) / hw
+                    ytop = a + droop * (0.35 * u + 0.65 * u * u)
+                    # needles hang thin near the trunk (the gap shows), fullest mid-bough
+                    th = 0.5 + curtain * math.sin(min(1.0, u * 1.25) * math.pi * 0.85)
+                    hem = (x * 5 + k * 3 + i + (s > 0)) % 4
+                    th += (0, 1, 0, 2)[hem] if u > 0.3 else 0
+                    if u > 0.88:  # the tip narrows to a hanging point
+                        th = max(1.0, th * (1 - (u - 0.88) * 5))
+                    y0, y1 = round(ytop), round(ytop + th)
+                    for y in range(y0, y1 + 1):
+                        if not 1 <= y <= base - 4:
+                            continue
+                        r = (y - y0) / max(1, y1 - y0)
+                        v = 4.6 - 3.6 * r - (1.0 * u if s > 0 else -0.4 * u) + (0.4 if upper else 0)
+                        v += -0.8 * ((x * 3 + y * 7 + k) % 5 == 0) + (bayer(x, y) - 0.5) * 0.7
+                        if y == y1 and y1 > y0:
+                            v = min(v, 1.0 if s < 0 else 0.0)  # the shadowed hem
+                        if y == y0 and u > 0.12:
+                            if s < 0 and u > 0.25:
+                                v = 6 if (upper or u > 0.55) and (x + k) % 3 else 5  # golden tips
+                            else:
+                                v = max(v, 4.4 if s < 0 else 3.2)
+                        c.set(x, y, str(max(0, min(6, round(v)))))
+        # the leader: a thin spire with two tufts and a lit tip
+        for y in range(1, top + 3):
+            c.set(tx - 1, y, "4" if y < 3 else "3")
+        c.set(tx - 1, 1, "6")
+        c.set(tx - 2, top + 2, "5")
+
+        g = Canvas.of(outline_grid(c.grid(), "k"))
+        # soft ground contact only: no ink line under the roots, a faint smudge around them
+        for x in range(w):
+            if g.get(x, h - 1) == "k":
+                g.set(x, h - 1, "z")
+        for dx in (-5, -4, 4, 5, 6):
+            if 0 <= tx + dx < w and g.get(tx + dx, h - 1) == ".":
+                g.set(tx + dx, h - 1, "y")
+        register(f"az.tb.pine@{i}", art(g.grid(), legend=PINE, anchor=(tx, h - 1),
+                                         note=f"tall olive Mulgore pine, {h // 8} yd"))
 
 
 def _cyl(t: float, light: str, mid: str, dark: str, deep: str | None = None) -> str:

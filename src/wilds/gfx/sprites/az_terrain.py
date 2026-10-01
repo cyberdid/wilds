@@ -227,17 +227,17 @@ def _strand(c: Canvas, x: int, y: int, ch: str, shade: str | None, horizontal: b
 
 
 def _grass(seed: int) -> Canvas:
-    """Short meadow grass: broad soft patches of three greens, a scatter of upright blades
-    (darker root, lit tip) and a few golden straws - Mulgore's sunny yellow-green turf."""
+    """Short meadow grass: broad soft patches of warm lime and gold, a scatter of upright
+    blades (darker root, lit tip) and a few golden straws - Mulgore's sunny turf."""
     rng = random.Random(seed)
-    c = _patches(seed, MEAD[2:5], [27, 48, 25])
+    c = _patches(seed, MEAD[3:6], [34, 46, 20])
     taken: set = set()
     for k in range(9):
         x, y = _free(rng, taken)
         _blade(c, x, y, rng.choice((2, 3, 3)), lean=rng.choice((0, 0, 1, -1)))
     for k in range(3):
         x, y = _free(rng, taken)
-        _strand(c, x, y, HAY[3] if k else HAY[4], None, horizontal=k % 2 == 0)
+        _strand(c, x, y, HAY[4] if k else HAY[5], None, horizontal=k % 2 == 0)
     return c
 
 
@@ -245,12 +245,12 @@ def _tall_grass(seed: int) -> Canvas:
     """Tall grass: a deeper green sward, dense with long upright blades, the front ones
     lit, a few golden seed tips catching the sun."""
     rng = random.Random(seed)
-    c = _patches(seed, MEAD[1:4], [28, 46, 26])
+    c = _patches(seed, MEAD[2:5], [28, 46, 26])
     taken: set = set()
     for k in range(16):
         x, y = _free(rng, taken, gap=1)
         n = rng.choice((3, 4, 4))
-        tip = HAY[4] if k % 5 == 0 else None
+        tip = HAY[5] if k % 4 == 0 else None
         _blade(c, x, y, n, lean=rng.choice((0, 1, 1, -1)), root=-1, tip=2 if k % 2 else 1, tip_ch=tip)
     return c
 
@@ -287,42 +287,66 @@ def _pebble(c: Canvas, x: int, y: int, light: str, mid: str, dark: str, big: boo
 
 
 def _dirt(seed: int) -> Canvas:
-    """Bare earth: a neutral brown, broad soft shading, a few small pebbles."""
+    """Bare earth: trampled tan dirt, broad soft shading, a few small pebbles."""
     rng = random.Random(seed)
-    c = _patches(seed, TRAIL[2:5], [18, 64, 18], lumps=5)
+    c = _patches(seed, SAND[2:5], [18, 64, 18], lumps=5)
     taken: set = set()
     for k in range(3):
         x, y = _free(rng, taken, margin=1, gap=3)
         if k == 0:
-            _pebble(c, x, y, GRAN[5], GRAN[4], TRAIL[1])
+            _pebble(c, x, y, GRAN[6], GRAN[5], SAND[1])
         else:
-            c.set(x, y, TRAIL[5])
-            c.set((x + 1) % T, (y + 1) % T, TRAIL[1])
+            c.set(x, y, SAND[5])
+            c.set((x + 1) % T, (y + 1) % T, SAND[1])
+    return c
+
+
+def _sand(seed: int) -> Canvas:
+    """The lake shore: soft pale tan sand and mud, calm, a slightly darker damp patch, a
+    couple of pebbles."""
+    rng = random.Random(seed)
+    c = _patches(seed, SAND[3:6], [22, 60, 18], lumps=4)
+    taken: set = set()
+    for k in range(2):
+        x, y = _free(rng, taken, margin=1, gap=4)
+        if k == 0:
+            _pebble(c, x, y, GRAN[6], GRAN[5], SAND[2])
+        else:
+            c.set(x, y, GRAN[5])
+            c.set((x + 1) % T, (y + 1) % T, SAND[2])
+    x, y = _free(rng, taken, margin=1, gap=3)
+    c.set(x, y, SAND[6])
+    c.set((x + 1) % T, y, SAND[6])
     return c
 
 
 def _road(seed: int) -> Canvas:
-    """A worn trail: hoof-packed earth a step paler than dirt, smooth, a couple of grey
-    pebbles and a pale scuff (the grass tufts at its sides come from the edge overlays)."""
+    """A worn trail of pale grey-beige gravel: smooth, a soft tan wash where hooves churned
+    the earth, a few pebbles (the grass tufts at its sides come from the edge overlays)."""
     rng = random.Random(seed)
     c = _patches(seed, TRAIL[3:6], [16, 68, 16], lumps=4)
+    tan = fbm(T, T, seed + 5, 2, 2)
+    cut = sorted(v for row in tan for v in row)[int(T * T * 0.85)]
+    for y in range(T):
+        for x in range(T):
+            if tan[y][x] >= cut:
+                c.px[y][x] = SAND[4]
+    _despeckle(c, 1)
     taken: set = set()
     x, y = _free(rng, taken, margin=1, gap=4)
-    _pebble(c, x, y, GRAN[6], GRAN[5], TRAIL[2])
-    x, y = _free(rng, taken, margin=1, gap=4)
-    c.set(x, y, GRAN[5])
-    c.set((x + 1) % T, (y + 1) % T, TRAIL[2])
-    x, y = _free(rng, taken, margin=1, gap=3)
-    c.set(x, y, TRAIL[6])
-    c.set((x + 1) % T, y, TRAIL[6])
+    _pebble(c, x, y, TRAIL[6], TRAIL[4], TRAIL[1])
+    for _k in range(4):  # gravel: a pale grain over a dark one
+        x, y = _free(rng, taken, margin=1, gap=2)
+        c.set(x, y, TRAIL[6] if _k % 2 else GRAN[6])
+        c.set((x + 1) % T, (y + 1) % T, TRAIL[2])
     return c
 
 
 def _mesa(seed: int) -> Canvas:
-    """Pale warm hardpan / bare rock: sun-bleached earth with grey stone showing through
-    in broad patches and a faint network of dry cracks."""
+    """Pale warm hardpan / bare rock: sun-bleached tan earth with pale stone showing
+    through in broad patches and a faint network of dry cracks."""
     rng = random.Random(seed)
-    c = _patches(seed, TRAIL[4:7], [26, 50, 24], lumps=5)
+    c = _patches(seed, SAND[4:7], [26, 50, 24], lumps=5)
     stone = fbm(T, T, seed + 9, 2, 2)
     for y in range(T):
         for x in range(T):
@@ -335,7 +359,7 @@ def _mesa(seed: int) -> Canvas:
             if edge[y][x] < 0.55 and (x * 7 + y * 3 + seed) % 5:
                 c.px[y][x] = _step(c.px[y][x], -1)
     x, y = rng.randrange(T), rng.randrange(T)
-    _pebble(c, x, y, GRAN[6], GRAN[4], TRAIL[2])
+    _pebble(c, x, y, GRAN[7], GRAN[5], SAND[2])
     return c
 
 
@@ -343,19 +367,21 @@ def _mesa(seed: int) -> Canvas:
 
 
 def _lake_frames(seed: int) -> list:
-    """4 seamless frames: a still swell, and glints going through a life cycle
-    (dot -> dash -> drifting dash -> gone) with staggered phases, so no frame pops."""
+    """4 seamless frames of calm turquoise: a slow, broad swell, and a few soft glints going
+    through a life cycle (dot -> dash -> drifting dash -> gone) with staggered phases, so no
+    frame pops."""
     rng = random.Random(seed)
     base = Canvas(T, T)
-    swell = _mix((0.5, fbm(T, T, seed, 2, 4)), (0.5, _emboss(fbm(T, T, seed + 1, 2, 4), 0, 1)))
-    _quantize(base, swell, "IJK", [22, 62, 16], dither=0.12)
-    glints = [(rng.randrange(T), rng.randrange(T), k % 4) for k in range(8)]
+    swell = _mix((0.6, fbm(T, T, seed, 2, 2)), (0.4, _emboss(fbm(T, T, seed + 1, 2, 2), 0, 1)))
+    _quantize(base, swell, "IJK", [20, 60, 20])
+    _despeckle(base)
+    glints = [(rng.randrange(T), rng.randrange(T), k % 4) for k in range(4)]
     frames = []
     for fr in range(4):
         c = base.copy()
         for x0, y0, phase in glints:
             s = (fr + phase) % 4
-            _stamp(c, x0, y0, (["L"], ["LML"], [".LMML"], ["..LL"])[s])
+            _stamp(c, x0, y0, (["K"], ["KLK"], [".KLLK"], ["..KK"])[s])
         frames.append(c.grid())
     return frames
 
@@ -369,8 +395,8 @@ def _shallows_frames(seed: int) -> list:
     rip = [[0.5 + 0.5 * math.sin(2 * math.pi * (2 * y / T + 0.6 * warp[y][x] + 0.1 * math.sin(
         2 * math.pi * x / T))) for x in range(T)] for y in range(T)]
     f = _mix((0.45, fbm(T, T, seed + 1, 2, 2)), (0.35, _emboss(rip, 0, 1)), (0.2, rip))
-    tones = "UVWXY"
-    _quantize(base, f, tones[0:3], [28, 52, 20], dither=0.0)
+    tones = "UVWXYZ"
+    _quantize(base, f, tones[1:4], [28, 52, 20], dither=0.0)
     wave = fbm(T, T, seed + 2, 2, 2)
     frames = []
     for fr in range(4):
@@ -413,25 +439,25 @@ def _rock_height(seed: int, n: int, stretch: float, cap: float) -> Field:
 
 
 def _mountain_top(seed: int) -> Canvas:
-    """The rim's plateau seen from above: broad, softly lit grey granite, a fine crack or
-    two, a soft patch of dark pine-green moss and a tuft of grass. Calm on purpose - on the
+    """The rim's plateau seen from above: broad, softly lit pale beige-grey rock, a fine
+    crack or two, a soft patch of olive moss and grass and a tuft of grass. Calm on purpose - on the
     diamond it covers whole mountainsides."""
     rng = random.Random(seed)
-    c = _patches(seed, GRAN[3:6], [15, 68, 17], lumps=5)
+    c = _patches(seed, GRAN[4:7], [15, 68, 17], lumps=5)
     moss = fbm(T, T, seed + 8, 2, 1)
     cut = sorted(v for row in moss for v in row)
     lo, mid = cut[int(T * T * 0.84)], cut[int(T * T * 0.96)]
     for y in range(T):  # one soft mat of moss per tile (the same share on every variant)
         for x in range(T):
             if moss[y][x] >= lo:
-                c.px[y][x] = PINE[4] if moss[y][x] < mid else PINE[3]
+                c.px[y][x] = MEAD[2] if moss[y][x] < mid else MEAD[1]
     _despeckle(c, 2)
     taken: set = set()
     for _k in range(2):  # hairline cracks, short, running down-right on screen (texture x)
         x, y = _free(rng, taken, gap=4)
         for i in range(rng.randrange(3, 6)):
             if c.px[y][(x + i) % T] in GRAN:
-                c.px[y][(x + i) % T] = GRAN[2]
+                c.px[y][(x + i) % T] = GRAN[3]
                 c.px[(y + 1) % T][(x + i) % T] = _step(c.px[(y + 1) % T][(x + i) % T], 1) \
                     if c.px[(y + 1) % T][(x + i) % T] in GRAN else c.px[(y + 1) % T][(x + i) % T]
             if rng.random() < 0.3:
@@ -500,23 +526,23 @@ def _rim(c: Canvas, seed: int) -> None:
     for x in range(T):
         grass = n[x] > 0.55
         c.px[0][x] = (MEAD[4] if n[(x + 3) % T] > 0.5 else MEAD[3]) if grass else GRAN[7 if n[x] < 0.3 else 6]
-        c.px[1][x] = (PINE[3] if grass else _step(c.px[1][x], 1))
-        c.px[2][x] = _step(c.px[2][x], -1) if not grass else PINE[2]
+        c.px[1][x] = (MEAD[1] if grass else _step(c.px[1][x], 1))
+        c.px[2][x] = _step(c.px[2][x], -1) if not grass else PINE[4]
     for _k in range(3):  # moss trickles
         x = rng.randrange(T)
         for y in range(2, 2 + rng.randrange(1, 4)):
-            c.px[y][x] = PINE[2] if y > 2 else PINE[3]
+            c.px[y][x] = PINE[3] if y > 2 else PINE[4]
 
 
 def _mountain_face(seed: int) -> Canvas:
-    """The rim's wall: tall grey granite with bold vertical streaks and crevices, a sunlit
-    edge with grass and pine moss along its crest."""
-    return _granite_face(seed, GRAN[1:6], [8, 22, 34, 25, 11], crevices=3, ledges=1)
+    """The rim's wall: tall pale beige-grey rock with bold vertical streaks and crevices, a
+    sunlit edge with grass and pine moss along its crest."""
+    return _granite_face(seed, GRAN[2:7], [8, 22, 34, 25, 11], crevices=3, ledges=1)
 
 
 def _cliff_face(seed: int) -> Canvas:
-    """Cliff at the land's edge: a paler grey rock, more broken by ledges, grass on top."""
-    return _granite_face(seed, GRAN[2:7], [8, 22, 34, 25, 11], crevices=2, ledges=2)
+    """Cliff at the land's edge: a paler rock, more broken by ledges, grass on top."""
+    return _granite_face(seed, GRAN[3:8], [8, 22, 34, 25, 11], crevices=2, ledges=2)
 
 
 def _mesa_lip(c: Canvas, seed: int) -> None:
@@ -524,25 +550,25 @@ def _mesa_lip(c: Canvas, seed: int) -> None:
     foot is dark; periodic sideways."""
     n = fbm(T, 1, seed, 2, 4)[0]
     for x in range(T):
-        c.set(x, 0, "t" if n[x] > 0.5 else "s")
-        c.set(x, 1, "s" if n[(x + 7) % T] > 0.4 else "r")
-        c.set(x, 2, "n" if n[(x + 3) % T] > 0.45 else "o")
-        c.set(x, T - 1, "m")
-        if bayer(x, 0) < 0.5:
-            c.set(x, T - 2, "m")
+        c.set(x, 0, GRAN[7] if n[x] > 0.5 else GRAN[6])
+        c.set(x, 1, GRAN[6] if n[(x + 7) % T] > 0.4 else GRAN[5])
+        c.set(x, 2, GRAN[3] if n[(x + 3) % T] > 0.45 else GRAN[4])
+        c.set(x, T - 1, GRAN[2])
+        if (x * 5) % 3:
+            c.set(x, T - 2, GRAN[3])
 
 
 def _mesa_face(seed: int) -> Canvas:
-    """Mulgore's layered mesa wall: bold horizontal strata of uneven thickness in brick red,
-    rust, deep maroon and pale sandstone - each ledge sunlit along its top edge and undercut
-    by a dark line below - one long vertical joint, a bare-rock lip and a dark foot;
-    periodic sideways."""
+    """A mesa wall: soft horizontal strata of uneven thickness in pale beige-grey and tan
+    stone - each ledge sunlit along its top edge and undercut by a darker line below - one
+    long vertical joint, a bare-rock lip and a darker foot; periodic sideways."""
     rng = random.Random(seed)
     c = Canvas(T, T)
     warp = fbm(T, 1, seed, 2, 4)[0]
     grain = fbm(T, T, seed + 1, 1, 8)
     # (lit top, body, undercut) for each kind of rock layer
-    kinds = [("r", "q", "o"), ("q", "p", "n"), ("s", "r", "p"), ("G", "F", "D"), ("p", "o", "m")]
+    kinds = [(GRAN[6], GRAN[5], GRAN[3]), (SAND[5], SAND[4], SAND[2]), (GRAN[7], GRAN[6], GRAN[4]),
+             (SAND[6], SAND[5], SAND[3]), (GRAN[5], GRAN[4], GRAN[2])]
     bands, y, last = [], 0.0, -1
     while y < T + 6:
         k = rng.choice([i for i in range(len(kinds)) if i != last])
@@ -558,7 +584,7 @@ def _mesa_face(seed: int) -> Canvas:
             ch = lit if pos < 1.0 else (under if pos >= th - 0.9 else body)
             if ch == body and grain[y][x] > 0.8:
                 ch = lit
-            if y > 11 and bayer(x, y) < (y - 11) / 6:
+            if y > 12 and (x + y) % 3 < y - 12:
                 ch = under
             c.set(x, y, ch)
     x = rng.randrange(T)  # one long vertical joint, wobbling
@@ -566,7 +592,7 @@ def _mesa_face(seed: int) -> Canvas:
     for _j in range(rng.randrange(7, 11)):
         if y >= T - 1:
             break
-        c.set(x % T, y, "m")
+        c.set(x % T, y, GRAN[1])
         y += 1
         x += rng.choice((0, 0, 0, 1, -1))
     _mesa_lip(c, seed + 11)
@@ -624,7 +650,7 @@ def _moss_cap(c: Canvas, rock: str, seed: int, depth: float = 2.2) -> None:
         for j in range(d):
             if top + j < c.h and c.px[top + j][x] in rock:
                 lit = j == 0 and (x == 0 or c.px[top][x - 1] not in rock)
-                c.px[top + j][x] = MEAD[3] if lit else (PINE[3] if j < d - 1 else PINE[2])
+                c.px[top + j][x] = MEAD[3] if lit else (MEAD[1] if j < d - 1 else PINE[4])
 
 
 def _boulders() -> None:
@@ -716,6 +742,8 @@ def _edge(kind: str, where: str, fr: int = 0) -> Canvas:
 
     if kind == "dirt":
         return _dirt_edge(where, g, rng)
+    if kind == "water":
+        return _shore(g, fr)
     for x, y in g:
         c.set(x, y, FRINGE.px[y][x])
     # the rim of the grass mat: lit where it faces up/left, in shade where it faces down/right
@@ -734,49 +762,53 @@ def _edge(kind: str, where: str, fr: int = 0) -> Canvas:
                 c.set(x - 1, y - 2, MEAD[4] if rng.random() < 0.7 else HAY[4])
 
     solid = {(x, y) for y in range(T) for x in range(T) if c.px[y][x] != "."}
-    if kind == "water":
-        # land is higher than the lake: an earth bank under every south-facing grass rim
-        bank = set()
-        for x, y in g:
-            if inside(x, y + 1) and not grass(x, y + 1):
-                run = sum(1 for j in range(3) if grass(x, y - j) or y - j < 0)
-                for j in range(1, 1 + min(2, run - 1) + 1):
-                    if inside(x, y + j) and not grass(x, y + j):
-                        c.set(x, y + j, TRAIL[3] if j == 1 else TRAIL[2])
-                        bank.add((x, y + j))
-        solid |= bank
-        # the water's edge: foam washed up (frame 0), then wet and the wave pulling back (1)
-        land = g | bank
-        for y in range(T):
-            for x in range(T):
-                if (x, y) in solid:
-                    continue
-                near = any((x + dx, y + dy) in land for dx, dy in ((0, -1), (-1, 0), (1, 0), (0, 1)))
-                near2 = any((x + dx, y + dy) in land for dx, dy in ((0, -2), (-2, 0), (2, 0), (0, 2)))
-                t = bayer(x + fr * 2, y + fr)
-                if near:
-                    if fr == 0:
-                        c.set(x, y, "M" if t < 0.15 else ("L" if t < 0.6 else "K"))
-                    elif t < 0.7:
-                        c.set(x, y, "K")
-                elif near2:
-                    if fr == 0 and t < 0.25:
-                        c.set(x, y, "K")
-                    elif fr == 1 and t < 0.5:
-                        c.set(x, y, "M" if t < 0.12 else "L")
-    else:  # cliff: roots and turf hang over the rock below a grass rim, and it casts a shadow
-        for x, y in sorted(g):
-            if inside(x, y + 1) and not grass(x, y + 1) and rng.random() < 0.4:
-                for j in range(1, rng.randrange(2, 4)):
-                    if inside(x, y + j) and (x, y + j) not in solid:
-                        c.set(x, y + j, TRAIL[1] if j > 1 else MEAD[1])
-        occ = {(x, y) for y in range(T) for x in range(T) if c.px[y][x] != "."}
-        for y in range(T):
-            for x in range(T):
-                if (x, y) in occ:
-                    continue
-                if (x, y - 1) in g or (x - 1, y) in g or ((x - 1, y - 1) in g and bayer(x, y) < 0.5):
-                    c.set(x, y, "z")
+    # cliff: roots and turf hang over the rock below a grass rim, and it casts a shadow
+    for x, y in sorted(g):
+        if inside(x, y + 1) and not grass(x, y + 1) and rng.random() < 0.4:
+            for j in range(1, rng.randrange(2, 4)):
+                if inside(x, y + j) and (x, y + j) not in solid:
+                    c.set(x, y + j, TRAIL[1] if j > 1 else MEAD[1])
+    occ = {(x, y) for y in range(T) for x in range(T) if c.px[y][x] != "."}
+    for y in range(T):
+        for x in range(T):
+            if (x, y) in occ:
+                continue
+            if (x, y - 1) in g or (x - 1, y) in g or ((x - 1, y - 1) in g and bayer(x, y) < 0.5):
+                c.set(x, y, "z")
+    return c
+
+
+SHORE_MAT = _patches(37, SAND[3:6], [24, 56, 20])
+SURF = fbm(T, T, 77, 1, 4)
+
+
+def _shore(g: set[tuple[int, int]], fr: int) -> Canvas:
+    """The lake's edge: a soft band of pale shore sand (damp and a step darker where the
+    water laps it), then a quiet line of foam that washes up (frame 0) and pulls back (1)."""
+    c = Canvas(T, T)
+    for x, y in g:
+        c.set(x, y, SHORE_MAT.px[y][x])
+
+    def wet(x, y):
+        return 0 <= x < T and 0 <= y < T and (x, y) not in g
+
+    for x, y in g:
+        if any(wet(x + dx, y + dy) for dx, dy in ((0, 1), (1, 0), (0, -1), (-1, 0))):
+            c.set(x, y, SAND[2] if SURF[y][x] > 0.3 else SAND[3])
+    for y in range(T):
+        for x in range(T):
+            if (x, y) in g:
+                continue
+            near = any((x + dx, y + dy) in g for dx, dy in ((0, -1), (-1, 0), (1, 0), (0, 1)))
+            near2 = any((x + dx, y + dy) in g for dx, dy in ((0, -2), (-2, 0), (2, 0), (0, 2)))
+            n = SURF[y][x]
+            if near:
+                if fr == 0:
+                    c.set(x, y, "M" if n > 0.75 else "L")
+                elif n > 0.35:
+                    c.set(x, y, "K")
+            elif near2 and fr == 1 and n > 0.55:
+                c.set(x, y, "L")
     return c
 
 
@@ -842,7 +874,7 @@ DECO = {
     "r": "red1", "R": "red2", "p": "red3", "P": "red4",
     "y": "gold1", "Y": "gold2", "o": "gold3", "e": "tent1",
     "b": "water2", "B": "water3", "c": "water4", "C": "water5",
-    "1": "azt_rock2", "2": "azt_rock3", "3": "azt_rock4", "4": "azt_rock5", "5": "azt_rock6", "6": "azt_rock7",
+    "1": "azt_gran2", "2": "azt_gran3", "3": "azt_gran4", "4": "azt_gran5", "5": "azt_gran6", "6": "azt_gran7",
     "7": "bone1", "8": "bone2", "9": "bone3", "0": "bone4",
     "O": "azt_straw0", "a": "azt_straw1", "s": "azt_straw2", "S": "azt_straw3", "f": "azt_straw4",
     "F": "azt_straw5",
@@ -907,7 +939,7 @@ def _tuft(blades: list[tuple[int, int, int]], golden: bool) -> Canvas:
 
 
 STONES = [
-    _g("....455.........",   # three red pebbles
+    _g("....455.........",   # three pale pebbles
        "...45443........",
        "...4433221..54..",
        "...3332211.4432.",
@@ -1012,7 +1044,7 @@ def _decos() -> None:
     ]
     for i, blades in enumerate(tufts):
         register(f"az.deco.tuft@{i}", art(_tuft(blades, golden=i == 1).grid(), legend=DECO, note=note))
-    hand = {"stones": (STONES, "pebbles of red mesa stone"), "bones": (BONES, "bleached bones in the grass"),
+    hand = {"stones": (STONES, "pale pebbles"), "bones": (BONES, "bleached bones in the grass"),
             "dry_bush": (DRY_BUSH, "dead sagebrush, tumbleweed"), "stump": (STUMPS, "old tree stump")}
     for name, (grids, what) in hand.items():
         for i, g in enumerate(grids):
@@ -1370,43 +1402,78 @@ def _reeds(i: int, fr: int) -> _Sk:
 
 
 # --- rocks ---
+# Mulgore's rock is pale and rounded: the beige-grey of the mountain ring, soft vertical
+# streaks, olive moss on its ledges; at Red Rocks the same rounded shapes in pink-tan
+# sandstone with orange bands toward the top.
 
 
-def _layered(c: Canvas, mask: set[tuple[int, int]], seed: int, cx_of, hw_of, band: float = 3.4,
-             pale: bool = True) -> None:
-    """Shade a rock silhouette as Mulgore sandstone: lit on the left, dark on the right,
-    stacked strata (lit ledge, undercut), some pale bands, vertical joints."""
-    warp = fbm(64, 1, seed, 2, 4)[0]
-    fine = fbm(64, 64, seed + 1, 1, 8)
-    pal = random.Random(seed).sample(range(12), 2) if pale else []
+def _rockshade(c: Canvas, mask: set[tuple[int, int]], seed: int, tones: str, bands: str = "",
+               band: float = 4.0, band_top: float = 0.6) -> None:
+    """Shade a rock silhouette as a rounded, weathered mass: lit on its left flank and on
+    its top (it faces the sky), rolling into shade on the right, soft vertical streaks,
+    darker at the foot. With ``bands`` (a ramp), some strata in the upper ``band_top`` of
+    the rock take that colour: the orange banding of Red Rocks sandstone."""
+    rng = random.Random(seed)
+    rows: dict[int, list[int]] = {}
+    cols: dict[int, list[int]] = {}
     for x, y in mask:
-        hw = max(1.0, hw_of(y))
-        nx = (x + 0.5 - cx_of(y)) / hw
-        v = 0.5 - 0.36 * nx
-        s_ = y + 1.4 * (warp[x % 64] - 0.5)
-        b = int(s_ // band)
-        pos = s_ - b * band
-        if pos < 0.9:
-            v += 0.14
-        elif pos > band - 1.0:
-            v -= 0.22
-        v += 0.08 if fine[y % 64][x % 64] > 0.75 else 0.0
-        if b % 12 in pal:
-            ch = "F" if v > 0.62 else ("E" if v > 0.36 else "D")
-        else:
-            ch = ROCK_CH[max(1, min(7, int(v * 7.2)))]
-        c.set(x, y, ch)
+        rows.setdefault(y, []).append(x)
+        cols.setdefault(x, []).append(y)
+    y0, y1 = min(rows), max(rows)
+    height = max(1, y1 - y0)
+    n = fbm(64, 64, seed, 2, 8)
+    streak = [[sum(n[(y + k) % 64][x] for k in range(-5, 6)) / 11 for x in range(64)] for y in range(64)]
+    warp = fbm(64, 1, seed + 1, 2, 4)[0]
+    picked = {b for b in range(40) if rng.random() < 0.5}
+    for x, y in mask:
+        lo, hi = min(rows[y]), max(rows[y])
+        cx, hw = (lo + hi + 1) / 2, max(1.0, (hi - lo + 1) / 2)
+        nx = (x + 0.5 - cx) / hw
+        top = min(cols[x])
+        d_top = y - top
+        t = (y - y0) / height
+        v = 0.56 - 0.34 * nx - 0.18 * max(0.0, nx) ** 3
+        v += 0.18 * max(0.0, 1 - d_top / 5)  # the sky-facing top of each bulge
+        v += 0.5 * (streak[y % 64][x % 64] - 0.5)
+        v -= 0.22 * max(0.0, (t - 0.75) / 0.25)
+        tone = tones
+        if bands:
+            s_ = y + 2.0 * (warp[x % 64] - 0.5)
+            b = int(s_ // band)
+            if b in picked and t < band_top + 0.15 * (warp[(x + 17) % 64] - 0.5):
+                tone = bands
+            if s_ - b * band < 0.9:
+                v += 0.08
+        kk = len(tone)
+        c.set(x, y, tone[max(0, min(kk - 1, int(v * kk)))])
+
+
+def _rock_mask(w: int, h: int, hw_of, cx_of=None) -> set[tuple[int, int]]:
+    cx_of = cx_of or (lambda y: w / 2)
+    return {(x, y) for y in range(h) for x in range(w) if abs(x + 0.5 - cx_of(y)) <= hw_of(y)}
+
+
+def _grass_foot(c: Canvas, mask: set[tuple[int, int]], seed: int) -> None:
+    """Blades of meadow grass along the foot of a rock, softening where it meets the ground."""
+    rng = random.Random(seed)
+    bottom = max(y for _, y in mask)
+    for x in sorted({x for x, y in mask if y == bottom}):
+        if rng.random() < 0.45:
+            h = rng.randrange(1, 4)
+            for j in range(h):
+                c.set(x, bottom - j, MEAD[1] if j == 0 else (MEAD[3] if j < h - 1 else MEAD[4]))
 
 
 def _spire(i: int) -> Canvas:
-    """A tall red-rock spire: a hoodoo of stacked strata under a wider caprock."""
-    specs = [  # height, cap half-width, neck, base half-width, lean, grass on top
-        (46, 4.5, 3.2, 9.0, 1.0, True),
-        (40, 3.5, 2.6, 8.0, -1.2, False),
-        (44, 5.0, 3.6, 10.0, 0.0, True),
-        (32, 5.5, 4.0, 9.5, 0.6, False),
+    """A tall rock spire: two of pale beige-grey streaked rock with moss on its ledges, two of
+    Red Rocks sandstone with orange bands under a rounded caprock."""
+    specs = [  # height, cap half-width, neck, base half-width, lean, sandstone
+        (46, 4.5, 3.4, 9.0, 1.0, False),
+        (40, 4.0, 2.8, 8.0, -1.2, True),
+        (44, 5.0, 3.8, 10.0, 0.0, False),
+        (34, 6.0, 4.2, 9.5, 0.6, True),
     ]
-    height, cap, neck, base, lean, grassy = specs[i]
+    height, cap, neck, base, lean, sand = specs[i]
     rng = random.Random(200 + i)
     W, H = 24, 48
     c = Canvas(W, H)
@@ -1416,50 +1483,40 @@ def _spire(i: int) -> Canvas:
     def t_of(y):
         return (y - y_top) / height
 
-    steps = [rng.uniform(-0.9, 0.9) for _ in range(20)]
-
     def hw_of(y):
         t = t_of(y)
-        if t < 0.14:
-            w = cap - (0.8 if t < 0.03 else 0)
+        if t < 0:
+            return -1
+        if t < 0.16:  # a rounded cap
+            w = cap * math.sqrt(max(0.0, 1 - ((0.16 - t) / 0.16) ** 2)) + 0.6
         else:
-            w = neck + (base - neck) * max(0.0, (t - 0.18) / 0.82) ** 1.7
-            w += steps[int((y - y_top) // 4) % 20]  # ledges: each stratum juts or recedes
-        return w + 2.0 * (wob[y] - 0.5)
+            w = neck + (base - neck) * max(0.0, (t - 0.2) / 0.8) ** 1.6
+        return w + 1.4 * (wob[y] - 0.5)
 
     def cx_of(y):
         return 11.5 + lean * (1 - t_of(y)) * 2
 
-    mask = {(x, y) for y in range(y_top, H - 1) for x in range(W) if abs(x + 0.5 - cx_of(y)) <= hw_of(y)}
+    mask = _rock_mask(W, H - 1, hw_of, cx_of)
     _shadow(c, 12, H - 1.6, base + 2, 1.6, "y")
-    _layered(c, mask, 220 + i, cx_of, hw_of)
-    for y in range(y_top, y_top + 2):  # the sunlit caprock top
-        for x in range(W):
-            if (x, y) in mask:
-                c.set(x, y, "t" if y == y_top else "s")
-    cap_bottom = y_top + int(height * 0.14)
-    for x in range(W):  # the caprock's shadow on the neck
-        if (x, cap_bottom + 1) in mask:
-            c.set(x, cap_bottom + 1, "m" if bayer(x, 0) < 0.6 else "n")
-    for _k in range(2):  # vertical joints
-        y = rng.randrange(y_top + 8, H - 10)
-        x = int(cx_of(y) + rng.uniform(-2, 2))
-        for j in range(rng.randrange(4, 8)):
-            if (x, y + j) in mask:
-                c.set(x, y + j, "n")
-    if grassy:
-        cx = int(cx_of(y_top))
-        c.set(cx - 1, y_top - 1, "3")
-        c.set(cx, y_top - 1, "2")
-        c.set(cx - 1, y_top - 2, "4")
-        c.set(cx + 2, y_top - 1, "e")
+    if sand:
+        _rockshade(c, mask, 220 + i, SST[1:7], BAND[1:5], band=3.5, band_top=0.7)
+    else:
+        _rockshade(c, mask, 220 + i, GRAN[2:8])
+        _moss_cap(c, GRAN, 230 + i, 1.6)
+    for _k in range(2 if not sand else 1):  # long vertical cracks
+        y = rng.randrange(y_top + 8, H - 12)
+        x = int(cx_of(y) + rng.uniform(-2, 1))
+        for j in range(rng.randrange(6, 11)):
+            if (x, y + j) in mask and (x + 1, y + j) in mask:
+                c.set(x, y + j, GRAN[2] if not sand else SST[2])
     for bx, by, r in ((cx_of(H - 3) - base - 1, H - 3, 1.6), (cx_of(H - 3) + base + 0.5, H - 3, 1.8)):  # rubble
-        _blob(c, bx, by, r * 1.2, r, "opqr")
+        _blob(c, bx, by, r * 1.2, r, GRAN[3:7] if not sand else SST[2:6])
+    _grass_foot(c, mask, 240 + i)
     _outline(c)
     return c
 
 
-def _chisel(c: Canvas, mask: set[tuple[int, int]], seed: int, n: int, tones: str = "nopqrst") -> None:
+def _chisel(c: Canvas, mask: set[tuple[int, int]], seed: int, n: int, tones: str = GRAN[1:8]) -> None:
     """Shade a rock silhouette as broken planes: Voronoi facets, each a flat plane whose tone
     comes from where it faces (upper-left facets lit), a lit edge along its top-left
     border and a dark crack along its bottom-right one."""
@@ -1470,7 +1527,7 @@ def _chisel(c: Canvas, mask: set[tuple[int, int]], seed: int, n: int, tones: str
     cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
     rx, ry = max(1, (x1 - x0) / 2), max(1, (y1 - y0) / 2)
     pts = [(rng.uniform(x0, x1), rng.uniform(y0, y1)) for _ in range(n)]
-    tilt = [rng.uniform(-0.12, 0.12) for _ in range(n)]
+    tilt = [rng.uniform(-0.1, 0.1) for _ in range(n)]
     own = {}
     for x, y in mask:
         own[(x, y)] = min(range(n), key=lambda i: (x + 0.5 - pts[i][0]) ** 2 + (y + 0.5 - pts[i][1]) ** 2)
@@ -1483,9 +1540,9 @@ def _chisel(c: Canvas, mask: set[tuple[int, int]], seed: int, n: int, tones: str
         right, below = own.get((x + 1, y)), own.get((x, y + 1))
         left, above = own.get((x - 1, y)), own.get((x, y - 1))
         if (right is not None and right != i) or (below is not None and below != i):
-            v -= 0.3
+            v -= 0.22
         elif (left is not None and left != i) or (above is not None and above != i):
-            v += 0.16
+            v += 0.12
         if (x, y + 1) not in mask or (x + 1, y) not in mask:
             v -= 0.12  # the silhouette's shadow side
         if (x, y - 1) not in mask:
@@ -1494,10 +1551,11 @@ def _chisel(c: Canvas, mask: set[tuple[int, int]], seed: int, n: int, tones: str
 
 
 def _boulder_big(i: int) -> Canvas:
+    """A big pale boulder at the mountain's foot: rounded, softly faceted, moss on its back."""
     specs = [
-        (32, 26, [(15.5, 14.5, 11.5, 9.5), (8, 18, 6, 5)], 9),
-        (30, 24, [(12, 14, 9, 8.5), (21, 16, 7.5, 6.5)], 8),
-        (32, 22, [(16, 12.5, 13, 8)], 7),
+        (32, 26, [(15.5, 14.5, 11.5, 9.5), (8, 18, 6, 5)], 7),
+        (30, 24, [(12, 14, 9, 8.5), (21, 16, 7.5, 6.5)], 6),
+        (32, 22, [(16, 12.5, 13, 8)], 6),
     ]
     w, h, lobes, facets = specs[i]
     rng = random.Random(300 + i)
@@ -1506,28 +1564,31 @@ def _boulder_big(i: int) -> Canvas:
     rock = set()
     for cx, cy, rx, ry in lobes:
         rock |= {(x, y) for y in range(h) for x in range(w) if ((x + 0.5 - cx) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2 <= 1}
-    if i == 2:  # a squared-off mesa block
+    if i == 2:  # a squared-off block
         rock = {(x, y) for x, y in rock if y >= 5}
     _chisel(c, rock, 310 + i, facets)
-    if i == 2:  # flat lit top and strata on its face
+    if i == 2:  # flat lit top and a soft seam across its face
         for x, y in rock:
-            if y < 9:
-                c.set(x, y, "s" if y < 7 else "r")
-            elif (y - 10) % 4 == 0 and c.px[y][x] not in "mn":
-                c.set(x, y, "o")
-    for _k in range(4):  # pale lichen on the lit side
-        x, y = rng.choice(sorted(p for p in rock if c.px[p[1]][p[0]] in "rs"))
-        c.set(x, y, "c")
+            if y < 8:
+                c.set(x, y, GRAN[6] if y < 7 else GRAN[5])
+            elif y == 12 and c.px[y][x] not in GRAN[:3]:
+                c.set(x, y, _step(c.px[y][x], -1))
+    _moss_cap(c, GRAN, 320 + i, 2.4)
+    for _k in range(3):  # pale lichen on the lit side
+        spots = sorted(p for p in rock if c.px[p[1]][p[0]] in GRAN[5:])
+        if spots:
+            x, y = rng.choice(spots)
+            c.set(x, y, HAY[4])
     _outline(c)
     for gx in (3, w - 5):  # grass at the foot
-        c.set(gx, h - 3, "2")
-        c.set(gx, h - 4, "4")
-        c.set(gx + 1, h - 3, "3")
+        c.set(gx, h - 3, MEAD[1])
+        c.set(gx, h - 4, MEAD[4])
+        c.set(gx + 1, h - 3, MEAD[3])
     return c
 
 
 def _slab(i: int) -> Canvas:
-    """A low rock outcrop: a flat sunlit top surface and a short layered front face."""
+    """A low rock outcrop: a flat sunlit top surface and a short front face."""
     rx, ry, face = [(10.5, 3.6, 4), (9.0, 3.0, 5), (10.8, 2.6, 3)][i]
     c = Canvas(24, 16)
     cx, cy = 12, 8.5 - face / 2
@@ -1543,31 +1604,36 @@ def _slab(i: int) -> Canvas:
     for x, y in front:
         nx = (x + 0.5 - cx) / rx
         v = 0.5 - 0.3 * nx - 0.05 * (y - cy - ry)
-        ch = ROCK_CH[max(0, min(6, int(v * 6)))]
+        ch = GRAN[1 + max(0, min(5, int(v * 6)))]
         if (y - int(cy + ry)) % 3 == 0:
-            ch = ROCK_CH[max(0, ROCK_CH.index(ch) - 1)]
+            ch = _step(ch, -1)
         c.set(x, y, ch)
     for x, y in top:
         nx, ny = (x + 0.5 - cx) / rx, (y + 0.5 - cy) / ry
         v = 0.6 - 0.25 * nx - 0.25 * ny + (fine[y][x] - 0.5) * 0.3
-        c.set(x, y, "qrrs"[max(0, min(3, int(v * 4)))])
+        c.set(x, y, (GRAN[4], GRAN[5], GRAN[5], GRAN[6])[max(0, min(3, int(v * 4)))])
     for x in range(24):  # the rim where top meets face catches the light
         ys = [y for (xx, y) in top if xx == x]
         if ys and x < cx + rx * 0.4:
-            c.set(x, max(ys), "t")
+            c.set(x, max(ys), GRAN[7])
     rng = random.Random(340 + i)
     x, y = rng.randrange(6, 16), int(cy)
     for _k in range(4):  # a crack across the top
         if (x, y) in top:
-            c.set(x, y, "p")
+            c.set(x, y, GRAN[3])
         x += 1
         y += rng.choice((-1, 0, 1))
+    for _k in range(2):  # moss in the crack and at the back
+        spots = sorted(p for p in top if c.px[p[1]][p[0]] in GRAN[3:5])
+        if spots:
+            x, y = rng.choice(spots)
+            c.set(x, y, MEAD[2])
     _outline(c)
     return c
 
 
 def _arch() -> Canvas:
-    """A small natural arch of layered sandstone, lit on the left, dark inside the opening."""
+    """A small natural arch of rounded sandstone, lit on the left, dark inside the opening."""
     W, H = 32, 32
     c = Canvas(W, H)
     _shadow(c, 16, H - 1.8, 14, 1.8, "y")
@@ -1579,28 +1645,103 @@ def _arch() -> Canvas:
             hole = ((x + 0.5 - 16.5) / 7.5) ** 2 + ((y + 0.5 - 30) / 16) ** 2 <= 1
             if outer and not hole:
                 mask.add((x, y))
-    _layered(c, mask, 350, lambda y: 16.0, lambda y: 14.5, band=3.2)
+    _rockshade(c, mask, 350, SST[1:7], BAND[1:5], band=3.2, band_top=0.5)
     for x, y in mask:  # inside the opening the rock turns away from the light
         hole_d = ((x + 0.5 - 16.5) / 8.5) ** 2 + ((y + 0.5 - 30) / 17) ** 2
         if hole_d <= 1.15:
-            c.set(x, y, "n" if x < 17 else "o")
+            c.set(x, y, SST[2] if x < 17 else SST[3])
         elif hole_d <= 1.35 and x >= 16:
-            c.set(x, y, "m")
-    for x in range(W):  # sunlit top of the span
-        ys = [y for (xx, y) in mask if xx == x]
-        if ys and x < 22:
-            c.set(x, min(ys), "t")
+            c.set(x, y, SST[1])
+    _grass_foot(c, mask, 351)
     _outline(c)
-    for gx in (5, 26):
-        c.set(gx, H - 3, "2")
-        c.set(gx, H - 4, "4")
+    return c
+
+
+def _dome(i: int) -> Canvas:
+    """Red Rocks: a rounded dome of pale pink-tan sandstone, soft vertical streaks running
+    down it, orange bands toward the top, olive moss in a fold and grass at its foot."""
+    specs = [  # canvas w, h, [(centre x, top y, radius, cap share)], band_top
+        (44, 52, [(22.0, 3, 19.0, 0.55)], 0.55),
+        (40, 40, [(20.0, 3, 17.5, 0.75)], 0.5),
+        (48, 36, [(19.0, 3, 16.0, 0.8), (35.0, 14, 10.0, 0.9)], 0.45),
+    ]
+    W, H, lobes, band_top = specs[i]
+    c = Canvas(W, H)
+    wob = fbm(H, 1, 400 + i, 2, 5)[0]
+    mask: set[tuple[int, int]] = set()
+    for cx, ty, r, capf in lobes:
+        hgt = H - 2 - ty
+        for y in range(ty, H - 1):
+            t = (y - ty) / hgt
+            if t < capf:
+                hw = r * math.sqrt(max(0.0, 1 - ((capf - t) / capf) ** 2))
+            else:
+                hw = r * (1 + 0.12 * (t - capf) / (1 - capf + 1e-6))
+            hw += 1.2 * (wob[y] - 0.5)
+            for x in range(W):
+                if abs(x + 0.5 - cx) <= hw:
+                    mask.add((x, y))
+    _shadow(c, W / 2 + 1, H - 1.6, W / 2 - 1, 1.6, "y")
+    _rockshade(c, mask, 410 + i, SST[1:7], BAND[1:5], band=3.6, band_top=band_top)
+    rng = random.Random(420 + i)
+    for _k in range(2):  # a fold of olive moss trickling down the shaded side
+        x = int(lobes[0][0] + rng.uniform(2, lobes[0][2] * 0.6))
+        y = rng.randrange(H // 3, H // 2)
+        for j in range(rng.randrange(4, 9)):
+            if (x, y + j) in mask:
+                c.set(x, y + j, MEAD[1] if j % 3 else PINE[4])
+            if rng.random() < 0.25:
+                x += 1
+    _grass_foot(c, mask, 430 + i)
+    _outline(c)
+    return c
+
+
+def _hoodoo(i: int) -> Canvas:
+    """Red Rocks: a mushroom-shaped hoodoo - a broad rounded caprock on a narrow, banded
+    sandstone neck that flares into its base; the cap shades the neck under it."""
+    specs = [  # height, cap rx, cap ry, neck half-width, base half-width, lean
+        (62, 13.0, 5.5, 4.0, 10.0, 0.8),
+        (52, 11.0, 5.0, 3.4, 9.0, -0.8),
+        (44, 12.5, 4.5, 4.5, 11.0, 0.0),
+    ]
+    height, crx, cry, neck, base, lean = specs[i]
+    W, H = 32, 64
+    c = Canvas(W, H)
+    y_top = H - 1 - height
+    cap_cy = y_top + cry
+    wob = fbm(H, 1, 500 + i, 2, 6)[0]
+
+    def cx_of(y):
+        return 16 + lean * (1 - (y - y_top) / height) * 2
+
+    def stem_hw(y):
+        t = (y - cap_cy) / max(1, H - 1 - cap_cy)
+        return neck + (base - neck) * max(0.0, (t - 0.35) / 0.65) ** 1.8 + 1.2 * (wob[y] - 0.5)
+
+    stem = {(x, y) for y in range(int(cap_cy), H - 1) for x in range(W) if abs(x + 0.5 - cx_of(y)) <= stem_hw(y)}
+    cap = {(x, y) for y in range(y_top, int(cap_cy + cry) + 1) for x in range(W)
+           if ((x + 0.5 - cx_of(cap_cy)) / crx) ** 2 + ((y + 0.5 - cap_cy) / cry) ** 2 <= 1}
+    _shadow(c, 16, H - 1.6, base + 2, 1.6, "y")
+    _rockshade(c, stem, 510 + i, SST[1:7], BAND[1:5], band=3.2, band_top=0.75)
+    under = int(cap_cy + cry)
+    for x, y in stem:  # the cap's shadow on the neck
+        if under < y <= under + 3:
+            c.set(x, y, _step(c.px[y][x], -2 if y <= under + 2 else -1))
+    _rockshade(c, cap, 520 + i, SST[2:7] + BAND[4])
+    for x, y in cap:  # the cap's underside, turned away from the sky
+        if (x, y + 1) not in cap and y > cap_cy:
+            c.set(x, y, SST[2])
+    _moss_cap(c, SST + BAND, 530 + i, 1.4)
+    _grass_foot(c, stem, 540 + i)
+    _outline(c)
     return c
 
 
 def _plants_rocks() -> None:
     # seeds picked so the four walls share the same mean brightness (neighbours sit side by side)
     for i, sd in enumerate((924, 852, 926, 884)):
-        register(f"az.mesa.face@{i}", art(_mesa_face(sd).grid(), legend=TER, note="layered red mesa wall"))
+        register(f"az.mesa.face@{i}", art(_mesa_face(sd).grid(), legend=TER, note="pale layered mesa wall"))
     notes = ["flat-topped acacia", "wide two-tiered acacia", "broad shade tree", "tall forked tree"]
     for i in range(4):
         register(f"az.plant.tree@{i}", art(_tree(i).grid(), legend=PL, note=notes[i]))
@@ -1619,11 +1760,15 @@ def _plants_rocks() -> None:
         register(f"az.plant.reeds@{i}", art(*[_reeds(i, f).grid() for f in range(2)], legend=PL, fps=1.3,
                                             note="cattails at the shore, sway"))
     for i in range(4):
-        register(f"az.rock.spire@{i}", art(_spire(i).grid(), legend=PL, note="red-rock spire"))
+        register(f"az.rock.spire@{i}", art(_spire(i).grid(), legend=PL,
+                                           note="sandstone spire" if i % 2 else "pale streaked rock spire"))
     for i in range(3):
         register(f"az.rock.boulder_big@{i}", art(_boulder_big(i).grid(), legend=PL, note="big boulder"))
         register(f"az.rock.slab@{i}", art(_slab(i).grid(), legend=PL, note="flat rock outcrop"))
     register("az.rock.arch_small", art(_arch().grid(), legend=PL, note="small natural rock arch"))
+    for i in range(3):
+        register(f"az.rock.dome@{i}", art(_dome(i).grid(), legend=PL, note="Red Rocks sandstone dome"))
+        register(f"az.rock.hoodoo@{i}", art(_hoodoo(i).grid(), legend=PL, note="Red Rocks mushroom hoodoo"))
 
 
 # --- register ---------------------------------------------------------------------------------------
@@ -1638,7 +1783,8 @@ def _ground() -> None:
     for i in range(3):
         register(f"az.ground.dirt@{i}", art(_dirt(400 + i).grid(), legend=TER, note="bare earth"))
         register(f"az.ground.road@{i}", art(_road(450 + i).grid(), legend=TER, note="packed dirt road"))
-        register(f"az.ground.mesa@{i}", art(_mesa(500 + i).grid(), legend=TER, note="red rock plateau"))
+        register(f"az.ground.mesa@{i}", art(_mesa(500 + i).grid(), legend=TER, note="pale hardpan, bare rock"))
+        register(f"az.ground.sand@{i}", art(_sand(550 + i).grid(), legend=TER, note="lake shore sand and mud"))
     for i in range(2):
         register(f"az.ground.water@{i}", art(*_lake_frames(600 + i * 17), legend=TER, fps=3,
                                              note="Stonebull Lake water"))
@@ -1648,7 +1794,7 @@ def _ground() -> None:
         register(f"az.mountain.top@{i}", art(_mountain_top(700 + i).grid(), legend=TER, note="mountain wall, top"))
         register(f"az.mountain.face@{i}", art(_mountain_face(750 + i).grid(), legend=TER,
                                               note="mountain wall, south face"))
-        register(f"az.cliff.face@{i}", art(_cliff_face(800 + i).grid(), legend=TER, note="layered sandstone cliff"))
+        register(f"az.cliff.face@{i}", art(_cliff_face(800 + i).grid(), legend=TER, note="pale rock cliff"))
 
 
 _ground()

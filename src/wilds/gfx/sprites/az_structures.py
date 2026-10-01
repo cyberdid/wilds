@@ -703,17 +703,17 @@ def _hut_large() -> None:
     door = arch_door(9, 11)
     drum = planks(WOOD[1:], 3.0)
     eave = canvas(12, 0.5, rings=(16.5,), tick=3)
-    prof = [(0, 17.0), (12.5, 17.0), (13.2, 28.0), (13.9, 28.2), (21.5, 14.5)]
+    prof = [(0, 17.0), (12.5, 17.0), (13.0, 28.5), (13.7, 28.7), (17.5, 25.3), (20, 21.0), (21.5, 14.5)]
     sc.lathe(cx, cy, prof,
              lambda th, z, r, v, ix, iy: ((door(th, z, r, v, ix, iy) or drum(th, z, r, v, ix, iy)) if z < 12.7
                                           else eave(th, z, r, v, ix, iy)))
-    sc.lathe(cx, cy, [(21, 15.0), (24, 14.2), (29, 11.2), (33, 7.0), (36, 3.0), (37.3, 0.8), (37.4, 0)],
+    sc.lathe(cx, cy, [(21, 15.0), (23, 14.4), (37.3, 1.0), (37.4, 0)],
              canvas(10, 0.0, bands=((22, 26, paint_band("hex", 4.0)),), tick=3))
     # posts lashed through the eave's rim, standing out above it
     for i in range(12):
         th = 0.26 + i * math.tau / 12
-        r = 25.5
-        z0 = 13.9 + (28.2 - r) / (28.2 - 14.5) * (21.5 - 13.9)
+        r = 26.0
+        z0 = 13.7 + (28.7 - r) / (28.7 - 25.3) * (17.5 - 13.7)
         x, y = cx + r * math.cos(th), cy + r * math.sin(th)
         sc.rod((x, y, z0 - 1.5), (x, y, z0 + 5.5), 0.9, WOOD[1:])
         sc.put(x - 0.5, y, z0 + 6.1, WOOD[5], sc.new_id(), bias=2)
@@ -860,11 +860,6 @@ def _inn() -> None:
              if z < 8.6 else canvas(12, 0.5)(th, z, r, v, ix, iy))
     sc.lathe(cx, cy, [(12, 15.4), (14, 14), (25, 4.5), (27, 1.5), (27.5, 0)],
              canvas(10, 0.0, bands=((14.5, 18.5, paint_band("hex", 4.0)),)))
-    # hide awning on two poles over the door
-    sc.quad((cx - 8, 15.5, 10.5), (16, 0, 0), (0, 7, -3.5),
-            lambda u, w, lv, ix, iy: PAINT_RED[2] if w > 0.82 else tone(HIDE[2:], lv + 0.1, ix, iy, 0.1))
-    for x in (cx - 7.5, cx + 7.5):
-        sc.rod((x, 22.5, 0), (x, 22.5, 7.5), 0.6, WOOD[1:])
     apex_poles(sc, cx, cy, 23, 33, 3.5, (0.5, 2.6, 1.6))
     # sign on a post at the right: a mug of ale
     sc.rod((41, 8, 0), (41, 8, 22), 0.7, WOOD[1:])
@@ -909,65 +904,70 @@ def _stable() -> None:
     # roof: canvas sloping toward the viewer, laced edges and a red-teal hem
     sc.quad(at(-A - 2, -B - 1, 17), v3(2 * A + 4, 0, 0), (v3(0, 2 * B + 4, 0)[0], v3(0, 2 * B + 4, 0)[1], -7),
             lambda u, w, lv, ix, iy: (PAINT_RED[2] if w > 0.93 else TEAL[2] if w > 0.86 else
-                                      cord(lv) if int(u * 9 + 0.5) != int(u * 9 + 0.35) or u < 0.02 or u > 0.98 else
+                                      cord(lv) if (u * 8) % 1.0 < 0.07 and int(w * 30) % 3 == 0 else
+                                      CANVAS[2] if (u * 8) % 1.0 < 0.07 or u < 0.02 or u > 0.98 else
                                       tone(CANVAS, lv, ix, iy, 0.1)))
     p = sc.pic()
     register("az.obj.stable", _art(finish(p, 20, 29, 19, 2.5), note="open stable: canvas lean-to on posts, hay, trough"))
 
 
 def _stilt_lodge() -> None:
-    """Bloodhoof's lodge by the lake: a timber house up on stilts with a deck, a sloped grey-teal
+    """Bloodhoof's lodge by the lake: a log house up on stilts with a deck, a sloped grey-teal
     roof with crossed poles at the ridge ends, and a ladder down to the grass."""
     W, H = 56, 48
-    sc = Scene(W, H, 0, 37)
-    P = box_frame(-0.42)
-    cx, cy = 27.0, -2.0
-    A, B, S, WH = 15.0, 7.0, 7.0, 9.0   # half length, half depth, stilt height, wall height
+    sc = Scene(W, H, 0, 38)
+    P = box_frame(0.22)
+    cx, cy = 27.0, -4.0
+    A, B, S, WH, R, O = 18.0, 6.5, 7.0, 10.0, 6.5, 1.6   # half length/depth, stilts, wall, ridge, overhang
 
     def at(a, b, z):
         return P(cx, cy, a, b, z)
 
     def vec(a, b, z):
         return P(0, 0, a, b, z)
-    # stilts and braces
-    for a in (-A, -A / 3, A / 3, A):
-        for b in (-B, B + 3):
-            sc.rod(at(a, b, 0), at(a, b, S + 0.5), 0.8, WOOD[1:])
-    sc.rod(at(-A, B + 3, 0.5), at(-A / 3, B + 3, S - 1), 0.5, WOOD[1:])
-    sc.rod(at(A / 3, B + 3, S - 1), at(A, B + 3, 0.5), 0.5, WOOD[1:])
-    # deck (wider than the house toward the front)
-    sc.quad(at(-A - 1, -B - 1, S), vec(2 * A + 2, 0, 0), vec(0, 2 * B + 5, 0),
-            lambda u, w, lv, ix, iy: WOOD[2] if int(u * 14) != int(u * 14 + 0.12) else tone(WOOD[2:], lv, ix, iy, 0.12))
-    sc.quad(at(-A - 1, B + 4, S - 1.5), vec(2 * A + 2, 0, 0), (0, 0, 1.5),
-            lambda u, w, lv, ix, iy: tone(WOOD[1:4], lv, ix, iy, 0.1))
-    # walls: horizontal logs
-    logs = lambda u, w, lv, ix, iy: WOOD[1] if (w * WH) % 2.2 < 0.6 else tone(WOOD[2:], lv + 0.05, ix, iy, 0.1)
-    sc.quad(at(-A, B, S), vec(2 * A, 0, 0), (0, 0, WH), lambda u, w, lv, ix, iy:
-            (DEEP if abs(u - 0.42) < 0.09 and w < 0.78 else logs(u, w, lv, ix, iy)))
-    sc.quad(at(A, B, S), vec(0, -2 * B, 0), (0, 0, WH), logs)
-    sc.quad(at(-A, B, S), vec(0, -2 * B, 0), (0, 0, WH), logs)
-    # gable ends, roof slopes (front lower, toward the viewer), ridge poles crossed at the ends
-    R = 8.0
-    for a in (-A, A):
-        sc.quad(at(a, B, S + WH), vec(0, -2 * B, 0), (vec(0, -B, 0)[0], vec(0, -B, 0)[1], R),
-                lambda u, w, lv, ix, iy: tone(WOOD[1:4], lv, ix, iy, 0.1), tri=True)
-    roof = lambda u, w, lv, ix, iy: (ROOF[1] if (w * 6) % 1.0 < 0.18 else
-                                     tone(ROOF, lv + (0.08 if int(u * 18) % 2 else 0), ix, iy, 0.12))
-    sc.quad(at(-A - 2, B + 2.5, S + WH - 1.5), vec(2 * A + 4, 0, 0),
-            (vec(0, -B - 2.5, 0)[0], vec(0, -B - 2.5, 0)[1], R + 1.5), roof)
-    sc.quad(at(-A - 2, -B - 2.5, S + WH - 1.5), vec(2 * A + 4, 0, 0),
-            (vec(0, B + 2.5, 0)[0], vec(0, B + 2.5, 0)[1], R + 1.5), roof)
-    for a, s in ((-A - 2, -1), (A + 2, 1)):
-        sc.rod(at(a, 0, S + WH + R - 1), at(a + s * 3, -3, S + WH + R + 4), 0.6, WOOD[1:])
-        sc.rod(at(a, 0, S + WH + R - 1), at(a + s * 3, 3, S + WH + R + 4), 0.6, WOOD[1:])
-    # ladder from the deck to the grass
-    for side in (-2.2, 2.2):
-        sc.rod(at(-2 + side, B + 4, S), at(-2 + side, B + 9, 0), 0.5, WOOD[2:])
+
+    def slope(db, dz):
+        d = vec(0, db, 0)
+        return (d[0], d[1], dz)
+    # stilts with cross braces
+    for a in (-A + 1, -A / 3, A / 3, A - 1):
+        for b in (-B + 1, B + 3):
+            sc.rod(at(a, b, 0), at(a, b, S), 0.9, WOOD[1:])
+    # deck: planks running across, a thick front beam
+    sc.quad(at(-A, -B, S), vec(2 * A, 0, 0), vec(0, 2 * B + 4, 0),
+            lambda u, w, lv, ix, iy: WOOD[2] if (u * 2 * A) % 3.5 < 1.0 else WOOD[4])
+    sc.quad(at(-A, B + 4, S - 1.5), vec(2 * A, 0, 0), (0, 0, 1.5),
+            lambda u, w, lv, ix, iy: WOOD[2] if w > 0.5 else WOOD[1])
+    # log walls; the door on the long front wall
+    def logs(u, w, lv, ix, iy):
+        return WOOD[1] if (w * WH) % 2.5 < 1.0 else (WOOD[4] if lv > 0.5 else WOOD[3] if lv > 0.3 else WOOD[2])
+    sc.quad(at(-A, B, S), vec(2 * A, 0, 0), (0, 0, WH - 1), lambda u, w, lv, ix, iy:
+            (DEEP if abs(u - 0.4) < 0.06 and w < 0.72 else WOOD[5] if abs(u - 0.4) < 0.085 and w < 0.78
+             else logs(u, w, lv, ix, iy)))
+    sc.quad(at(A, B, S), vec(0, -2 * B, 0), (0, 0, WH - 1), logs)
+    sc.quad(at(A, B, S + WH - 1), vec(0, -2 * B, 0), slope(-B, R),
+            lambda u, w, lv, ix, iy: tone(WOOD[1:4], lv, ix, iy, 0.1), tri=True)
+    # roof: two slopes of grey-teal shingles, darker rows, a lit ridge
+    def roof(u, w, lv, ix, iy):
+        if w > 0.95:
+            return ROOF[4]
+        return ROOF[1] if (w * 5) % 1.0 < 0.22 else tone(ROOF[2:], lv, ix, iy, 0.08)
+    for side in (1, -1):
+        sc.quad(at(-A - O, side * (B + O), S + WH - O * R / B), vec(2 * A + 2 * O, 0, 0),
+                slope(-side * (B + O), R + O * R / B), roof)
+    for a, sg in ((-A - O, -1), (A + O, 1)):
+        top = S + WH + R
+        sc.rod(at(a, 0, top - 1), at(a + sg * 2.5, -3, top + 4), 0.6, WOOD[1:])
+        sc.rod(at(a, 0, top - 1), at(a + sg * 2.5, 3, top + 4), 0.6, WOOD[1:])
+    # a ladder down to the grass
+    for side in (-2.0, 2.0):
+        sc.rod(at(-A * 0.25 + side, B + 4.6, S), at(-A * 0.25 + side, B + 9.5, 0), 0.5, WOOD[2:])
     for k in range(1, 4):
         t = k / 4
-        sc.rod(at(-4.2, B + 4 + 5 * t, S * (1 - t)), at(0.2, B + 4 + 5 * t, S * (1 - t)), 0.4, WOOD[3:])
+        sc.rod(at(-A * 0.25 - 2, B + 4.6 + 4.9 * t, S * (1 - t)), at(-A * 0.25 + 2, B + 4.6 + 4.9 * t, S * (1 - t)),
+               0.4, WOOD[4:])
     p = sc.pic()
-    register("az.obj.stilt_lodge", _art(finish(p, 28, 44.5, 26, 3.2),
+    register("az.obj.stilt_lodge", _art(finish(p, 28, 45, 25, 2.8),
              note="timber lodge on stilts by the lake: log walls, deck, grey-teal roof, ladder"))
 
 
