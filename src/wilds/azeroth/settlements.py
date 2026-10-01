@@ -39,27 +39,27 @@ class Platform:
 Recipe = list[tuple[str, int, int, int, int]]
 
 RECIPES: dict[str, tuple[int, Recipe]] = {
-    "Bloodhoof Village": (34, [
-        ("az.obj.totem_pole@0", 1, 0, 4, 3), ("az.obj.bonfire", 3, 3, 12, 2), ("az.obj.well", 2, 6, 18, 2),
-        ("az.obj.hut_large", 3, 10, 26, 6), ("az.obj.hut_small@0", 5, 8, 32, 4), ("az.obj.hut_small@1", 5, 8, 32, 4),
-        ("az.obj.tent@0", 3, 10, 34, 4), ("az.obj.tent@1", 3, 10, 34, 4), ("az.obj.tent@2", 3, 10, 34, 4),
-        ("az.obj.totem_pole@1", 2, 12, 30, 3), ("az.obj.banner", 4, 6, 26, 2), ("az.obj.drying_rack", 4, 8, 30, 3),
-        ("az.obj.inn", 1, 14, 24, 6), ("az.obj.forge", 1, 16, 28, 3), ("az.obj.anvil", 1, 16, 28, 2),
-        ("az.obj.stable", 1, 26, 40, 5), ("az.obj.kodo_pen", 6, 28, 46, 4), ("az.obj.barrel@0", 4, 8, 34, 1),
-        ("az.obj.crate@1", 4, 8, 34, 1), ("az.node.prairie_flower", 3, 10, 44, 1),
-        ("az.obj.haystack", 4, 24, 40, 3), ("az.obj.cooking_pot", 3, 2, 10, 1), ("az.obj.torch", 7, 6, 32, 1),
+    "Bloodhoof Village": (34, [  # a few big airy tents on the grass, tall totems between them
+        ("az.obj.big_teepee", 1, 8, 16, 8), ("az.obj.totem_pole@0", 2, 2, 8, 2), ("az.obj.bonfire", 2, 4, 12, 2),
+        ("az.obj.well", 2, 8, 18, 2), ("az.obj.hut_large", 3, 12, 28, 7), ("az.obj.hut_small", 4, 10, 32, 5),
+        ("az.obj.tent", 4, 12, 34, 4), ("az.obj.totem_pole@1", 3, 10, 30, 2), ("az.obj.totem_pole@2", 2, 14, 32, 2),
+        ("az.obj.eagle_totem", 2, 10, 28, 3), ("az.obj.stilt_lodge", 1, 20, 32, 6), ("az.obj.banner", 3, 8, 26, 2),
+        ("az.obj.drying_rack", 2, 10, 30, 3), ("az.obj.inn", 1, 16, 26, 6), ("az.obj.forge", 1, 18, 28, 3),
+        ("az.obj.anvil", 1, 18, 28, 2), ("az.obj.stable", 1, 26, 40, 5), ("az.obj.kodo_pen", 5, 28, 46, 4),
+        ("az.obj.barrel@0", 3, 8, 34, 1), ("az.obj.crate@1", 2, 8, 34, 1), ("az.node.prairie_flower", 3, 10, 44, 1),
+        ("az.obj.haystack", 3, 24, 40, 3), ("az.obj.cooking_pot", 2, 2, 10, 1), ("az.obj.torch", 4, 6, 32, 1),
         ("az.obj.signpost", 3, 30, 40, 1), ("az.obj.prayer_flags", 2, 10, 26, 4),
-        ("az.obj.stone_circle", 1, 20, 30, 6), ("az.obj.hide_stretcher", 3, 10, 30, 3),
-        ("az.obj.kodo_saddle_rack", 2, 24, 36, 3), ("az.obj.grave_cairn", 4, 30, 40, 1)]),
+        ("az.obj.stone_circle", 1, 20, 30, 6), ("az.obj.hide_stretcher", 2, 10, 30, 3),
+        ("az.obj.kodo_saddle_rack", 1, 24, 36, 3), ("az.obj.grave_cairn", 3, 30, 40, 1)]),
     "Camp Narache": (28, [
-        ("az.obj.bonfire", 2, 0, 8, 2), ("az.obj.totem_pole@1", 2, 6, 20, 3), ("az.obj.tent@0", 3, 8, 30, 4),
-        ("az.obj.tent@2", 3, 8, 30, 4), ("az.obj.hut_small@0", 2, 12, 32, 4), ("az.obj.training_dummy", 5, 8, 26, 2),
-        ("az.obj.banner", 2, 4, 20, 2), ("az.obj.drying_rack", 2, 10, 28, 3), ("az.obj.barrel@1", 3, 6, 26, 1),
-        ("az.obj.torch", 4, 6, 24, 1), ("az.obj.signpost", 2, 22, 28, 1), ("az.obj.haystack", 1, 14, 24, 3),
-        ("az.obj.cooking_pot", 2, 2, 8, 1), ("az.obj.hide_stretcher", 2, 10, 24, 3)]),
+        ("az.obj.bonfire", 2, 0, 8, 2), ("az.obj.totem_pole@1", 3, 4, 20, 2), ("az.obj.eagle_totem", 1, 8, 18, 3),
+        ("az.obj.hut_large", 2, 8, 22, 7), ("az.obj.tent", 3, 8, 28, 4), ("az.obj.hut_small", 2, 12, 28, 5),
+        ("az.obj.training_dummy", 5, 8, 26, 2), ("az.obj.banner", 2, 4, 20, 2), ("az.obj.drying_rack", 2, 10, 28, 3),
+        ("az.obj.barrel@1", 2, 6, 26, 1), ("az.obj.torch", 3, 6, 24, 1), ("az.obj.signpost", 2, 22, 28, 1),
+        ("az.obj.haystack", 1, 14, 24, 3), ("az.obj.cooking_pot", 2, 2, 8, 1), ("az.obj.hide_stretcher", 2, 10, 24, 3)]),
     "Camp Sungraze": (24, [
-        ("az.obj.bonfire", 2, 0, 8, 2), ("az.obj.totem_pole@2", 1, 4, 14, 3), ("az.obj.tent@1", 3, 8, 26, 4),
-        ("az.obj.tent@2", 2, 8, 26, 4), ("az.obj.hut_small@1", 2, 10, 28, 4), ("az.obj.drying_rack", 2, 8, 24, 3),
+        ("az.obj.bonfire", 2, 0, 8, 2), ("az.obj.totem_pole@2", 2, 4, 14, 2), ("az.obj.tent", 3, 8, 26, 4),
+        ("az.obj.hut_large", 1, 10, 22, 7), ("az.obj.hut_small", 2, 10, 28, 5), ("az.obj.drying_rack", 2, 8, 24, 3),
         ("az.obj.torch", 3, 6, 20, 1), ("az.obj.cooking_pot", 1, 2, 8, 1), ("az.obj.haystack", 1, 12, 20, 3)]),
     "Venture Co. Mine": (26, [
         ("az.obj.mine_entrance", 1, 0, 6, 6), ("az.obj.goblin_shack", 3, 8, 26, 4), ("az.obj.ore_cart", 3, 6, 24, 3),
