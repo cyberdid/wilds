@@ -451,6 +451,32 @@ One tile = 16 px = 2 yards.
 | `az.tb.gatehouse` | <=48x32 | 1 | 2 | wooden gatehouse block at the end of a rope bridge, teal roof |
 | `az.tb.pine` | <=24x56 | 1 | 4 | tall dark-green mountain pine / fir, layered boughs, golden sunlit tips (Thunder Bluff is full of them) |
 
+## materials
+
+| name | size | frames | variants | note |
+|---|---|---|---|---|
+| `az.mat.wall.hide` | 16x16 | 1 | 4 | tanned tauren hide wall, stitched seams, pegs and lacing |
+| `az.mat.wall.hide_red` | 16x16 | 1 | 2 | hide wall with a horizontal painted red band edged in cream zigzags (rows 5-10) |
+| `az.mat.wall.hide_teal` | 16x16 | 1 | 2 | hide wall with a horizontal band of teal and cream hexagons (rows 4-11) |
+| `az.mat.wall.plank` | 16x16 | 1 | 3 | weathered brown timber boards with nail rows |
+| `az.mat.wall.plank_dark` | 16x16 | 1 | 2 | dark smoked timber, for Venture Co. and Bael'dun buildings |
+| `az.mat.wall.stone` | 16x16 | 1 | 2 | rough pale grey-tan stacked stone |
+| `az.mat.wall.thorn` | 16x16 | 1 | 2 | quilboar wall: woven thorn branches and bone |
+| `az.mat.wall.canvas` | 16x16 | 1 | 2 | off-white canvas with rope lashings |
+| `az.mat.wall.scrap` | 16x16 | 1 | 2 | goblin corrugated metal patched with planks |
+| `az.mat.roof.teal` | 16x16 | 1 | 3 | teal-green wooden shingle panels with darker ridge lines (Thunder Bluff halls) |
+| `az.mat.roof.hide` | 16x16 | 1 | 3 | orange-tan stretched hide panels with stitching |
+| `az.mat.roof.thatch` | 16x16 | 1 | 3 | golden prairie-grass thatch |
+| `az.mat.roof.canvas` | 16x16 | 1 | 2 | white canvas panels with seams |
+| `az.mat.roof.plank` | 16x16 | 1 | 2 | brown timber shingles |
+| `az.mat.roof.sod` | 16x16 | 1 | 2 | grass sod with tiny flowers |
+| `az.mat.roof.scrap` | 16x16 | 1 | 1 | rusty corrugated metal |
+| `az.mat.door.hide` | <=16x24 | 1 | 2 | doorway cut in a hide wall: dark interior, hide flap rolled up on one side |
+| `az.mat.door.plank` | <=16x24 | 1 | 2 | plank door in a timber wall with iron straps |
+| `az.mat.door.gate` | <=32x32 | 1 |  | double palisade gate with a bull-skull ornament |
+| `az.hill.face` | 16x16 | 1 | 4 | earth wall under a grassy lip (top 3 rows green), vertical roots/streaks, seamless sideways; the 4-12 px step of a rolling hill |
+| `az.hill.face_dry` | 16x16 | 1 | 2 | same for dry straw-coloured ground (dirt, dry grass) |
+
 ## items
 
 | name | size | frames | variants | note |

@@ -25,6 +25,12 @@ _ramp("azb_wood", "#2a1a16", "#4a2f22", "#6e4a32", "#936644", "#b98a5c", "#dcb48
 # Tanned kodo hide (lodge roofs, tents, mats): warm cream, shadows lean red-brown.
 _ramp("azb_hide", "#5a3a2a", "#8a6446", "#b8916a", "#dcc094", "#f4e2bc")
 
+# Thunder Bluff as it really looks (v4): teal-painted roof boards, the pale tan-grey cliffs
+# the rises stand on, and the dark mountain pines with sunlit tips that grow on top.
+_ramp("azb_teal", "#173c44", "#24606a", "#3a8a8e", "#62b3ad", "#a3dacb")
+_ramp("azb_cliff", "#3b3431", "#5f5650", "#867b70", "#ab9f8f", "#cdc1ad", "#ebe0cb")
+_ramp("azb_pine", "#0e2016", "#173522", "#234d2d", "#336839", "#558a45", "#a8b25a")
+
 # One legend for the whole city. Digits = wood, a-e = hide, r/R/q = Horde red,
 # h/i/j/J = bone and horn, t/T = turquoise paint, m/M/n = mesa rock, v/V = the drop.
 TB = {
@@ -46,6 +52,8 @@ TB = {
     "A": "tent0", "B": "tent1", "C": "tent2", "D": "tent3", "E": "tent4",
     "Q": "fire2", "W": "fire5", "l": "fire1",
     "X": "water5:190", "H": "water5:120", "Z": "glowcyan:210",
+    # teal roof boards
+    "6": "azb_teal0", "7": "azb_teal1", "8": "azb_teal2", "9": "azb_teal3", "%": "azb_teal4",
 }
 
 
@@ -1381,6 +1389,170 @@ def _banner_pole() -> None:
                                       note="tall Bloodhoof banner on a carved pole"))
 
 
+# === Thunder Bluff v4: grassy mesa tops on sheer cliffs ==========================================
+
+CLIFF = {**{str(i): f"azb_cliff{i}" for i in range(6)}, "g": "azb_pine3", "G": "azb_pine4", "f": "azb_pine1",
+         "K": "ink2"}
+_CLIFF_SHARED = [random.Random(5150).random() for _ in range(T)]
+
+
+def _ridge_profile(seed: int) -> list[float]:
+    """1D periodic height across the cliff (ridges and crevices), blended to a shared
+    profile on the border columns so every variant joins every other sideways."""
+    rng = random.Random(seed)
+    k = [(rng.uniform(0.4, 1.0), rng.random()) for _ in range(3)]
+    out = []
+    for x in range(T):
+        v = sum(a * math.sin(2 * math.pi * ((i + 1) * x / T + ph)) / (i + 1) for i, (a, ph) in enumerate(k))
+        w = max(0.0, 1.0 - min(x, T - 1 - x) / 3.0)
+        out.append(v * (1 - w) + (_CLIFF_SHARED[x] - 0.5) * 1.2 * w)
+    return out
+
+
+def _cliff_face() -> None:
+    """The sheer pale cliffs the rises stand on: tall ridges and dark crevices running top
+    to bottom (lit on their left, light from the top-left), long water stains, a pale lip
+    at the top and the face darkening toward the foot. Horizontal detail is kept to a
+    minimum because the client stretches this tile 2.5-5x vertically."""
+    for i in range(6):
+        seed = 5200 + i * 11
+        rng = random.Random(seed)
+        prof = _ridge_profile(seed)
+        stain = fbm(T, T, seed + 3, 2, 2)
+        c = Canvas(T, T)
+        for x in range(T):
+            slope = prof[(x + 1) % T] - prof[x - 1]
+            for y in range(T):
+                v = 0.6 + 0.18 * prof[x] - 0.45 * slope       # ridges up, faces turned left lit
+                v += (stain[y][x] - 0.5) * 0.2 - 0.22 * (y / (T - 1)) ** 2
+                v += (bayer(x, y // 3) - 0.5) * 0.1              # dither in tall cells: survives stretching
+                c.set(x, y, str(max(2, min(5, int(v * 4.6) + 1))))
+            if slope > 0.75:  # the deep crevices: a dark slot full height, a shadowed lip beside it
+                for y in range(T):
+                    c.set(x, y, "1" if y > 1 else "2")
+                    if c.get((x + 1) % T, y) in "45":
+                        c.set((x + 1) % T, y, "3")
+        for x in range(T):  # the pale lip where the grass top breaks off
+            c.set(x, 0, "5" if c.get(x, 0) not in "01" else "2")
+        if i in (2, 5):  # a few moss tufts on a ledge
+            lx = rng.randrange(3, 10)
+            ly = rng.randrange(5, 10)
+            _stamp(c, lx, ly, [".gG.", "fggG", ".ff."])
+        if i == 4:  # a long dark water stain
+            sx = rng.randrange(4, 12)
+            for y in range(2, T):
+                if c.get(sx, y) not in "0":
+                    c.set(sx, y, "2" if c.get(sx, y) in "345" else "1")
+        register(f"az.tb.cliff.face@{i}", art(c.grid(), legend=CLIFF, note="sheer pale cliff, vertical streaks"))
+
+
+COBBLE = {**{str(i): f"azb_cliff{i}" for i in range(6)}, "m": "azb_cliff0", "M": "azb_cliff1", "g": "azb_pine3",
+          "G": "azb_pine4"}
+_CR = random.Random(77)
+# a jittered 3x3 grid of stone centres; the eight outer ones are shared by every variant
+# (the middle row is staggered by half a stone so the joints never line up)
+_COBBLE_SHARED = [(((gx + 0.5 + (0.5 if gy == 1 else 0)) * T / 3 + _CR.uniform(-1.6, 1.6)) % T,
+                   (gy + 0.5) * T / 3 + _CR.uniform(-1.4, 1.4))
+                  for gy in range(3) for gx in range(3) if (gx, gy) != (1, 1)]
+
+
+def _cobble() -> None:
+    """Light cobblestone paving: rounded pale stones in dark earth joints, each stone lit
+    on its top-left. Stones touching the border come from one shared set, so the four
+    variants join each other in any order; interior stones differ per variant."""
+    def dist(ax, ay, bx, by):
+        dx = min(abs(ax - bx), T - abs(ax - bx))
+        dy = min(abs(ay - by), T - abs(ay - by))
+        return math.hypot(dx, dy * 1.15)
+
+    for i in range(4):
+        rng = random.Random(6100 + i * 7)
+        inner = [(10.7 + rng.uniform(-1.2, 1.2), 8 + rng.uniform(-1.2, 1.2))]
+        if i % 2:  # the middle stone split in two
+            ix, iy = inner[0]
+            inner = [(ix - 1.6, iy - 0.4), (ix + 1.6, iy + 0.5)]
+        pts = _COBBLE_SHARED + inner
+        tone = [random.Random(900 + k + (0 if k < len(_COBBLE_SHARED) else i * 31)).random() for k in range(len(pts))]
+        c = Canvas(T, T)
+        for y in range(T):
+            for x in range(T):
+                border = min(x, y, T - 1 - x, T - 1 - y) < 2
+                cand = range(len(_COBBLE_SHARED)) if border else range(len(pts))
+                ds = sorted((dist(x + 0.5, y + 0.5, *pts[k]), k) for k in cand)
+                (d1, k1), (d2, _k2) = ds[0], ds[1]
+                if d2 - d1 < 0.9:
+                    ch = "m" if bayer(x, y) < 0.7 else "M"
+                else:
+                    px, py = pts[k1]
+                    ddx = (x + 0.5 - px + T / 2) % T - T / 2
+                    ddy = (y + 0.5 - py + T / 2) % T - T / 2
+                    lit = -(ddx + ddy) / max(1.0, d1 * 2.2)
+                    v = 0.5 + 0.25 * tone[k1] + lit * 0.5 - (0.18 if d2 - d1 < 1.9 else 0)
+                    v += (bayer(x, y) - 0.5) * 0.15
+                    ch = str(max(2, min(5, int(v * 5.2))))
+                c.set(x, y, ch)
+        if i == 3:  # grass pushing up in a joint
+            for x, y in ((7, 7), (8, 6)):
+                if c.get(x, y) in "mM":
+                    c.set(x, y, "g")
+        register(f"az.tb.cobble@{i}", art(c.grid(), legend=COBBLE, note="light cobblestone paving"))
+
+
+PINE = {**{str(i): f"azb_pine{i}" for i in range(6)}, "t": "azb_wood1", "T": "azb_wood2", "u": "azb_wood3",
+        "z": "ink:96"}
+
+
+def _pine() -> None:
+    """Tall dark mountain pines: a straight trunk under tiers of drooping boughs. Each
+    tier is a fan of twigs spreading out and down from the trunk: lit on the upper left,
+    dark underneath, the outer tips hanging lower and catching golden sunlight; tiers
+    vary in width so the outline is ragged, and the trunk shows between the lowest."""
+    for i, (h, w, tiers) in enumerate(((56, 24, 8), (54, 22, 7), (48, 21, 6), (42, 24, 5))):
+        rng = random.Random(7000 + i)
+        c = Canvas(24, h)
+        cx = 11.5
+        base = h - 2
+        trunk_top = base - 8
+        for y in range(4, base + 1):  # trunk, mostly hidden by the boughs
+            c.set(11, y, "u")
+            c.set(12, y, "T")
+        c.set(12, base, "t")
+        top = 1
+        span = trunk_top - top
+        tiers_y = [top + round(span * (k / tiers) ** 0.95) for k in range(tiers + 1)]
+        for k in reversed(range(tiers)):  # the bottom tier first: upper tiers overlap it
+            ty0 = tiers_y[k]
+            ty1 = min(base - 4, tiers_y[k + 1] + 2)
+            hw_max = (2.0 + (w / 2 - 2.0) * ((k + 1) / tiers) ** 0.8) * rng.uniform(0.85, 1.05)
+            th = max(2, ty1 - ty0)
+            for x in range(24):
+                u = (x + 0.5 - cx) / hw_max
+                if abs(u) > 1:
+                    continue
+                droop = round(2.2 * u * u)  # the outer twigs hang lower
+                yb = ty0 + th + droop + (x + k) % 2  # a ragged, drooping hem
+                ytop = ty0 + round(th * 0.85 * abs(u) ** 1.4)
+                for y in range(ytop, min(base - 2, yb) + 1):
+                    r = (y - ytop) / max(1, yb - ytop)
+                    v = 0.65 - 0.45 * u - 0.6 * r + (bayer(x, y) - 0.5) * 0.3
+                    ch = "4" if v > 0.62 else "3" if v > 0.32 else "2" if v > 0.02 else "1"
+                    if y >= yb - 1:  # the dark underside of the tier, two rows deep
+                        ch = "0" if y == yb or u > 0.2 else "1"
+                    c.set(x, y, ch)
+                if (x + k * 2) % 4 == 0 and abs(u) > 0.3:
+                    c.set(x, yb, ".")  # notches between twig tips along the hem
+                if u < 0.1 and (x + k) % 2 == 0:
+                    c.set(x, ytop, "5")  # sunlit twig tips on the lit side
+                    if ytop + 1 < base:
+                        c.set(x, ytop + 1, "4")
+                elif u >= 0.1 and (x + k) % 3 == 0:
+                    c.set(x, ytop, "4")
+        c.set(11, 0, "4")
+        c.set(12, 0, "3")
+        g = _finish(c, (12, h - 1.2, 7, 1.2))
+        register(f"az.tb.pine@{i}", art(g.grid(), legend=PINE, note="tall dark mountain pine"))
+
+
 _platform()
 _inlay()
 _platform_edge()
@@ -1400,3 +1572,6 @@ _hanging_hides()
 _prayer_flags()
 _pots()
 _banner_pole()
+_cliff_face()
+_cobble()
+_pine()

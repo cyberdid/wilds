@@ -31,11 +31,12 @@ AZEROTH_MODULES = (
     "az_people_other",
     "az_structures",
     "az_thunder_bluff",
+    "az_materials",
     "az_items",
     "az_fx",
 )
-# thunder_bluff v4 (grassy rises, tents, totem towers) is being drawn: held out until complete
-AZEROTH_DONE: tuple[str, ...] = tuple(m for m in AZEROTH_MODULES if m != "az_thunder_bluff")
+# thunder_bluff v4 and the isometric materials are being drawn: held out until complete
+AZEROTH_DONE: tuple[str, ...] = tuple(m for m in AZEROTH_MODULES if m not in ("az_thunder_bluff", "az_materials"))
 
 
 def load(module: str) -> None:

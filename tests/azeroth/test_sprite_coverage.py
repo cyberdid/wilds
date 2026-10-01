@@ -24,7 +24,7 @@ def test_manifest_is_coherent():
 def test_the_manifest_is_the_size_the_plan_says():
     s = manifest.summary()
     total = sum(v["sprites"] for v in s.values())
-    assert 450 < total < 700, total
+    assert 450 < total < 800, total
 
 
 def test_creature_and_portrait_lists_come_from_the_data():

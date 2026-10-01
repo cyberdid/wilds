@@ -290,6 +290,40 @@ ITEM_FAMILIES = ("belt", "boots", "bracers", "chest", "gloves", "helm", "legs", 
                  "drink", "potion", "bag", "reagent", "quest_item", "ticket", "book")
 
 
+def materials() -> list[Need]:
+    """Textures the client wraps around true isometric volumes (huts, halls, tents, hills, palisades).
+
+    Walls and roofs are 16x16 and must tile seamlessly in BOTH directions: the client maps one tile of
+    wall length to 16 px and repeats the texture vertically. Light comes from the top-left."""
+    n = [Need(f"az.mat.wall.{k}", "16x16", variants=v, note=note) for k, v, note in (
+        ("hide", 4, "tanned tauren hide wall, stitched seams, pegs and lacing"),
+        ("hide_red", 2, "hide wall with a horizontal painted red band edged in cream zigzags (rows 5-10)"),
+        ("hide_teal", 2, "hide wall with a horizontal band of teal and cream hexagons (rows 4-11)"),
+        ("plank", 3, "weathered brown timber boards with nail rows"),
+        ("plank_dark", 2, "dark smoked timber, for Venture Co. and Bael'dun buildings"),
+        ("stone", 2, "rough pale grey-tan stacked stone"),
+        ("thorn", 2, "quilboar wall: woven thorn branches and bone"),
+        ("canvas", 2, "off-white canvas with rope lashings"),
+        ("scrap", 2, "goblin corrugated metal patched with planks"))]
+    n += [Need(f"az.mat.roof.{k}", "16x16", variants=v, note=note) for k, v, note in (
+        ("teal", 3, "teal-green wooden shingle panels with darker ridge lines (Thunder Bluff halls)"),
+        ("hide", 3, "orange-tan stretched hide panels with stitching"),
+        ("thatch", 3, "golden prairie-grass thatch"),
+        ("canvas", 2, "white canvas panels with seams"),
+        ("plank", 2, "brown timber shingles"),
+        ("sod", 2, "grass sod with tiny flowers"),
+        ("scrap", 1, "rusty corrugated metal"))]
+    n += [
+        Need("az.mat.door.hide", "<=16x24", variants=2, note="doorway cut in a hide wall: dark interior, hide flap rolled up on one side"),
+        Need("az.mat.door.plank", "<=16x24", variants=2, note="plank door in a timber wall with iron straps"),
+        Need("az.mat.door.gate", "<=32x32", note="double palisade gate with a bull-skull ornament"),
+        Need("az.hill.face", "16x16", variants=4, note="earth wall under a grassy lip (top 3 rows green), vertical roots/streaks, seamless sideways; "
+             "the 4-12 px step of a rolling hill"),
+        Need("az.hill.face_dry", "16x16", variants=2, note="same for dry straw-coloured ground (dirt, dry grass)"),
+    ]
+    return n
+
+
 def items() -> list[Need]:
     return [Need(f"az.item.{f}", "16x16", variants=4, note="item icon family, four looks") for f in ITEM_FAMILIES]
 
@@ -315,7 +349,8 @@ def required(pack: Path = PACK) -> dict[str, list[Need]]:
     """Sprite module (``az_<key>``) -> what it must define."""
     return {"terrain": terrain(), "creatures": creatures(pack), "monsters": monsters(pack),
             "people_tauren": people_tauren(pack), "people_other": people_other(),
-            "structures": structures(), "thunder_bluff": thunder_bluff(), "items": items(), "fx": fx()}
+            "structures": structures(), "thunder_bluff": thunder_bluff(), "materials": materials(), "items": items(),
+            "fx": fx()}
 
 
 def check(registry, modules: list[str] | None = None, pack: Path = PACK) -> list[str]:
