@@ -32,6 +32,7 @@ class Terrain(IntEnum):
     WATER = 9
     SHALLOWS = 10
     VOID = 11
+    SAND = 12  # the soft band of sand and mud around a lake
 
     @property
     def passable(self) -> bool:
@@ -85,12 +86,12 @@ class ZoneTerrain:
         ly = int(LAKE_SEED_PCT[1] / 100 * macro.height)
         self._lake = macro.component(lx, ly) if macro.rows[ly][lx] == "r" else set()
         self.roads: set[tuple[int, int]] = set()
-        self._macro_cache: dict[tuple[int, int], tuple[str, bool]] = {}
+        self._macro_cache: dict[tuple[int, int], tuple[str, bool, bool]] = {}
 
     def in_bounds(self, p: tuple[int, int]) -> bool:
         return 0 <= p[0] < self.geo.width and 0 <= p[1] < self.geo.height
 
-    def _macro_class(self, x: int, y: int) -> tuple[str, bool]:
+    def _macro_class(self, x: int, y: int) -> tuple[str, bool, bool]:
         """Macro class under a tile, with the coast wobbled by domain-warp noise (per 4x4 block)."""
         key = (x >> 2, y >> 2)
         hit = self._macro_cache.get(key)
@@ -102,20 +103,21 @@ class ZoneTerrain:
         u = (bx + wx) / self.geo.width
         v = (by + wy) / self.geo.height
         cls = self.macro.at(u, v)
-        in_lake = False
-        if cls == "r" and self._lake:
+        in_lake = shore = False
+        if self._lake and cls in _LAND:
             cx = min(self.macro.width - 1, max(0, int(u * self.macro.width)))
             cy = min(self.macro.height - 1, max(0, int(v * self.macro.height)))
-            in_lake = (cx, cy) in self._lake
-        self._macro_cache[key] = (cls, in_lake)
-        return cls, in_lake
+            in_lake = cls == "r" and (cx, cy) in self._lake
+            shore = not in_lake and any((cx + dx, cy + dy) in self._lake for dx in (-1, 0, 1) for dy in (-1, 0, 1))
+        self._macro_cache[key] = (cls, in_lake, shore)
+        return cls, in_lake, shore
 
     def tile(self, x: int, y: int) -> Terrain:
         if not self.in_bounds((x, y)):
             return Terrain.VOID
         if (x, y) in self.roads:
             return Terrain.ROAD
-        cls, in_lake = self._macro_class(x, y)
+        cls, in_lake, shore = self._macro_class(x, y)
         if cls == "v":
             return Terrain.VOID
         if cls == "m":
@@ -125,6 +127,8 @@ class ZoneTerrain:
         fine = self._fine.fractal(x / 5, y / 5, 2)
         if in_lake:
             return Terrain.SHALLOWS if fine > 0.74 else Terrain.WATER
+        if shore and fine < 0.72:
+            return Terrain.SAND
         if cls == "r":
             return Terrain.BOULDER if fine > 0.86 else (Terrain.MESA if patch > 0.78 else (Terrain.DRY_GRASS if patch > 0.45 else Terrain.GRASS))
         if cls == "d":

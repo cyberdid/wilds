@@ -95,6 +95,7 @@ def terrain() -> list[Need]:
         Need("az.ground.dirt", "16x16", variants=3, note="bare earth, seamless"),
         Need("az.ground.road", "16x16", variants=3, note="packed dirt road, seamless with dirt"),
         Need("az.ground.mesa", "16x16", variants=3, note="red-brown rock plateau surface"),
+        Need("az.ground.sand", "16x16", variants=3, note="soft pale tan sand and mud of the lake shore (#B79A6A), seamless, calm, a few pebbles"),
         Need("az.ground.water", "16x16", frames=4, variants=2, note="lake water, animated"),
         Need("az.ground.shallows", "16x16", frames=4, variants=2, note="clear shallow water over sand"),
         Need("az.mountain.top", "16x16", variants=3, note="top of the mountain wall"),

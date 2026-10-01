@@ -57,10 +57,10 @@ PLACES = ("Camp Narache", "Bloodhoof Village", "Thunderhorn Water Well", "High R
 
 GROUND = {Terrain.GRASS: "az.ground.grass", Terrain.TALL_GRASS: "az.ground.tall_grass",
           Terrain.DRY_GRASS: "az.ground.dry_grass", Terrain.DIRT: "az.ground.dirt", Terrain.ROAD: "az.ground.road",
-          Terrain.MESA: "az.ground.mesa", Terrain.WATER: "az.ground.water", Terrain.SHALLOWS: "az.ground.shallows",
+          Terrain.MESA: "az.ground.mesa", Terrain.WATER: "az.ground.water", Terrain.SHALLOWS: "az.ground.shallows", Terrain.SAND: "az.ground.sand",
           Terrain.BOULDER: "az.ground.grass", Terrain.MOUNTAIN: "az.mountain.top", Terrain.CLIFF: "az.mountain.top"}
 # a higher-ranked neighbour bleeds into a lower-ranked tile along their shared edge
-RANK = {Terrain.DIRT: 1, Terrain.ROAD: 2, Terrain.MESA: 3, Terrain.DRY_GRASS: 4, Terrain.GRASS: 5,
+RANK = {Terrain.SAND: 0, Terrain.DIRT: 1, Terrain.ROAD: 2, Terrain.MESA: 3, Terrain.DRY_GRASS: 4, Terrain.GRASS: 5,
         Terrain.TALL_GRASS: 6, Terrain.BOULDER: 5}
 WATERS = (Terrain.WATER, Terrain.SHALLOWS)
 GRASSES = (Terrain.GRASS, Terrain.TALL_GRASS, Terrain.DRY_GRASS, Terrain.BOULDER)
@@ -124,6 +124,8 @@ class Painter:
         if terr in WATERS:
             return self._water(grid, gx, gy, x, y, t)
         name = self.variant(GROUND[terr if terr is not Terrain.BOULDER else Terrain.GRASS], x, y)
+        if name not in self.bank:  # art not drawn yet: fall back to bare earth
+            name = self.variant(GROUND[Terrain.DIRT], x, y)
         blends, overlays = [], []
         rank = RANK.get(terr)
         for side, (dx, dy) in SIDES.items():

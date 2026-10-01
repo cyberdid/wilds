@@ -170,14 +170,14 @@ class ZoneWorld:
     def _wobbly(self, path: list[Pos], name: str) -> set[Pos]:
         """A road along ``path`` that meanders a little instead of following the search's straight legs."""
         noise = ValueNoise(self.seed * 31 + sum(map(ord, name)))
-        pts = [(x + (noise.fractal(i / 45, 0.5, 2) - 0.5) * 14, y + (noise.fractal(i / 45, 7.5, 2) - 0.5) * 14)
+        pts = [(x + (noise.fractal(i / 45, 0.5, 2) - 0.5) * 8, y + (noise.fractal(i / 45, 7.5, 2) - 0.5) * 8)
                for i, (x, y) in enumerate(path)]
         out: set[Pos] = set()
         for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
             steps = max(1, int(max(abs(x1 - x0), abs(y1 - y0))))
             for k in range(steps + 1):
                 x, y = x0 + (x1 - x0) * k / steps, y0 + (y1 - y0) * k / steps
-                out.update((int(x) + dx, int(y) + dy) for dx in (0, 1, 2) for dy in (0, 1, 2))
+                out.update((int(x) + dx, int(y) + dy) for dx in (0, 1) for dy in (0, 1))  # a 2-tile trail (4 yd)
         return out
 
     def build_roads(self) -> None:

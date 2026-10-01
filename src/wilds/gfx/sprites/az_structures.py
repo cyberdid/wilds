@@ -380,7 +380,7 @@ def shade3(nx: float, ny: float, nz: float) -> float:
     """Brightness 0..1 of a surface with normal n under the top-left sun (a little ambient)."""
     n = math.sqrt(nx * nx + ny * ny + nz * nz) or 1.0
     d = (nx * LIGHT3[0] + ny * LIGHT3[1] + nz * LIGHT3[2]) / n
-    return max(0.0, min(1.0, 0.2 + 0.85 * max(0.0, d) ** 0.85))
+    return max(0.0, min(1.0, 0.16 + 0.86 * max(0.0, d) ** 1.25))
 
 
 class Scene:
@@ -581,11 +581,12 @@ def canvas(seams: int = 10, off: float = 0.0, ramp: Sequence[str] = (), rings: S
                 if c:
                     return c
         a = (th / math.tau * seams + off) % 1.0
-        dist = min(a, 1 - a) * math.tau * r / seams          # arc px to the nearest seam
-        if dist < 1.5 and int(z) % tick == 0:
+        gap = math.tau * r / seams                           # px between two seams here
+        dist = min(a, 1 - a) * gap                           # arc px to the nearest seam
+        if gap > 5 and dist < 1.5 and int(z) % tick == 0:
             return cord(v)
-        if dist < 0.5:
-            return step(ramp, tone(ramp, v * gain, ix, iy), -2)
+        if gap > 3 and dist < 0.6:
+            return ramp[1] if v < 0.45 else ramp[2]
         for rz in rings:
             if abs(z - rz) < 0.5:
                 return cord(v) if int(th * r) % 3 else step(ramp, tone(ramp, v * gain, ix, iy), -1)
@@ -694,24 +695,32 @@ def finish(p: Pic, cx: float, gy: float, rx: float, ry: float) -> Pic:
 
 
 def _hut_large() -> None:
-    """Camp Narache's great tent: a timber drum, a wide flared canvas eave pierced by a ring of
-    posts, a stitched canvas bell above, painted band and crossed horns at the top."""
+    """Camp Narache's great tent: a timber drum, a wide flared canvas eave with posts standing
+    through its rim, a stitched canvas bell above, a painted band and crossed horns on top."""
     W, H = 64, 56
     cx, cy = 32.0, 0.0
-    sc = Scene(W, H, 0, 42)
-    door = arch_door(8, 9)
+    sc = Scene(W, H, 0, 44)
+    door = arch_door(9, 11)
     drum = planks(WOOD[1:], 3.0)
-    eave = canvas(12, 0.5, rings=(14.5,), tick=3)
-    sc.lathe(cx, cy, [(0, 17.0), (10, 17.0), (11, 29.0), (11.8, 29.2), (20, 14.5)],
-             lambda th, z, r, v, ix, iy: ((door(th, z, r, v, ix, iy) or drum(th, z, r, v, ix, iy)) if z < 10.2
+    eave = canvas(12, 0.5, rings=(16.5,), tick=3)
+    prof = [(0, 17.0), (12.5, 17.0), (13.2, 28.0), (13.9, 28.2), (21.5, 14.5)]
+    sc.lathe(cx, cy, prof,
+             lambda th, z, r, v, ix, iy: ((door(th, z, r, v, ix, iy) or drum(th, z, r, v, ix, iy)) if z < 12.7
                                           else eave(th, z, r, v, ix, iy)))
-    sc.lathe(cx, cy, [(19.5, 15.0), (23, 14.2), (28, 11.5), (32, 7.5), (35, 3.5), (36.5, 0.8), (36.6, 0)],
-             canvas(10, 0.0, bands=((20.5, 24.5, paint_band("hex", 4.0)),), tick=3))
-    ring_posts(sc, cx, cy, 24.5, 12, 19, off=0.26, rad=0.9)
+    sc.lathe(cx, cy, [(21, 15.0), (24, 14.2), (29, 11.2), (33, 7.0), (36, 3.0), (37.3, 0.8), (37.4, 0)],
+             canvas(10, 0.0, bands=((22, 26, paint_band("hex", 4.0)),), tick=3))
+    # posts lashed through the eave's rim, standing out above it
+    for i in range(12):
+        th = 0.26 + i * math.tau / 12
+        r = 25.5
+        z0 = 13.9 + (28.2 - r) / (28.2 - 14.5) * (21.5 - 13.9)
+        x, y = cx + r * math.cos(th), cy + r * math.sin(th)
+        sc.rod((x, y, z0 - 1.5), (x, y, z0 + 5.5), 0.9, WOOD[1:])
+        sc.put(x - 0.5, y, z0 + 6.1, WOOD[5], sc.new_id(), bias=2)
     p = sc.pic()
     finial(p, 32, 0)
-    register("az.obj.hut_large", _art(finish(p, 32, 53, 30, 3.4),
-             note="Camp Narache's great tent: timber drum, flared canvas eave, ring of posts, stitched bell"))
+    register("az.obj.hut_large", _art(finish(p, 32, 53.5, 22, 3.2),
+             note="Camp Narache's great tent: timber drum, flared canvas eave, posts through its rim, stitched bell"))
 
 
 def _big_teepee() -> None:

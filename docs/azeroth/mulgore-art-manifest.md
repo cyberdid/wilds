@@ -13,6 +13,7 @@ One tile = 16 px = 2 yards.
 | `az.ground.dirt` | 16x16 | 1 | 3 | bare earth, seamless |
 | `az.ground.road` | 16x16 | 1 | 3 | packed dirt road, seamless with dirt |
 | `az.ground.mesa` | 16x16 | 1 | 3 | red-brown rock plateau surface |
+| `az.ground.sand` | 16x16 | 1 | 3 | soft pale tan sand and mud of the lake shore (#B79A6A), seamless, calm, a few pebbles |
 | `az.ground.water` | 16x16 | 4 | 2 | lake water, animated |
 | `az.ground.shallows` | 16x16 | 4 | 2 | clear shallow water over sand |
 | `az.mountain.top` | 16x16 | 1 | 3 | top of the mountain wall |

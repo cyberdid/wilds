@@ -31,16 +31,20 @@ _ramp("azt_straw", "#3a2f1b", "#5b4924", "#7f672e", "#a5893d", "#c8ac58", "#e5d1
 _ramp("azt_soil", "#2a1915", "#462a1d", "#654027", "#845735", "#a37447", "#c39562", "#dcb784")  # earth
 _ramp("azt_rock", "#1e1219", "#361c1e", "#552a23", "#763d2b", "#975536", "#b67146", "#d4955f",
       "#ebbd85")  # red-brown mesa stone
-_ramp("azt_lake", "#10263f", "#173a5a", "#1f5476", "#2b7090", "#4a93aa", "#86c2cc", "#d2eee8")
-_ramp("azt_shoal", "#1f5a78", "#2d7189", "#448896", "#619d9f", "#86b5a8", "#b9d2bb")  # clear water over sand
+_ramp("azt_lake", "#1f4f5c", "#2c6673", "#3e8590", "#55a0a5", "#6fb5ae", "#98cdc3", "#cfe9e0")  # pale turquoise
+_ramp("azt_shoal", "#4f9c9c", "#62aca8", "#6fb5ae", "#84c2b6", "#9fd0c1", "#c3e2d4")  # see-through shallows
 # The ground as the 2.5D client drapes it (it adds the slope light itself, so these stay close
-# together): Mulgore's soft yellow-green meadow, golden hay, a neutral worn-earth trail, and the
-# grey granite of the mountain wall with dark pine-green moss.
-_ramp("azt_mead", "#3d5427", "#4e692a", "#607d2e", "#739032", "#87a137", "#9db341")
-_ramp("azt_hay", "#5b5024", "#766729", "#917f31", "#aa963c", "#c0ab4c", "#d5c163")
-_ramp("azt_trail", "#3d2b1e", "#59402b", "#735838", "#8b6e47", "#a28558", "#b89c6d", "#ccb388")
-_ramp("azt_gran", "#222326", "#34363a", "#4a4c4e", "#616260", "#797973", "#929087", "#aba89c", "#c5c1b3")
-_ramp("azt_pine", "#18261c", "#223522", "#2e4729", "#3d5b31")
+# together): Mulgore's warm lime-gold meadow, golden straw, a pale gravel trail, tan bare earth
+# and shore sand, the pale beige-grey rock of the mountain ring with olive and pine-green moss,
+# and the pink-tan sandstone with orange bands of Red Rocks.
+_ramp("azt_mead", "#4f6a28", "#6e8a2e", "#7f9832", "#8fa535", "#a8b840", "#c4be55")
+_ramp("azt_hay", "#6f5f2b", "#8c7a35", "#a99441", "#c4ad52", "#d6c068", "#e6d48a")
+_ramp("azt_trail", "#4b453b", "#675f52", "#81796a", "#978f7e", "#a9a08e", "#bcb4a2", "#d0c9b8")
+_ramp("azt_sand", "#5a4630", "#76603f", "#937a51", "#a88d5f", "#b89a68", "#c9ae7f", "#dac59b")
+_ramp("azt_gran", "#2f2b27", "#4a433b", "#665c50", "#7d7163", "#8e8172", "#a99b86", "#c9b9a0", "#ddd0ba")
+_ramp("azt_pine", "#18261c", "#223522", "#2e4729", "#3d5b31", "#5a6f48")
+_ramp("azt_sstone", "#4a3330", "#6b4a42", "#8c6656", "#a9806b", "#c29a84", "#d6b39c", "#e6cbb6")
+_ramp("azt_band", "#7a3a1e", "#a5532a", "#c8703a", "#e08f52", "#efb07a")
 
 
 def _chars(chars: str, ramp: str) -> dict[str, str]:
@@ -53,17 +57,19 @@ ROCK_CH, LAKE_CH, SHOAL_CH = "mnopqrst", "HIJKLMN", "UVWXYZ"
 # the newer ramps are only ever written by code, so they take (Greek) letters the hand-drawn
 # legends never use
 MEAD, HAY, TRAIL = "αβγδεζ", "ηθικλμ", "νξοπρστ"
-GRAN, PINE = "ΑΒΓΔΕΖΗΘ", "ΙΚΛΜ"
+GRAN, PINE, SAND = "ΑΒΓΔΕΖΗΘ", "ΙΚΛΜΝ", "абвгдеж"
+SST, BAND = "зийклмн", "фхцчш"
 TER = {**_chars(GRASS_CH, "azt_grass"), **_chars(STRAW_CH, "azt_straw"), **_chars(SOIL_CH, "azt_soil"),
        **_chars(ROCK_CH, "azt_rock"), **_chars(LAKE_CH, "azt_lake"), **_chars(SHOAL_CH, "azt_shoal"),
        **_chars(MEAD, "azt_mead"), **_chars(HAY, "azt_hay"), **_chars(TRAIL, "azt_trail"),
-       **_chars(GRAN, "azt_gran"), **_chars(PINE, "azt_pine"),
+       **_chars(GRAN, "azt_gran"), **_chars(PINE, "azt_pine"), **_chars(SAND, "azt_sand"),
+       **_chars(SST, "azt_sstone"), **_chars(BAND, "azt_band"),
        "z": "ink:72", "y": "ink:40"}
 
 
 def _step(ch: str, k: int) -> str:
     """The same material ``k`` steps lighter (k > 0) or darker along its ramp."""
-    for ramp in (MEAD, HAY, TRAIL, GRAN, PINE, GRASS_CH, STRAW_CH, SOIL_CH, ROCK_CH):
+    for ramp in (MEAD, HAY, TRAIL, GRAN, PINE, SAND, SST, BAND, GRASS_CH, STRAW_CH, SOIL_CH, ROCK_CH):
         i = ramp.find(ch)
         if i >= 0:
             return ramp[max(0, min(len(ramp) - 1, i + k))]
@@ -411,14 +417,14 @@ def _mountain_top(seed: int) -> Canvas:
     two, a soft patch of dark pine-green moss and a tuft of grass. Calm on purpose - on the
     diamond it covers whole mountainsides."""
     rng = random.Random(seed)
-    c = _patches(seed, GRAN[3:6], [20, 58, 22], lumps=5)
+    c = _patches(seed, GRAN[3:6], [15, 68, 17], lumps=5)
     moss = fbm(T, T, seed + 8, 2, 1)
     cut = sorted(v for row in moss for v in row)
-    lo, mid = cut[int(T * T * 0.86)], cut[int(T * T * 0.95)]
+    lo, mid = cut[int(T * T * 0.84)], cut[int(T * T * 0.96)]
     for y in range(T):  # one soft mat of moss per tile (the same share on every variant)
         for x in range(T):
             if moss[y][x] >= lo:
-                c.px[y][x] = PINE[3] if moss[y][x] < mid else PINE[2]
+                c.px[y][x] = PINE[4] if moss[y][x] < mid else PINE[3]
     _despeckle(c, 2)
     taken: set = set()
     for _k in range(2):  # hairline cracks, short, running down-right on screen (texture x)
