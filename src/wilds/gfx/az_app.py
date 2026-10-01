@@ -193,7 +193,7 @@ class Painter:
             out = pygame.Surface((32, 16 + span), pygame.SRCALPHA)
             du = ((he + hs) - (hn + hw)) / 2  # rise towards the east corner, px per tile
             dv = ((hw + hs) - (hn + he)) / 2
-            shade = int(max(-46, min(46, 15 * (0.85 * du + 0.15 * dv))))
+            shade = int(max(-40, min(40, 11 * (0.85 * du + 0.15 * dv))))
             for sx in range(32):
                 prev_y, prev_c = None, None
                 for sy in range(16):
@@ -218,6 +218,15 @@ class Painter:
                         above = out.get_at((sx, sy - 1))
                         if above.a:
                             out.set_at((sx, sy), above)
+            seam = out.copy()  # and 1 px sideways: neighbours overpaint it, so no background shows through
+            for sy in range(span + 16):
+                for sx in range(32):
+                    if out.get_at((sx, sy)).a == 0:
+                        for nx in (sx - 1, sx + 1):
+                            if 0 <= nx < 32 and out.get_at((nx, sy)).a:
+                                seam.set_at((sx, sy), out.get_at((nx, sy)))
+                                break
+            out = seam
             hit = self._slopes[k] = out
         return hit, top
 

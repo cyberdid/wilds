@@ -88,7 +88,7 @@ class Relief:
             d = math.hypot(vx - cx, (vy - cy) / 0.75)
             if d < r + 14:
                 lift *= max(0.0, (d - r * 0.8) / (r * 0.2 + 14))
-        return int(lift * min(1.0, wet / 14))  # banks slope gently down to the water
+        return int(lift * min(1.0, wet / 14) ** 1.5)  # banks slope gently down to the water
 
     def _water_distance(self, vx: int, vy: int) -> int:
         """Rough tiles to the nearest lake (probed along 8 directions), capped at 14."""

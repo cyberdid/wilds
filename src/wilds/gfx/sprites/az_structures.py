@@ -558,19 +558,6 @@ class Scene:
             out.append((q[0], q[1], q[2], r, s))
         return out
 
-    def disc(self, cx: float, cy: float, z: float, r: float, mat: Callable) -> None:
-        """A flat horizontal disc (a platform top); ``mat(rr, th, ix, iy)``."""
-        oid = self.new_id()
-        lv = shade3(0, 0, 1)
-        rr = 0.0
-        while rr <= r:
-            n = max(6, int(math.tau * rr / 0.5))
-            for i in range(n):
-                th = i * math.tau / n
-                self.put(cx + rr * math.cos(th), cy + rr * math.sin(th), z,
-                         lambda ix, iy, rr=rr, th=th: mat(rr, th, lv, ix, iy), oid)
-            rr += 0.4
-
     def pic(self, edge: float = 7.0) -> Pic:
         """Freeze into a Pic. Where a nearer part overlaps a farther one, the farther pixel along
         the boundary turns dark: the inner contour lines of pixel art."""
@@ -845,14 +832,12 @@ def _hut_small(v: int) -> None:
     W, H = 48, 44
     cx, cy = 24.0, 0.0
     sc = Scene(W, H, 0, 33)
-    if v == 0:   # Sungraze: painted hide wall, flared eave, tall canvas cone
-        door = arch_door(7, 8)
-        wall = hide_wall()
-        sc.lathe(cx, cy, [(0, 14.5), (8.5, 14.5), (9.5, 20.5), (10.2, 20.6), (13, 15)],
-                 lambda th, z, r, vv, ix, iy: (door(th, z, r, vv, ix, iy) or wall(th, z, r, vv, ix, iy))
-                 if z < 8.6 else canvas(10, 0.5, bands=((10.2, 12.8, paint_band("step", 2.6)),))(th, z, r, vv, ix, iy))
-        sc.lathe(cx, cy, [(12.5, 15.4), (16, 13), (30, 2.2), (31, 0)], canvas(9, 0.0))
-        apex_poles(sc, cx, cy, 27, 37, 4, (0.5, 2.6, 1.6))
+    if v == 0:   # Sungraze: a canvas cone flaring into a painted tan hide skirt
+        door = arch_door(7, 9)
+        sc.lathe(cx, cy, [(0, 20.0), (3, 17.0), (7, 14.8), (12, 13.0)], skirt(16.0, 6.0, 6.0, door))
+        sc.lathe(cx, cy, [(11.8, 13.2), (31, 2.2), (32, 0)],
+                 canvas(9, 0.0, bands=((11.8, 15.4, paint_band("step", 3.6)),)))
+        apex_poles(sc, cx, cy, 28, 38, 4, (0.5, 2.6, 1.6))
         p = sc.pic()
         finial(p, 24, 0)
     elif v == 1:  # round hide lodge: a tan bell, red-and-teal band, ring of short posts
@@ -872,7 +857,7 @@ def _hut_small(v: int) -> None:
         p = sc.pic()
         finial(p, 24, 0)
     register(f"az.obj.hut_small@{v}", _art(finish(p, 24, 40.5, 23, 3.4),
-             note=["tent with a painted hide wall, flared eave and a canvas cone",
+             note=["Sungraze tent: canvas cone flaring into a tan skirt with teal diamonds",
                    "round tan hide lodge with a red-and-teal band and posts",
                    "two-tier canvas tent with a hex band"][v]))
 
@@ -892,6 +877,26 @@ def hide_wall() -> Callable:
     return mat
 
 
+def skirt(spacing: float, size: float, mid: float, door: Callable) -> Callable:
+    """Tan hide skirt flaring to the ground, big teal diamonds in red outline (Camp Sungraze)."""
+    def mat(th, z, r, v, ix, iy):
+        c = door(th, z, r, v, ix, iy)
+        if c:
+            return c
+        u = wrap(th - FRONT) * r
+        du = (u % spacing) - spacing / 2
+        if abs(u) > spacing / 2:
+            d = abs(du) / size + abs(z - mid) / (size * 0.8)
+            if d < 0.62:
+                return CANVAS[4] if d < 0.2 else TEAL[3] if v > 0.4 else TEAL[2]
+            if d < 0.9:
+                return PAINT_RED[2] if v > 0.4 else PAINT_RED[1]
+        if z < 1.2:
+            return HIDE[1]
+        return tone(HIDE[1:5], v, ix, iy, 0.12)
+    return mat
+
+
 def _tent(v: int) -> None:
     """Tall conical tents with laced seams and crossed horns (three patterns)."""
     W, H = 40, 48
@@ -908,19 +913,17 @@ def _tent(v: int) -> None:
                  canvas(8, 0.5, ramp=HIDE[1:], bands=((22, 25, paint_band("step", 3.0)),
                                                        (4, 8, paint_band("hex", 4.0))), door=door, gain=1.05))
         apex_poles(sc, cx, cy, 31, 42, 3.5, (0.7, 2.4, 1.55))
-    else:          # flared skirt halfway up, painted hide wall below (Camp Sungraze)
-        door = arch_door(6, 7)
-        wall = hide_wall()
-        sc.lathe(cx, cy, [(0, 11.0), (8, 11.0), (9, 16.5), (9.8, 16.6), (12.5, 11.4)],
-                 lambda th, z, r, vv, ix, iy: (door(th, z, r, vv, ix, iy) or wall(th, z, r, vv, ix, iy))
-                 if z < 8.1 else canvas(10, 0.5, bands=((9.8, 12.4, paint_band("step", 2.6)),))(th, z, r, vv, ix, iy))
-        sc.lathe(cx, cy, [(12, 11.8), (14, 10.4), (35, 1.6), (36, 0)], canvas(8, 0.0))
-        apex_poles(sc, cx, cy, 32, 42, 3.5, (0.5, 2.6, 1.6))
+    else:          # Camp Sungraze: a white cone flaring into a painted tan hide skirt
+        door = arch_door(5, 7)
+        sc.lathe(cx, cy, [(0, 15.5), (2.5, 13.2), (6, 11.4), (11.5, 9.8)], skirt(13.0, 5.0, 5.6, door))
+        sc.lathe(cx, cy, [(11.3, 10.0), (36, 1.6), (37, 0)],
+                 canvas(8, 0.0, bands=((11.3, 14.5, paint_band("step", 3.2)),)))
+        apex_poles(sc, cx, cy, 33, 43, 3.5, (0.5, 2.6, 1.6))
     p = sc.pic()
     finial(p, 20, 0)
     register(f"az.obj.tent@{v}", _art(finish(p, 20, 45, 18, 3),
              note=["white laced cone tent, teal-and-red bands", "tan hide cone tent, stepped and hex bands",
-                   "Sungraze tent: canvas cone over a flared eave and a painted hide wall"][v]))
+                   "Sungraze tent: tall canvas cone flaring into a tan skirt with teal diamonds"][v]))
 
 
 # --- inn, stable, stilt lodge -----------------------------------------------------------------------
@@ -1579,7 +1582,6 @@ def _camp() -> None:
         _crate(v)
 
 
-
 # --- rock ----------------------------------------------------------------------------------------
 
 
@@ -1790,17 +1792,6 @@ def _kodo_bones() -> None:
 # --- the Great Gate --------------------------------------------------------------------------------
 
 
-def _log_wall(p: Pic, x0: int, y0: int, x1: int, y1: int, vertical: bool, dark: float = 0.0) -> None:
-    """Stacked logs: each 3px, lit edge / body / shadow, with end-grain notches."""
-    for y in range(y0, y1 + 1):
-        for x in range(x0, x1 + 1):
-            k = (x - x0) % 3 if vertical else (y - y0) % 3
-            c = [WOOD[4], WOOD[3], WOOD[1]][k]
-            if dark:
-                c = step(WOOD, c, -1) if (x - x0) / max(1, x1 - x0) > 1 - dark else c
-            p.set(x, y, c)
-
-
 # --- Venture Co. ------------------------------------------------------------------------------------
 
 
@@ -1819,7 +1810,7 @@ def _mine_entrance() -> None:
         top = 4 + abs(x - 24) ** 2 * 0.028 + wob[int(x) % 48] * 3
         return 0.5 < x < 47.5 and y >= top
 
-    pts = rock(p, hill, MESA[1:], 56, strata=5)
+    pts = rock(p, hill, PALE[1:], 56, cells=4, lit=0.6)
     tufts(p, pts, 57)
     # tunnel mouth
     for y in range(14, 40):
@@ -1833,13 +1824,24 @@ def _mine_entrance() -> None:
             p.hline(lx - 1, rx_ + 1, y, WOOD[2])
         p.set(lx, y, STEEL[4])
         p.set(rx_, y, STEEL[4])
-    # timber frame: posts, lintel, knee braces
-    for x in (14, 32):
-        p.vline(x, 13, 39, WOOD[4])
-        p.vline(x + 1, 13, 39, WOOD[2])
-    p.rect(12, 11, 24, 3, lambda x, y: [WOOD[4], WOOD[3], WOOD[1]][y - 11])
-    p.line(16, 14, 18, 16, WOOD[3])
-    p.line(31, 14, 29, 16, WOOD[2])
+    # two sloping buttresses of horizontal planks, heavy posts and a beam lintel
+    for y in range(13, 40):
+        t = (y - 13) / 26
+        for side in (-1, 1):
+            inner, outer = (15, 15 - (3 + 7 * t)) if side < 0 else (32, 32 + (3 + 7 * t))
+            lit = side < 0
+            for x in range(int(round(min(inner, outer))), int(round(max(inner, outer))) + 1):
+                row = (y - 13) % 3
+                c = [WOOD[4] if lit else WOOD[3], WOOD[3] if lit else WOOD[2], WOOD[1]][row]
+                if x == int(round(outer)):
+                    c = WOOD[2] if lit else WOOD[1]
+                p.set(x, y, c)
+    for x in (15, 32):
+        p.vline(x, 12, 39, WOOD[5] if x == 15 else WOOD[3])
+        p.vline(x + 1, 12, 39, WOOD[2])
+    p.rect(11, 10, 26, 3, lambda x, y: [WOOD[4], WOOD[3], WOOD[1]][y - 10])
+    for x in (14, 33):
+        p.set(x, 11, STEEL[4])
     # the Venture Co. sign: a riveted rust plate with hazard stripes
     p.rect(17, 5, 14, 6, lambda x, y: RUST[3] if x < 28 else RUST[2])
     p.hline(17, 30, 5, RUST[4])
@@ -1850,10 +1852,10 @@ def _mine_entrance() -> None:
     for x in range(20, 28, 2):
         p.set(x, 7, RUST[1])
     # a lantern on the left post
-    p.stamp(["s.", "ly", "ss"], {"s": STEEL[2], "l": "fire4", "y": "fire3"}, 12, 17)
+    p.stamp(["sss", "lys", "sss", ".s.", ".s.", ".s.", ".s.", "sss"], {"s": STEEL[2], "l": "fire4", "y": "fire3"}, 2, 31)
     p.outline()
     p.shadow(24, 39.5, 24, 1)
-    register("az.obj.mine_entrance", _art(p, note="Venture Co. mine: timber-framed shaft in the mesa, rails"))
+    register("az.obj.mine_entrance", _art(p, note="Venture Co. mine: plank-buttressed portal in pale rock, rails, lamp post"))
 
 
 def _metal_panels(p: Pic, x0: int, y0: int, x1: int, y1: int, seed: int) -> None:
@@ -2371,7 +2373,6 @@ def _wilds() -> None:
     _spirit_portal()
 
 
-
 # --- settlement dressing ------------------------------------------------------------------------
 
 
@@ -2789,16 +2790,17 @@ def _hide_longhouse() -> None:
             if abs(a) > 3.2 or z > 9:
                 return HIDE[4] if a < 0 else WOOD[1]
             return DEEP if z > 1.5 else FIRE[2]
-        if rib < 0.12:
-            return HIDE[0] if lv < 0.5 else HIDE[1]
-        if rib < 0.26:
-            lv += 0.12
-        for sz in (0.55, 1.25):   # stitched seams along the lodge
-            if abs(th - sz) * R < 0.55:
-                return cord(lv) if int(a * 1.0) % 3 else HIDE[1]
-        if -20 < a < -12 and 0.7 < th < 1.05 or 14 < a < 21 and 0.25 < th < 0.55:
-            return tone(HIDE[2:], lv + 0.1, ix, iy, 0.1)   # lighter patches
-        return tone(HIDE[0:5], lv, ix, iy, 0.12)
+        if rib < 0.1:
+            return HIDE[0] if lv < 0.6 else HIDE[1]
+        if rib < 0.24:
+            lv += 0.14
+        elif rib > 0.85:
+            lv -= 0.1
+        if abs(th - 0.62) * R < 0.55 and int(a) % 3:   # one stitched seam along the lodge
+            return cord(lv)
+        if -20 < a < -13 and 0.9 < th < 1.25 or 14 < a < 20 and 0.3 < th < 0.55:
+            return tone(HIDE[1:5], lv + 0.1, ix, iy, 0.1)   # lighter patches
+        return tone(HIDE[0:4], lv, ix, iy, 0.12)
 
     def vault(u, w):
         a, th = -L + 2 * L * u, math.pi * w
@@ -2810,10 +2812,10 @@ def _hide_longhouse() -> None:
     for end in (-1, 1):
         ex, ey, _ = P(cx, cy, end * L, 0, 0)
         prof = [(HH * math.sin(t * math.pi / 2 / 12), R * math.cos(t * math.pi / 2 / 12)) for t in range(13)]
-        sc.lathe(ex, ey, prof, lambda th, z, r, v, ix, iy: (HIDE[1] if (th * 6 / math.pi) % 1.0 < 0.1
-                                                             else tone(HIDE[0:5], v, ix, iy, 0.12)))
+        sc.lathe(ex, ey, prof, lambda th, z, r, v, ix, iy: (HIDE[0] if (th * 6 / math.pi) % 1.0 < 0.1
+                                                             else tone(HIDE[0:4], v, ix, iy, 0.12)))
         for db in (-3.5, 3.5):
-            sc.rod(P(cx, cy, end * (L + 2), 0, HH - 3), P(cx, cy, end * (L + 6), db, HH + 5), 0.7, WOOD[1:])
+            sc.rod(P(cx, cy, end * (L + 3), 0, HH - 4), P(cx, cy, end * (L + 7), db, HH + 4), 0.8, WOOD[1:])
     # stakes pinning the hide hem along the front
     for a in range(-int(L) - 4, int(L) + 6, 7):
         sc.rod(P(cx, cy, a, R + 1, 0), P(cx, cy, a, R + 1, 2.2), 0.5, WOOD[2:])
@@ -2838,13 +2840,14 @@ def _windbreak(v: int) -> None:
             bulge = 1.6 * math.sin(math.pi * u) * math.sin(math.pi * w)
             return (x0 + 1.2 + (x1 - x0 - 2.4) * u, y0 + (y1 - y0) * u + bulge, z), (-0.1, 1.0, 0.25 * (w - 0.5))
 
-        def mat(u, w, lv, ix, iy, ramp=ramp, i=i):
+        def mat(u, w, lv, ix, iy, ramp=ramp, i=i, x0=x0, x1=x1):
             if u < 0.04 or u > 0.96:
                 return cord(lv) if int(w * 18) % 2 else None   # lacing to the poles
             if w > 0.94 or w < 0.05:
                 return ramp[1]
-            if v == 0 and abs(u - 0.5) * 3 + abs(w - 0.55) * 2.2 < 0.42:
-                return TEAL[3] if abs(u - 0.5) * 3 + abs(w - 0.55) * 2.2 < 0.28 else PAINT_RED[2]
+            dd = abs(u - 0.5) * (x1 - x0) / 5.5 + abs(w - 0.55) * 17 / 5.5
+            if v == 0 and dd < 1:
+                return CANVAS[4] if dd < 0.3 else TEAL[3] if dd < 0.72 else PAINT_RED[2]
             if v == 1 and i == 1 and 0.2 < u < 0.42 and 0.3 < w < 0.6:
                 return CANVAS[3] if (u * 40) % 3 > 0.6 else cord(lv)   # a stitched patch
             return tone(ramp, lv + 0.05 * math.sin(u * 20), ix, iy, 0.12)
@@ -3019,7 +3022,8 @@ def fur_roof(sc: Scene, cx: float, cy: float, z: float, r0: float, r1: float, ri
             return WOOD[0] if v < 0.35 else HIDE[0] if v < 0.6 else HIDE[1]
         if zz < z + 1.2:
             return TEAL[3] if v > 0.5 else TEAL[1]
-        return tone(HIDE[0:4], v + (0.1 if (th * r / 3) % 1.0 < 0.3 else 0), ix, iy, 0.15)
+        streak = (th * r / 2.0 + (zz - z) * 0.15) % 1.0
+        return tone(HIDE[0:4], v + (0.16 if streak < 0.35 else -0.08 if streak > 0.8 else 0), ix, iy, 0.1)
     sc.lathe(cx, cy, [(z - fringe, r0 + 0.3), (z, r0), (z + rise, r1), (z + rise, 0)], mat)
 
 
@@ -3119,19 +3123,23 @@ def _wagon() -> None:
     sc.quad(at(-A, B, 4), vec(2 * A, 0, 0), (0, 0, 8), lambda u, w, lv, ix, iy: (
         DEEP if 0.62 < u < 0.8 and 0.3 < w < 0.75 else boards(u, w, lv, ix, iy)))
     sc.quad(at(A, B, 4), vec(0, -2 * B, 0), (0, 0, 8), boards)
-    sc.quad(at(A, B, 12), vec(0, -2 * B, 0), (vec(0, -B, 0)[0], vec(0, -B, 0)[1], 4.5),
+    sc.quad(at(A, B, 12), vec(0, -2 * B, 0), (vec(0, -B, 0)[0], vec(0, -B, 0)[1], 2.8),
             lambda u, w, lv, ix, iy: WOOD[1], tri=True)
 
     def shingles(u, w, lv, ix, iy):
         if 0.25 < u < 0.42 and 0.3 < w < 0.75:
             return DEEP   # the hole torn in the roof
+        if w > 0.9:
+            return RUST[4]
+        if w < 0.1:
+            return RUST[0]
         row = int(w * 4)
         if (w * 4) % 1.0 < 0.22 or (u * 12 + row * 0.5) % 1.0 < 0.1:
             return RUST[1]
         return tone(RUST[1:], lv + (0.08 if (int(u * 12 + row * 0.5)) % 3 == 0 else 0), ix, iy, 0.12)
     for side in (1, -1):
-        sc.quad(at(-A - 1, side * (B + 1), 11.2), vec(2 * A + 2, 0, 0),
-                (vec(0, -side * (B + 1), 0)[0], vec(0, -side * (B + 1), 0)[1], 5.3), shingles)
+        sc.quad(at(-A - 1.5, side * (B + 1.5), 11.6), vec(2 * A + 3, 0, 0),
+                (vec(0, -side * (B + 1.5), 0)[0], vec(0, -side * (B + 1.5), 0)[1], 3.2), shingles)
     # chassis beam and wheels: iron rims, wooden spokes
     sc.rod(at(-A, B - 0.5, 3.6), at(A, B - 0.5, 3.6), 0.6, WOOD[0:3])
 
@@ -3142,9 +3150,9 @@ def _wagon() -> None:
 
         def mat(u, w, lv, ix, iy):
             if w > 0.78:
-                return STEEL[3] if w > 0.9 and u < 0.5 else STEEL[2]
+                return STONE[3] if w > 0.9 and u < 0.5 else STONE[1]
             if w < 0.25:
-                return STEEL[2]
+                return STONE[2]
             return WOOD[2] if (u * 8) % 1.0 < 0.22 else None
         sc.surface(fn, 80, 16, mat)
     wx, wy, _ = at(-A + 3, B + 0.8, 0)
@@ -3152,7 +3160,7 @@ def _wagon() -> None:
     # the torn-off wheel lying flat in the grass on the right, the shaft on the left
     lx, ly = cx + 15, 4.0
     sc.surface(lambda u, w: ((lx + math.cos(u * math.tau) * w * 4, ly + math.sin(u * math.tau) * w * 4, 0.4), (0, 0, 1)),
-               80, 16, lambda u, w, lv, ix, iy: STEEL[3] if w > 0.8 else (STEEL[2] if w < 0.25 else
+               80, 16, lambda u, w, lv, ix, iy: STONE[2] if w > 0.8 else (STONE[1] if w < 0.25 else
                                                                          WOOD[3] if (u * 8) % 1.0 < 0.25 else None))
     sc.rod(at(-A - 1, B - 2, 2), at(-A - 7, B + 3, 0.5), 0.6, WOOD[1:])
     sc.rod(at(-A + 7, B + 0.8, 4.2), at(-A + 7, B + 0.8, 0.5), 0.6, WOOD[0:3])   # a prop where the wheel was

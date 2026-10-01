@@ -1,16 +1,19 @@
 """Azeroth / Mulgore art: terrain. Must satisfy
 ``wilds.azeroth.manifest.required()["terrain"]`` (see docs/azeroth/mulgore-art-manifest.md).
 
-Ground is generated from seeded, periodic noise (seamless with itself and with its sibling
-variants: every variant of a ground type is quantised to the same colour histogram, so the
-same mean brightness). Walls and boulders are procedural too; the scattered decorations are
-small hand-placed shapes, soft (no outline) with a translucent contact shadow.
+The 2.5D client maps every ground texture onto a 2:1 diamond, drapes it over a smooth
+heightfield and shades it by the slope itself, so the ground here is deliberately calm:
+broad, clean-edged patches one small ramp step apart (seeded, periodic noise; every variant
+of a ground type is quantised to the same histogram, so siblings meet without a seam), then
+sparse little strokes. A texture step of (-1, -1) is straight up on the diamond, so grass
+blades are drawn along that diagonal. Wall faces are stretched vertically to the block
+height and continue sideways, so they are built from vertical streaks and crevices, and
+their top rows (all that shows on small steps) read as a sunlit ledge with grass tufts.
 
-Edge overlays follow the Tau-7 shore convention: ``az.edge.<kind>.<side>`` is drawn on a
-tile of ``<kind>`` (water, dirt, cliff) whose neighbour on ``<side>`` is grass; it paints the
-grass fringe creeping in from that side (plus a bank and foam for water, roots for a cliff)
-and is transparent elsewhere. ``corner.<c>`` is for grass only on the diagonal ``<c>``.
-Every fringe is 3 px deep where it meets the tile corners, so sides and corners chain up.
+Edge overlays: ``az.edge.<kind>.<side>`` is drawn on a tile of ``<kind>`` (water, dirt,
+cliff) whose neighbour on ``<side>`` is land; it paints the land creeping in from that
+side (shore sand and foam for water, grass tussocks for dirt, turf for a cliff) and is
+transparent elsewhere. ``corner.<c>`` is for land only on the diagonal ``<c>``.
 """
 
 from __future__ import annotations
@@ -179,7 +182,7 @@ def _despeckle(c: Canvas, passes: int = 2) -> Canvas:
             for x in range(c.w):
                 nb = [src[(y + dy) % c.h][(x + dx) % c.w] for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))]
                 if src[y][x] not in nb:
-                    c.px[y][x] = max(set(nb), key=nb.count)
+                    c.px[y][x] = max(sorted(set(nb)), key=nb.count)
     return c
 
 
@@ -692,8 +695,8 @@ def _boulders() -> None:
 
 
 # --- edge overlays ---------------------------------------------------------------------------------
-# Each overlay paints the grass creeping in from ``side``. Its colours are the meadow green
-# with a little hay mixed in, so it sits well against short, tall and dry grass alike.
+# Each overlay paints the land creeping in from ``side``: a grass mat in meadow green with a
+# little hay (so it sits against short, tall and dry grass alike), or shore sand for water.
 
 CORNERS = ("ne", "nw", "se", "sw")
 END = {"water": 4, "dirt": 3, "cliff": 3}      # fringe depth at the tile corners
