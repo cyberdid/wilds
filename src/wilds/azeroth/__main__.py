@@ -13,7 +13,7 @@ def main(argv: list[str] | None = None) -> None:
     import argparse
 
     from ..__main__ import add_gfx_args, window_size
-    from .brain import ScriptedZoneBrain
+    from .brain import ExploreBrain, ScriptedZoneBrain
     from .sim import ZoneSim
     from .world import ZoneWorld
 
@@ -27,6 +27,8 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--seed", type=int, default=None)
     p.add_argument("--speed", type=int, default=1, help="початкова швидкість 0-9")
     p.add_argument("--log-dir", default="logs")
+    p.add_argument("--explore", action="store_true",
+                   help="огляд: герой стоїть і його не вбити, камера вільна, світ живе (WASD, мінікарта, цифри)")
     p.add_argument("--headless", type=int, metavar="TICKS", default=0, help="без вікна: прогнати N тіків")
     p.add_argument("--start", default=None, help="почати біля місця, напр. 'Bloodhoof Village' (для скріншотів)")
     p.add_argument("--pack", default=str(PACK), help="тека з контент-пакетом зони")
@@ -38,7 +40,9 @@ def main(argv: list[str] | None = None) -> None:
     seed = args.seed if args.seed is not None else random.randrange(1_000_000)
     world = ZoneWorld(args.pack, seed=seed)
     sim = ZoneSim(world, seed=seed)
-    brain = ScriptedZoneBrain()
+    brain = ExploreBrain() if args.explore else ScriptedZoneBrain()
+    if args.explore and not args.start:
+        args.start = "Bloodhoof Village"
     if args.start:
         spot = sim.find_place(args.start)
         if spot is None:

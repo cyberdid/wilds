@@ -91,3 +91,14 @@ class ScriptedZoneBrain:
 
 
 __all__ = ["ScriptedZoneBrain", "q"]
+
+
+class ExploreBrain(ScriptedZoneBrain):
+    """A sightseeing hero: stands still so the world lives around the free camera (``--explore``)."""
+
+    name = "explore"
+    label = "огляд (герой стоїть)"
+
+    def decide(self, sim: "ZoneSim") -> Decision:
+        sim.hero.hp = sim.hero.max_hp = 10**6  # nothing can hurt a tourist
+        return Decision("rest", "300", "Оглядаю Мулгор.")

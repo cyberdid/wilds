@@ -81,3 +81,25 @@ def test_roads_are_laid_between_settlements():
     assert len(w.terrain.roads) > 1500
     a = w.nearest_passable(w.at("Camp Narache").pos, 40)
     assert any(w.tile(a[0] + dx, a[1] + dy) is Terrain.ROAD for dx in range(-60, 60, 2) for dy in range(-60, 60, 2))
+
+
+def test_the_great_gate_has_a_palisade_either_side():
+    from wilds.azeroth import settlements
+
+    world = ZoneWorld(PACK, seed=3)
+    built = settlements.build_structures(world)
+    gate = next(s for s in built if s.sprite == "az.obj.great_gate")
+    wall = [s for s in built if s.sprite == "az.obj.palisade" and abs((s.pos[0] - gate.pos[0]) + (s.pos[1] - gate.pos[1])) == 0]
+    left = [s for s in wall if s.pos[0] < gate.pos[0]]
+    right = [s for s in wall if s.pos[0] > gate.pos[0]]
+    assert len(left) >= 3 and len(right) >= 3
+
+
+def test_the_explore_brain_keeps_the_hero_standing_and_alive():
+    from wilds.azeroth.brain import ExploreBrain
+    from wilds.azeroth.sim import ZoneSim
+
+    sim = ZoneSim(ZoneWorld(PACK, seed=3), seed=3)
+    start = sim.hero.pos
+    sim.run(ExploreBrain(), 40)
+    assert sim.hero.alive and sim.hero.pos == start

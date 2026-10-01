@@ -175,7 +175,23 @@ def build_structures(world: "ZoneWorld") -> list[Structure]:
         for s in _scatter(world, rng_plat, plat.center, plat.radius, _street(plat), out):
             if not any((s.pos[0] + dx, s.pos[1] + dy) in bridge for dx in (-1, 0, 1) for dy in (-1, 0, 1)):
                 out.append(s)
+    out += _gate_wall(world, out)
     return out
+
+
+def _gate_wall(world: "ZoneWorld", built: list[Structure]) -> list[Structure]:
+    """The Great Gate's log palisade, running from the gate on both sides until it meets the mountains."""
+    gate = next((s for s in built if s.sprite == "az.obj.great_gate"), None)
+    if gate is None:
+        return []
+    wall: list[Structure] = []
+    for sign in (1, -1):
+        for k in range(5, 40):  # the gate itself spans about 4 tiles across the pass (screen-horizontal)
+            p = (gate.pos[0] + sign * k, gate.pos[1] - sign * k)
+            if not _free(world, p):
+                break
+            wall.append(Structure("az.obj.palisade", p, 1))
+    return wall
 
 
 def bridges(world: "ZoneWorld") -> list[tuple[Pos, Pos]]:
