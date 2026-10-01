@@ -42,6 +42,9 @@ _ramp("azt_hay", "#6f5f2b", "#8c7a35", "#a99441", "#c4ad52", "#d6c068", "#e6d48a
 _ramp("azt_trail", "#4b453b", "#675f52", "#81796a", "#978f7e", "#a9a08e", "#bcb4a2", "#d0c9b8")
 _ramp("azt_sand", "#5a4630", "#76603f", "#937a51", "#a88d5f", "#b89a68", "#c9ae7f", "#dac59b")
 _ramp("azt_gran", "#2f2b27", "#4a433b", "#665c50", "#7d7163", "#8e8172", "#a99b86", "#c9b9a0", "#ddd0ba")
+# fine ramps (small steps) for the broad patches of the ground textures: low contrast on purpose
+_ramp("azt_lawn", "#7c9631", "#859d34", "#8ea437", "#97ab3a", "#a0b13e", "#aab644", "#b5ba4d")
+_ramp("azt_stubble", "#a08d3e", "#ab9744", "#b6a14b", "#c0aa52", "#c9b35a", "#d2bc63", "#dbc66f")
 _ramp("azt_pine", "#18261c", "#223522", "#2e4729", "#3d5b31", "#5a6f48")
 _ramp("azt_sstone", "#4a3330", "#6b4a42", "#8c6656", "#a9806b", "#c29a84", "#d6b39c", "#e6cbb6")
 _ramp("azt_band", "#7a3a1e", "#a5532a", "#c8703a", "#e08f52", "#efb07a")
@@ -59,17 +62,19 @@ ROCK_CH, LAKE_CH, SHOAL_CH = "mnopqrst", "HIJKLMN", "UVWXYZ"
 MEAD, HAY, TRAIL = "αβγδεζ", "ηθικλμ", "νξοπρστ"
 GRAN, PINE, SAND = "ΑΒΓΔΕΖΗΘ", "ΙΚΛΜΝ", "абвгдеж"
 SST, BAND = "зийклмн", "фхцчш"
+LAWN, STUB = "уъыьэюя", "ЁЂЃЄЅІЇ"
 TER = {**_chars(GRASS_CH, "azt_grass"), **_chars(STRAW_CH, "azt_straw"), **_chars(SOIL_CH, "azt_soil"),
        **_chars(ROCK_CH, "azt_rock"), **_chars(LAKE_CH, "azt_lake"), **_chars(SHOAL_CH, "azt_shoal"),
        **_chars(MEAD, "azt_mead"), **_chars(HAY, "azt_hay"), **_chars(TRAIL, "azt_trail"),
        **_chars(GRAN, "azt_gran"), **_chars(PINE, "azt_pine"), **_chars(SAND, "azt_sand"),
-       **_chars(SST, "azt_sstone"), **_chars(BAND, "azt_band"),
+       **_chars(SST, "azt_sstone"), **_chars(BAND, "azt_band"), **_chars(LAWN, "azt_lawn"),
+       **_chars(STUB, "azt_stubble"),
        "z": "ink:72", "y": "ink:40"}
 
 
 def _step(ch: str, k: int) -> str:
     """The same material ``k`` steps lighter (k > 0) or darker along its ramp."""
-    for ramp in (MEAD, HAY, TRAIL, GRAN, PINE, SAND, SST, BAND, GRASS_CH, STRAW_CH, SOIL_CH, ROCK_CH):
+    for ramp in (MEAD, HAY, TRAIL, GRAN, PINE, SAND, SST, BAND, LAWN, STUB, GRASS_CH, STRAW_CH, SOIL_CH, ROCK_CH):
         i = ramp.find(ch)
         if i >= 0:
             return ramp[max(0, min(len(ramp) - 1, i + k))]
@@ -197,7 +202,7 @@ def _free(rng: random.Random, taken: set, margin: int = 0, gap: int = 2) -> tupl
 
 
 def _blade(c: Canvas, x: int, y: int, n: int, lean: int = 0, root: int = -1, tip: int = 1,
-           tip_ch: str | None = None) -> None:
+           tip_ch: str | None = None, root_ch: str | None = None) -> None:
     """A grass blade standing up on the diamond: ``n`` px from a shaded root to a lit tip,
     toned relative to the ground under it; ``lean`` bends the top toward screen right (+1) or
     left (-1)."""
@@ -207,7 +212,7 @@ def _blade(c: Canvas, x: int, y: int, n: int, lean: int = 0, root: int = -1, tip
             xx, yy = ((xx + 1) % T, yy) if lean > 0 else (xx, (yy + 1) % T)
         base = c.px[yy][xx]
         if j == 0:
-            ch = _step(base, root)
+            ch = root_ch or _step(base, root)
         elif j == n - 1:
             ch = tip_ch or _step(base, tip)
         else:
@@ -230,11 +235,11 @@ def _grass(seed: int) -> Canvas:
     """Short meadow grass: broad soft patches of warm lime and gold, a scatter of upright
     blades (darker root, lit tip) and a few golden straws - Mulgore's sunny turf."""
     rng = random.Random(seed)
-    c = _patches(seed, MEAD[3:6], [34, 46, 20])
+    c = _patches(seed, LAWN[2:6], [18, 38, 32, 12])
     taken: set = set()
     for k in range(9):
         x, y = _free(rng, taken)
-        _blade(c, x, y, rng.choice((2, 3, 3)), lean=rng.choice((0, 0, 1, -1)))
+        _blade(c, x, y, rng.choice((2, 3, 3)), lean=rng.choice((0, 0, 1, -1)), root=-2, tip=2)
     for k in range(3):
         x, y = _free(rng, taken)
         _strand(c, x, y, HAY[4] if k else HAY[5], None, horizontal=k % 2 == 0)
@@ -245,13 +250,14 @@ def _tall_grass(seed: int) -> Canvas:
     """Tall grass: a deeper green sward, dense with long upright blades, the front ones
     lit, a few golden seed tips catching the sun."""
     rng = random.Random(seed)
-    c = _patches(seed, MEAD[2:5], [28, 46, 26])
+    c = _patches(seed, LAWN[0:4], [18, 38, 32, 12])
     taken: set = set()
     for k in range(16):
         x, y = _free(rng, taken, gap=1)
         n = rng.choice((3, 4, 4))
-        tip = HAY[5] if k % 4 == 0 else None
-        _blade(c, x, y, n, lean=rng.choice((0, 1, 1, -1)), root=-1, tip=2 if k % 2 else 1, tip_ch=tip)
+        tip = HAY[4] if k % 6 == 0 else (MEAD[4] if k % 2 else None)
+        _blade(c, x, y, n, lean=rng.choice((0, 1, 1, -1)), root=-2, tip=3, tip_ch=tip,
+               root_ch=MEAD[1] if k % 3 == 0 else None)
     return c
 
 
@@ -259,14 +265,14 @@ def _dry_grass(seed: int) -> Canvas:
     """Dry grass: golden hay in soft patches, upright straw blades, a strand blown flat
     here and there and a green blade still alive."""
     rng = random.Random(seed)
-    c = _patches(seed, HAY[2:5], [27, 47, 26])
+    c = _patches(seed, STUB[1:5], [18, 38, 32, 12])
     taken: set = set()
     for k in range(9):
         x, y = _free(rng, taken)
-        _blade(c, x, y, rng.choice((2, 3, 3)), lean=rng.choice((0, 1, -1)))
+        _blade(c, x, y, rng.choice((2, 3, 3)), lean=rng.choice((0, 1, -1)), root=-3, tip=2)
     for k in range(3):
         x, y = _free(rng, taken)
-        _strand(c, x, y, HAY[5], HAY[1], horizontal=k % 2 == 0)
+        _strand(c, x, y, HAY[5], HAY[2], horizontal=k % 2 == 0)
     x, y = _free(rng, taken)
     _blade(c, x, y, 2, tip_ch=MEAD[3])
     c.set(x, y, MEAD[1])
@@ -321,17 +327,10 @@ def _sand(seed: int) -> Canvas:
 
 
 def _road(seed: int) -> Canvas:
-    """A worn trail of pale grey-beige gravel: smooth, a soft tan wash where hooves churned
-    the earth, a few pebbles (the grass tufts at its sides come from the edge overlays)."""
+    """A worn trail of pale grey-beige gravel: smooth, a few pebbles and grains (the tan
+    edge and the grass tufts at its sides come from the edge overlays)."""
     rng = random.Random(seed)
     c = _patches(seed, TRAIL[3:6], [16, 68, 16], lumps=4)
-    tan = fbm(T, T, seed + 5, 2, 2)
-    cut = sorted(v for row in tan for v in row)[int(T * T * 0.85)]
-    for y in range(T):
-        for x in range(T):
-            if tan[y][x] >= cut:
-                c.px[y][x] = SAND[4]
-    _despeckle(c, 1)
     taken: set = set()
     x, y = _free(rng, taken, margin=1, gap=4)
     _pebble(c, x, y, TRAIL[6], TRAIL[4], TRAIL[1])
@@ -446,11 +445,11 @@ def _mountain_top(seed: int) -> Canvas:
     c = _patches(seed, GRAN[4:7], [15, 68, 17], lumps=5)
     moss = fbm(T, T, seed + 8, 2, 1)
     cut = sorted(v for row in moss for v in row)
-    lo, mid = cut[int(T * T * 0.84)], cut[int(T * T * 0.96)]
+    lo, mid = cut[int(T * T * 0.88)], cut[int(T * T * 0.97)]
     for y in range(T):  # one soft mat of moss per tile (the same share on every variant)
         for x in range(T):
             if moss[y][x] >= lo:
-                c.px[y][x] = MEAD[2] if moss[y][x] < mid else MEAD[1]
+                c.px[y][x] = PINE[4] if moss[y][x] < mid else MEAD[1]
     _despeckle(c, 2)
     taken: set = set()
     for _k in range(2):  # hairline cracks, short, running down-right on screen (texture x)
@@ -1432,13 +1431,13 @@ def _rockshade(c: Canvas, mask: set[tuple[int, int]], seed: int, tones: str, ban
         top = min(cols[x])
         d_top = y - top
         t = (y - y0) / height
-        v = 0.56 - 0.34 * nx - 0.18 * max(0.0, nx) ** 3
+        v = 0.58 - 0.4 * nx - 0.22 * max(0.0, nx) ** 3
         v += 0.18 * max(0.0, 1 - d_top / 5)  # the sky-facing top of each bulge
         v += 0.5 * (streak[y % 64][x % 64] - 0.5)
         v -= 0.22 * max(0.0, (t - 0.75) / 0.25)
         tone = tones
         if bands:
-            s_ = y + 2.0 * (warp[x % 64] - 0.5)
+            s_ = y - 2.5 * math.sqrt(max(0.0, 1 - nx * nx)) + 2.0 * (warp[x % 64] - 0.5)
             b = int(s_ // band)
             if b in picked and t < band_top + 0.15 * (warp[(x + 17) % 64] - 0.5):
                 tone = bands

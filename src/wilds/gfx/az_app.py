@@ -212,6 +212,12 @@ class Painter:
                             out.set_at((sx, fy), prev_c)
                     out.set_at((sx, y), col)
                     prev_y, prev_c = y, col
+            for sx in range(32):  # seal the 1 px cracks that rounding leaves along the diagonal seams
+                for sy in range(span + 15, 0, -1):
+                    if out.get_at((sx, sy)).a == 0:
+                        above = out.get_at((sx, sy - 1))
+                        if above.a:
+                            out.set_at((sx, sy), above)
             hit = self._slopes[k] = out
         return hit, top
 
@@ -523,6 +529,7 @@ class AzApp:
         cw, ch = self.renderer.canvas_size(view, self.zoom)
         f = self.renderer.frame(cx - (cw - 1) / 2, cy - (ch - 1) / 2, view, self.zoom, self.now, proj)
         f.ambient = sky(TAU7_SKY, self._hour())
+        f.shadow_on_ground = True
         self.build(f)
         self.renderer.draw(f, screen, view)
         if self.show_names and self.zoom >= 2:

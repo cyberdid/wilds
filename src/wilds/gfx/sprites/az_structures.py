@@ -38,6 +38,10 @@ _ramp("azs_teal", "#123a3c", "#1f6265", "#2f8f8c", "#57bdb0", "#9fe3d2")        
 _ramp("azs_crim", "#2e0c10", "#5e1519", "#8f2220", "#bb3a2c", "#de6e55")               # crimson paint
 _ramp("azs_drift", "#221c19", "#3d332c", "#5d5045", "#7f6f60", "#a3927f", "#c6b7a2")   # weathered wood
 _ramp("azs_roof", "#1e2a2b", "#334544", "#4d6662", "#6d8a83", "#97b0a6")               # grey-teal roof
+# Mulgore's mountains are pale beige-grey; the boulders at Palemane and Kodo Rock blue-grey
+_ramp("azs_pale", "#3b3431", "#5f5650", "#867b70", "#ab9f8f", "#cdc1ad", "#ebe0cb")   # pale cliff
+_ramp("azs_slate", "#1b1f2a", "#2c3342", "#434d60", "#627083", "#8996a6", "#b3bdc8")  # blue-grey stone
+_ramp("azs_vine", "#1d180c", "#352d15", "#544823", "#766832", "#9c8d4a", "#c2b674")   # thorn vine
 
 WOOD = RAMPS["azs_wood"]
 HIDE = RAMPS["azs_hide"]
@@ -61,8 +65,12 @@ TEAL = RAMPS["azs_teal"]
 PAINT_RED = RAMPS["azs_crim"]
 DRIFT = RAMPS["azs_drift"]
 ROOF = RAMPS["azs_roof"]
+PALE = RAMPS["azs_pale"]
+SLATE = RAMPS["azs_slate"]
+VINE = RAMPS["azs_vine"]
 STRAW = SAND[1:]
-_MATERIALS = [WOOD, HIDE, STONE, LEAF, BRIER, CANVAS, TEAL, PAINT_RED, DRIFT, ROOF, BONE, SAND, TENT]
+_MATERIALS = [WOOD, HIDE, STONE, LEAF, BRIER, CANVAS, TEAL, PAINT_RED, DRIFT, ROOF, BONE, SAND, TENT, PALE, SLATE,
+              VINE, RUST, STEEL]
 SHADOW = "ink:90"          # soft contact shadow on the ground (never outlined)
 SHADOW_CORE = "ink:140"    # its denser core right under the object
 DEEP = "ink2"
@@ -412,11 +420,11 @@ class Scene:
                 self.col[iy][ix], self.dep[iy][ix], self.oid[iy][ix] = c, d, oid
 
     def lathe(self, cx: float, cy: float, prof: Sequence[tuple[float, float]], mat: Callable,
-              ds: float = 0.25) -> None:
+              ds: float = 0.25, k: float = 1.0, z0: float = 0.0) -> None:
         """Surface of revolution through profile points (z, r), listed from the bottom outward/up.
         ``mat(th, z, r, v, ix, iy)`` returns a palette name (``th`` = angle, FRONT faces the viewer).
         Rasterised column by column, so the angle is exact for each pixel column and seams and
-        patterns come out as clean lines."""
+        patterns come out as clean lines. ``k`` squashes the depth (oval plan), ``z0`` lifts it."""
         oid = self.new_id()
         samples = []
         for (z0, r0), (z1, r1) in zip(prof, prof[1:]):
@@ -439,9 +447,11 @@ class Scene:
                     y = sgn * math.sqrt(r * r - dx * dx)
                     th = math.atan2(y, dx) % math.tau
                     c, s = dx / r if r else 0.0, y / r if r else 0.0
-                    v = shade3(nr * c, nr * s, nz)
-                    iy = int(math.floor(self.oy + (cy + y) * 0.5 - z))
-                    d = 2 * (cy + y) + z
+                    v = shade3(nr * c, nr * s / k, nz)
+                    y *= k
+                    zz = z + z0
+                    iy = int(math.floor(self.oy + (cy + y) * 0.5 - zz))
+                    d = 2 * (cy + y) + zz
                     rows = [iy]
                     if prev is not None and abs(iy - prev) > 1:   # close gaps on flat parts
                         rows = range(min(iy, prev) + 1, max(iy, prev)) if iy != prev else [iy]
@@ -491,6 +501,63 @@ class Scene:
                 self.put(x + px * k, y, z - py * k, c, oid, bias=(rad - abs(k)) * 0.5)
                 k += 0.5
 
+    def surface(self, fn: Callable, nu: int, nv: int, mat: Callable, oid: int | None = None) -> None:
+        """Parametric patch: ``fn(u, v)`` -> ((x, y, z), (nx, ny, nz)) for u, v in 0..1;
+        ``mat(u, v, light, ix, iy)``."""
+        oid = oid or self.new_id()
+        for i in range(nu + 1):
+            u = i / nu
+            for j in range(nv + 1):
+                w = j / nv
+                (x, y, z), n = fn(u, w)
+                lv = shade3(*n)
+                self.put(x, y, z, lambda ix, iy, u=u, w=w, lv=lv: mat(u, w, lv, ix, iy), oid)
+
+    def ball(self, x: float, y: float, z: float, r: float, mat: Callable, oid: int) -> None:
+        """A lit sphere seen from the camera (the building block of thick vines);
+        ``mat(light, ix, iy)``."""
+        sx, sy = self.ox + x, self.oy + y * 0.5 - z
+        d0 = 2 * y + z
+        for iy in range(int(math.floor(sy - r)), int(math.ceil(sy + r)) + 1):
+            for ix in range(int(math.floor(sx - r)), int(math.ceil(sx + r)) + 1):
+                a, b = (ix + 0.5 - sx) / r, (iy + 0.5 - sy) / r
+                q = a * a + b * b
+                if q > 1:
+                    continue
+                f = math.sqrt(1 - q)
+                # screen right = world x; screen up = (0, -1, 2)/sqrt5; toward camera = (0, 2, 1)/sqrt5
+                n = (a, (b + 2 * f) / 2.236, (-2 * b + f) / 2.236)
+                lv = shade3(*n)
+                self.put_px(ix, iy, d0 + f * r * 2.2, lambda px, py, lv=lv: mat(lv, px, py), oid)
+
+    def tube(self, pts: Sequence[tuple[float, float, float]], r0: float, r1: float, mat: Callable,
+             step: float = 0.5) -> list[tuple[float, float, float, float, float]]:
+        """A thick tapering tube along a Catmull-Rom spline through ``pts`` (radius r0 -> r1).
+        ``mat(light, s, ix, iy)`` gets the arc length s. Returns the samples (x, y, z, r, s)."""
+        oid = self.new_id()
+        dense = []
+        ext = [pts[0]] + list(pts) + [pts[-1]]
+        for i in range(1, len(ext) - 2):
+            p0, p1, p2, p3 = ext[i - 1], ext[i], ext[i + 1], ext[i + 2]
+            n = max(2, int(math.dist(p1, p2) / 0.25))
+            for k in range(n):
+                t = k / n
+                dense.append(tuple(0.5 * (2 * p1[c] + (-p0[c] + p2[c]) * t + (2 * p0[c] - 5 * p1[c] + 4 * p2[c] - p3[c]) * t * t
+                                          + (-p0[c] + 3 * p1[c] - 3 * p2[c] + p3[c]) * t ** 3) for c in range(3)))
+        dense.append(tuple(pts[-1]))
+        total = sum(math.dist(a, b) for a, b in zip(dense, dense[1:])) or 1.0
+        out, s, last = [], 0.0, -1e9
+        for i, q in enumerate(dense):
+            if i:
+                s += math.dist(dense[i - 1], q)
+            if s - last < step and i != len(dense) - 1:
+                continue
+            last = s
+            r = r0 + (r1 - r0) * (s / total)
+            self.ball(q[0], q[1], q[2], r, lambda lv, ix, iy, s=s: mat(lv, s, ix, iy), oid)
+            out.append((q[0], q[1], q[2], r, s))
+        return out
+
     def disc(self, cx: float, cy: float, z: float, r: float, mat: Callable) -> None:
         """A flat horizontal disc (a platform top); ``mat(rr, th, ix, iy)``."""
         oid = self.new_id()
@@ -538,6 +605,17 @@ def darker(name: str, d: int) -> str:
 def wrap(a: float) -> float:
     """Angle difference folded into -pi..pi."""
     return (a + math.pi) % math.tau - math.pi
+
+
+def decal(rows: Sequence[str], legend: dict[str, str], fallback: Callable | None = None) -> Callable:
+    """Quad material that maps a hand-drawn grid over the patch (u -> columns, w -> rows upward)."""
+    def mat(u, w, lv, ix, iy):
+        r = rows[min(len(rows) - 1, int((1 - w) * len(rows)))]
+        ch = r[min(len(r) - 1, int(u * len(r)))]
+        if ch == ".":
+            return fallback(u, w, lv, ix, iy) if fallback else None
+        return {"k": "ink", "K": "ink2", "w": "white", **legend}[ch]
+    return mat
 
 
 def hexcell(u: float, v: float, s: float) -> tuple[int, int, float]:
@@ -1102,7 +1180,7 @@ def _totem(v: int) -> None:
                    "very tall totem: eagle and wolf faces, kodo head with sweeping horns"][v]))
 
 
-def eagle_wing(p: Pic, cx: int, side: int, tip_y: float, lit: bool) -> None:
+def eagle_wing(p: Pic, cx: int, side: int, tip_y: float, lit: bool, dy: int = 0) -> None:
     """One spread wing in screen space: carved coverts along the leading edge, a cream band,
     teal-striped flight feathers with dark tips, separate finger feathers at the end."""
     s0, span, d = cx + side * 4, 12, (0 if lit else -1)
@@ -1126,7 +1204,7 @@ def eagle_wing(p: Pic, cx: int, side: int, tip_y: float, lit: bool) -> None:
                 c = DRIFT[1] if t > 0.4 else PAINT_RED[2 + d]
             else:
                 c = TEAL[3 + d] if i % 3 != 1 else CANVAS[3 + d]
-            p.set(x, y, c)
+            p.set(x, y + dy, c)
 
 
 EAGLE = [
