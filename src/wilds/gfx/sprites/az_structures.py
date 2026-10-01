@@ -2738,37 +2738,37 @@ def _water_well() -> None:
     cross-pole on top with two dark hides hanging."""
     W, H = 48, 80
     cx = 24.0
-    sc = Scene(W, H, 0, 68)
-    sc.lathe(cx, 0, [(0, 19.5), (3.4, 19.2), (3.8, 18.0), (3.8, 0)], stone_dais)
-    sc.lathe(cx, 0, [(8, 3.8), (13, 3.8), (13, 0)],
-             lambda th, z, r, v, ix, iy: PAINT_RED[2] if 9.5 < z < 10.5 else tone(CANVAS, v, ix, iy, 0.1))
+    sc = Scene(W, H, 0, 75)
+    sc.lathe(cx, 0, [(0, 16.0), (3.4, 15.7), (3.8, 14.5), (3.8, 0)], stone_dais)
+    sc.lathe(cx, 0, [(11, 4.0), (17, 4.0), (17, 0)],
+             lambda th, z, r, v, ix, iy: PAINT_RED[2] if 12.5 < z < 13.5 or 15 < z < 15.8 else tone(CANVAS, v, ix, iy, 0.1))
     for a in (0.785, 2.356, 3.927, 5.498):
-        sc.rod((cx + 8 * math.cos(a), 8 * math.sin(a), 3.8), (cx + 3 * math.cos(a), 3 * math.sin(a), 27), 1.1, WOOD[1:])
+        sc.rod((cx + 9 * math.cos(a), 9 * math.sin(a), 3.8), (cx + 3.5 * math.cos(a), 3.5 * math.sin(a), 33), 1.1, WOOD[1:])
     # the carved box: face toward the viewer, a shaded right side, a lit top
-    sc.quad((cx - 5.5, 4.5, 15), (11, 0, 0), (0, 0, 12), decal(BEAST_FACE, _FACE_LG))
-    sc.quad((cx + 5.5, 4.5, 15), (0, -9, 0), (0, 0, 12), lambda u, w, lv, ix, iy: tone(DRIFT[1:], lv, ix, iy, 0.1))
-    sc.quad((cx - 5.5, -4.5, 27), (11, 0, 0), (0, 9, 0), lambda u, w, lv, ix, iy: DRIFT[4])
+    sc.quad((cx - 5.5, 4.5, 19), (11, 0, 0), (0, 0, 12), decal(BEAST_FACE, _FACE_LG))
+    sc.quad((cx + 5.5, 4.5, 19), (0, -9, 0), (0, 0, 12), lambda u, w, lv, ix, iy: tone(DRIFT[1:], lv, ix, iy, 0.1))
+    sc.quad((cx - 5.5, -4.5, 31), (11, 0, 0), (0, 9, 0), lambda u, w, lv, ix, iy: DRIFT[4])
     # canopy: shallow hide cone, a teal band near the rim, a spiky red-brown fringe hanging below
-    hide = canvas(12, 0.5, ramp=HIDE[1:], bands=((31.8, 33.2, lambda th, t, r, v, ix, iy: TEAL[2] if v < 0.5 else TEAL[3]),))
+    hide = canvas(12, 0.5, ramp=HIDE[1:], bands=((36.8, 38.2, lambda th, t, r, v, ix, iy: TEAL[2] if v < 0.5 else TEAL[3]),))
 
     def canopy(th, z, r, v, ix, iy):
-        if z < 31.2:
+        if z < 36.2:
             ph = (th * r / 2.6) % 1.0
-            if (31.2 - z) > (1 - abs(ph - 0.5) * 2) * 3.4:
+            if (36.2 - z) > (1 - abs(ph - 0.5) * 2) * 3.6:
                 return None
             return PAINT_RED[1] if v < 0.45 else PAINT_RED[2]
         return hide(th, z, r, v, ix, iy)
-    sc.lathe(cx, 0, [(27.6, 22.2), (31.2, 22.0), (31.6, 21.6), (38.5, 1.2), (38.6, 0)], canopy)
+    sc.lathe(cx, 0, [(32.4, 21.2), (36.2, 21.0), (36.6, 20.6), (46.5, 1.2), (46.6, 0)], canopy)
     # cross-pole with two hides
-    sc.rod((cx, 0, 37), (cx, 0, 62), 1.0, WOOD[1:])
-    sc.rod((cx - 10, 0.5, 58), (cx + 10, 0.5, 58), 0.8, WOOD[1:])
+    sc.rod((cx, 0, 45), (cx, 0, 72), 1.0, WOOD[1:])
+    sc.rod((cx - 10, 0.5, 68), (cx + 10, 0.5, 68), 0.8, WOOD[1:])
     for x0 in (cx - 9, cx + 2.5):
-        sc.quad((x0, 1.5, 44), (6.5, 0, 0), (0, 0, 13.5), lambda u, w, lv, ix, iy, x0=x0: (
+        sc.quad((x0, 1.5, 53), (6.5, 0, 0), (0, 0, 14.5), lambda u, w, lv, ix, iy, x0=x0: (
             None if w < 0.1 and int(u * 6) % 2 else
             BONE[3] if abs(u - 0.5) < 0.2 and abs(w - 0.55) < 0.12 else
             HIDE[1] if x0 < cx else HIDE[0]))
     p = sc.pic()
-    register("az.obj.water_well", _art(finish(p, 24, 77, 23, 2.5),
+    register("az.obj.water_well", _art(finish(p, 24, 77, 19, 2.5),
              note="tauren well-totem: stone dais, splayed legs, beast-face box, fringed hide canopy, hanging hides"))
 
 
@@ -2872,32 +2872,34 @@ def _cave_mouth() -> None:
     """Palemane Rock: a dark cave in the foot of a pale streaked cliff, framed by blue-grey boulders."""
     W, H = 64, 48
     sc = Scene(W, H, 0, 44)
-    cx, cy, RX, RY, RZ = 32.0, -8.0, 31.0, 10.0, 40.0
+    cx = 32.0
+    base = Pic(W, H)
+    wob = fbm(64, 1, 71, 2, 5)[0]
 
-    def cliff(u, w):
-        th, ph = math.pi * u, math.pi / 2 * w
-        x, y, z = math.cos(th) * math.cos(ph), math.sin(th) * math.cos(ph), math.sin(ph)
-        x *= 1 + 0.08 * math.sin(th * 7) * (1 - w)
-        return (cx + RX * x, cy + RY * y, RZ * z ** 1.3), (x / RX, y / RY, z / RZ * 1.4)
-
-    def rockface(u, w, lv, ix, iy):
-        streak = ((ix * 7919) % 13) / 13.0 - 0.5
-        return tone(PALE, lv + streak * 0.18 - 0.05, ix, iy, 0.1)
-    sc.surface(cliff, 300, 160, rockface)
-    p0 = sc.pic()
-    # the cave: a dark arch with a dim floor
+    def cliff(x, y):
+        top = 3 + abs(x - 32) ** 2.2 * 0.012 + wob[int(x) % 64] * 6
+        return 0.5 < x < 63.5 and top <= y < 46
+    rock(base, cliff, PALE[1:], 72, cells=4, lit=0.6)
+    for y in range(H):   # vertical weathering streaks
+        for x in range(W):
+            c = base.px[y][x]
+            if c in PALE and (x * 7919 // 3) % 11 == 0:
+                base.px[y][x] = step(PALE, c, -1)
+    for y in range(H):
+        for x in range(W):
+            if base.px[y][x]:
+                sc.col[y][x], sc.dep[y][x] = base.px[y][x], -500.0
+    # the cave: a dark arch with a dim rim
     for y in range(H):
         for x in range(W):
             dx, dy = (x + 0.5 - 32) / 9.5, (y + 0.5 - 43) / 17
             if dy < 0 and dx * dx + dy * dy < 1 and sc.col[y][x]:
                 sc.col[y][x] = DEEP if dx * dx + dy * dy < 0.82 else PALE[0]
-                sc.dep[y][x] -= 0.5
     for bx, by, r, h, z0, sd in ((-13, 5, 6.5, 11, 0, 1), (-20, 8, 5, 7, 0, 2), (-9, 10, 4, 5, 0, 3),
                                  (13, 5, 7, 12, 0, 4), (20, 9, 5.5, 7, 0, 5), (8, 11, 4, 4.5, 0, 6),
                                  (-4, 3, 6, 6, 15.5, 7), (5, 2, 5, 5, 15, 8), (-26, 4, 4, 5, 0, 9)):
         boulder(sc, cx + bx, by, r, h, z0, sd)
     p = sc.pic()
-    del p0
     tufts(p, [(x, y) for y in range(H) for x in range(W) if p.px[y][x] in PALE], 61, 0.06)
     register("az.obj.cave_mouth", _art(finish(p, 32, 45, 31, 2.5),
              note="Palemane Rock: cave mouth in a pale cliff framed by blue-grey boulders"))
@@ -2925,8 +2927,8 @@ def _standing_stone() -> None:
         u = wrap(th - FRONT) * r
         col, row = int(u + 2.5), int(20 - z)
         if 0 <= col < 5 and 0 <= row < len(RUNES) and RUNES[row][col] == "s":
-            return SLATE[3] if v > 0.4 else SLATE[2]
-        return tone(SLATE[:5], v - 0.05 + (0.08 if int(z * 0.7 + th * 2) % 5 == 0 else 0), ix, iy, 0.15)
+            return SLATE[4] if v > 0.4 else SLATE[3]
+        return tone(SLATE[:4], v - 0.05 + (0.08 if int(z * 0.7 + th * 2) % 5 == 0 else 0), ix, iy, 0.15)
     sc.lathe(8.0, 0.0, [(0, 5.2), (5, 5.6), (15, 5.0), (21, 4.0), (24.5, 2.4), (25.5, 0)], mat, squash=0.6)
     p = sc.pic()
     tufts(p, [(x, y) for y in range(24, H) for x in range(W) if p.px[y][x]], 63, 0.5)
@@ -3014,7 +3016,7 @@ def fur_roof(sc: Scene, cx: float, cy: float, z: float, r0: float, r1: float, ri
             ph = (th * r / 2.0) % 1.0
             if (z - zz) > fringe * (0.55 + 0.45 * math.sin(ph * math.pi)):
                 return None
-            return HIDE[0] if v < 0.4 else HIDE[1] if v < 0.65 else HIDE[2]
+            return WOOD[0] if v < 0.35 else HIDE[0] if v < 0.6 else HIDE[1]
         if zz < z + 1.2:
             return TEAL[3] if v > 0.5 else TEAL[1]
         return tone(HIDE[0:4], v + (0.1 if (th * r / 3) % 1.0 < 0.3 else 0), ix, iy, 0.15)
@@ -3033,12 +3035,12 @@ def gate_tower(sc: Scene, cx: float, cy: float) -> None:
             return PAINT_RED[2] if v > 0.4 else PAINT_RED[1]
         if 5 <= z < 6 or 21 <= z < 22:
             return TEAL[3] if v > 0.5 else TEAL[1]
-        return tone(DRIFT[1:], v + (0.06 if int(th * r / 2.5) % 2 else 0), ix, iy, 0.12)
+        return tone(WOOD[1:5], v + (0.06 if int(th * r / 2.5) % 2 else 0), ix, iy, 0.12)
     sc.lathe(cx, cy, [(0, 9.0), (27, 8.5), (27, 0)], column)
-    fur_roof(sc, cx, cy, 30.5, 16, 6, 9, 4.5)
-    sc.lathe(cx, cy, [(38, 5.5), (56, 5.0), (56, 0)], totem_mat([(41, 53, "hex")]))
-    fur_roof(sc, cx, cy, 58.5, 12, 4.5, 7, 3.5)
-    sc.lathe(cx, cy, [(64, 4.0), (72, 3.8), (72, 0)], totem_mat([(64, 65, "red")]))
+    fur_roof(sc, cx, cy, 31, 15, 4.5, 12, 6)
+    sc.lathe(cx, cy, [(40, 5.0), (58, 4.6), (58, 0)], totem_mat([(43, 55, "hex")]))
+    fur_roof(sc, cx, cy, 61, 11, 3.5, 8, 4.5)
+    sc.lathe(cx, cy, [(66, 3.8), (76, 3.6), (76, 0)], totem_mat([(66, 67, "red")]))
 
 
 def _great_gate() -> None:
@@ -3081,7 +3083,7 @@ def _great_gate() -> None:
                 c = [TEAL[3], PAINT_RED[2], BONE[4]][(x // 5) % 3]
                 p.vline(x, y + 1, y + 2 + (x // 5) % 2, c)
         # carved eagle on the gate, eagles on the towers
-        for ex, ey, dy in ((64, 70, 56), (30, 16, 2), (98, 16, 2)):
+        for ex, ey, dy in ((64, 70, 56), (30, 16, 13), (98, 16, 13)):
             tip = 2.0 if fr == 0 or ex == 64 else 5.0
             eagle_wing(p, ex - 1, -1, tip, True, dy=dy)
             eagle_wing(p, ex, 1, tip + 0.5, False, dy=dy)
