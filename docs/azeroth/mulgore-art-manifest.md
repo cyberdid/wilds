@@ -367,10 +367,13 @@ One tile = 16 px = 2 yards.
 
 | name | size | frames | variants | note |
 |---|---|---|---|---|
-| `az.obj.hut_large` | <=48x40 | 1 |  | tauren hide-and-timber longhouse |
-| `az.obj.hut_small` | <=32x32 | 1 | 2 | small tauren hut |
-| `az.obj.tent` | <=32x28 | 1 | 3 | hide tent, three patterns |
-| `az.obj.totem_pole` | <=16x40 | 1 | 3 | carved totem pole |
+| `az.obj.hut_large` | <=64x56 | 1 |  | big tauren round hide tent: white-cream stitched canvas, a ring of wooden posts, horn-cross finial, painted band; ~12 yards across |
+| `az.obj.big_teepee` | <=64x80 | 1 |  | Bloodhoof's great teepee: tall white stitched cone on a round timber base with steps, a bundle of crossed long poles poking out of the top |
+| `az.obj.eagle_totem` | <=32x56 | 2 |  | tall carved pole with a spread-winged eagle on top, wings flutter |
+| `az.obj.stilt_lodge` | <=56x48 | 1 |  | timber lodge on stilts with a sloped teal-grey roof and a ladder (Bloodhoof by the lake) |
+| `az.obj.hut_small` | <=48x44 | 1 | 3 | medium tauren tent: stitched white or tan canvas, a painted red/teal band, horn finial |
+| `az.obj.tent` | <=40x48 | 1 | 3 | tall conical hide tent with stitched seams and a crossed-horn finial, three patterns |
+| `az.obj.totem_pole` | <=16x72 | 1 | 3 | VERY tall carved totem: stacked faces and bands of teal and red hexagons on weathered wood, horns on top |
 | `az.obj.bonfire` | <=16x16 | 3 |  | camp bonfire |
 | `az.obj.drying_rack` | <=24x16 | 1 |  | hide/meat drying rack |
 | `az.obj.kodo_pen` | <=32x24 | 1 |  | kodo corral fence section |
@@ -442,40 +445,10 @@ One tile = 16 px = 2 yards.
 | `az.tb.warrior_hall` | <=64x48 | 1 |  | Hunter Rise / warrior hall |
 | `az.tb.cliff.face` | 16x16 | 1 | 6 | sheer pale tan-grey cliff wall, bold VERTICAL streaks and crevices, a few moss ledges; stretched vertically to 40-80 px by the client, seamless sideways |
 | `az.tb.cobble` | 16x16 | 1 | 4 | light cobblestone paving for plazas; tiles seamlessly |
-| `az.tb.tent_tall` | <=32x48 | 1 | 4 | tall conical hide tent, stitched seams, crossed horn finial on top, painted bands in red / teal / cream (a different colour scheme per variant) |
-| `az.tb.longhouse` | <=64x40 | 1 | 3 | long low tauren hall: tan hide walls, sloped TEAL wooden roof panels with ridge poles, red-and-cream trim, a stepped doorway |
 | `az.tb.tower_totem` | <=32x96 | 1 |  | the High Rise tower: tall cylinder, bands of red, teal hexagons and cream, a carved bull head with horns at the top |
 | `az.tb.windmill_totem` | <=24x40 | 4 |  | wind totem: carved pole with a spinning four-blade pinwheel |
-| `az.tb.round_tent` | <=64x48 | 1 |  | Elder Rise druid hall: big round white canvas tent held by tall carved posts and rope lashings, red trim |
 | `az.tb.lift_tower` | <=32x80 | 2 |  | the rope elevator: very tall carved pole with a small cab, round wooden landing disc at its foot with a ramp |
-| `az.tb.gatehouse` | <=48x32 | 1 | 2 | wooden gatehouse block at the end of a rope bridge, teal roof |
 | `az.tb.pine` | <=24x56 | 1 | 4 | tall dark-green mountain pine / fir, layered boughs, golden sunlit tips (Thunder Bluff is full of them) |
-
-## materials
-
-| name | size | frames | variants | note |
-|---|---|---|---|---|
-| `az.mat.wall.hide` | 16x16 | 1 | 4 | tanned tauren hide wall, stitched seams, pegs and lacing |
-| `az.mat.wall.hide_red` | 16x16 | 1 | 2 | hide wall with a horizontal painted red band edged in cream zigzags (rows 5-10) |
-| `az.mat.wall.hide_teal` | 16x16 | 1 | 2 | hide wall with a horizontal band of teal and cream hexagons (rows 4-11) |
-| `az.mat.wall.plank` | 16x16 | 1 | 3 | weathered brown timber boards with nail rows |
-| `az.mat.wall.plank_dark` | 16x16 | 1 | 2 | dark smoked timber, for Venture Co. and Bael'dun buildings |
-| `az.mat.wall.stone` | 16x16 | 1 | 2 | rough pale grey-tan stacked stone |
-| `az.mat.wall.thorn` | 16x16 | 1 | 2 | quilboar wall: woven thorn branches and bone |
-| `az.mat.wall.canvas` | 16x16 | 1 | 2 | off-white canvas with rope lashings |
-| `az.mat.wall.scrap` | 16x16 | 1 | 2 | goblin corrugated metal patched with planks |
-| `az.mat.roof.teal` | 16x16 | 1 | 3 | teal-green wooden shingle panels with darker ridge lines (Thunder Bluff halls) |
-| `az.mat.roof.hide` | 16x16 | 1 | 3 | orange-tan stretched hide panels with stitching |
-| `az.mat.roof.thatch` | 16x16 | 1 | 3 | golden prairie-grass thatch |
-| `az.mat.roof.canvas` | 16x16 | 1 | 2 | white canvas panels with seams |
-| `az.mat.roof.plank` | 16x16 | 1 | 2 | brown timber shingles |
-| `az.mat.roof.sod` | 16x16 | 1 | 2 | grass sod with tiny flowers |
-| `az.mat.roof.scrap` | 16x16 | 1 | 1 | rusty corrugated metal |
-| `az.mat.door.hide` | <=16x24 | 1 | 2 | doorway cut in a hide wall: dark interior, hide flap rolled up on one side |
-| `az.mat.door.plank` | <=16x24 | 1 | 2 | plank door in a timber wall with iron straps |
-| `az.mat.door.gate` | <=32x32 | 1 |  | double palisade gate with a bull-skull ornament |
-| `az.hill.face` | 16x16 | 1 | 4 | earth wall under a grassy lip (top 3 rows green), vertical roots/streaks, seamless sideways; the 4-12 px step of a rolling hill |
-| `az.hill.face_dry` | 16x16 | 1 | 2 | same for dry straw-coloured ground (dirt, dry grass) |
 
 ## items
 

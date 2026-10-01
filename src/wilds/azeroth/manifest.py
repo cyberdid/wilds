@@ -188,10 +188,15 @@ def structures() -> list[Need]:
     """Camps, villages, mines, nests, gates and things to gather or open."""
     return [
         # Bloodhoof Village, Camp Narache, Camp Sungraze
-        Need("az.obj.hut_large", "<=48x40", frames=1, note="tauren hide-and-timber longhouse"),
-        Need("az.obj.hut_small", "<=32x32", variants=2, note="small tauren hut"),
-        Need("az.obj.tent", "<=32x28", variants=3, note="hide tent, three patterns"),
-        Need("az.obj.totem_pole", "<=16x40", variants=3, note="carved totem pole"),
+        Need("az.obj.hut_large", "<=64x56", frames=1, note="big tauren round hide tent: white-cream stitched canvas, a ring of "
+             "wooden posts, horn-cross finial, painted band; ~12 yards across"),
+        Need("az.obj.big_teepee", "<=64x80", note="Bloodhoof's great teepee: tall white stitched cone on a round timber base with "
+             "steps, a bundle of crossed long poles poking out of the top"),
+        Need("az.obj.eagle_totem", "<=32x56", frames=2, note="tall carved pole with a spread-winged eagle on top, wings flutter"),
+        Need("az.obj.stilt_lodge", "<=56x48", note="timber lodge on stilts with a sloped teal-grey roof and a ladder (Bloodhoof by the lake)"),
+        Need("az.obj.hut_small", "<=48x44", variants=3, note="medium tauren tent: stitched white or tan canvas, a painted red/teal band, horn finial"),
+        Need("az.obj.tent", "<=40x48", variants=3, note="tall conical hide tent with stitched seams and a crossed-horn finial, three patterns"),
+        Need("az.obj.totem_pole", "<=16x72", variants=3, note="VERY tall carved totem: stacked faces and bands of teal and red hexagons on weathered wood, horns on top"),
         Need("az.obj.bonfire", "<=16x16", frames=3, note="camp bonfire"),
         Need("az.obj.drying_rack", "<=24x16", note="hide/meat drying rack"),
         Need("az.obj.kodo_pen", "<=32x24", note="kodo corral fence section"),
@@ -268,18 +273,11 @@ def thunder_bluff() -> list[Need]:
         Need("az.tb.cliff.face", "16x16", variants=6, note="sheer pale tan-grey cliff wall, bold VERTICAL streaks and "
              "crevices, a few moss ledges; stretched vertically to 40-80 px by the client, seamless sideways"),
         Need("az.tb.cobble", "16x16", variants=4, note="light cobblestone paving for plazas; tiles seamlessly"),
-        Need("az.tb.tent_tall", "<=32x48", variants=4, note="tall conical hide tent, stitched seams, crossed horn "
-             "finial on top, painted bands in red / teal / cream (a different colour scheme per variant)"),
-        Need("az.tb.longhouse", "<=64x40", variants=3, note="long low tauren hall: tan hide walls, sloped TEAL wooden "
-             "roof panels with ridge poles, red-and-cream trim, a stepped doorway"),
         Need("az.tb.tower_totem", "<=32x96", note="the High Rise tower: tall cylinder, bands of red, teal hexagons and "
              "cream, a carved bull head with horns at the top"),
         Need("az.tb.windmill_totem", "<=24x40", frames=4, note="wind totem: carved pole with a spinning four-blade pinwheel"),
-        Need("az.tb.round_tent", "<=64x48", note="Elder Rise druid hall: big round white canvas tent held by tall "
-             "carved posts and rope lashings, red trim"),
         Need("az.tb.lift_tower", "<=32x80", frames=2, note="the rope elevator: very tall carved pole with a small cab, "
              "round wooden landing disc at its foot with a ramp"),
-        Need("az.tb.gatehouse", "<=48x32", variants=2, note="wooden gatehouse block at the end of a rope bridge, teal roof"),
         Need("az.tb.pine", "<=24x56", variants=4, note="tall dark-green mountain pine / fir, layered boughs, "
              "golden sunlit tips (Thunder Bluff is full of them)"),
     ]
@@ -288,40 +286,6 @@ def thunder_bluff() -> list[Need]:
 ITEM_FAMILIES = ("belt", "boots", "bracers", "chest", "gloves", "helm", "legs", "shoulders", "cloak", "shield",
                  "sword", "axe", "mace", "dagger", "staff", "ranged", "totem", "relic", "ring", "amulet", "food",
                  "drink", "potion", "bag", "reagent", "quest_item", "ticket", "book")
-
-
-def materials() -> list[Need]:
-    """Textures the client wraps around true isometric volumes (huts, halls, tents, hills, palisades).
-
-    Walls and roofs are 16x16 and must tile seamlessly in BOTH directions: the client maps one tile of
-    wall length to 16 px and repeats the texture vertically. Light comes from the top-left."""
-    n = [Need(f"az.mat.wall.{k}", "16x16", variants=v, note=note) for k, v, note in (
-        ("hide", 4, "tanned tauren hide wall, stitched seams, pegs and lacing"),
-        ("hide_red", 2, "hide wall with a horizontal painted red band edged in cream zigzags (rows 5-10)"),
-        ("hide_teal", 2, "hide wall with a horizontal band of teal and cream hexagons (rows 4-11)"),
-        ("plank", 3, "weathered brown timber boards with nail rows"),
-        ("plank_dark", 2, "dark smoked timber, for Venture Co. and Bael'dun buildings"),
-        ("stone", 2, "rough pale grey-tan stacked stone"),
-        ("thorn", 2, "quilboar wall: woven thorn branches and bone"),
-        ("canvas", 2, "off-white canvas with rope lashings"),
-        ("scrap", 2, "goblin corrugated metal patched with planks"))]
-    n += [Need(f"az.mat.roof.{k}", "16x16", variants=v, note=note) for k, v, note in (
-        ("teal", 3, "teal-green wooden shingle panels with darker ridge lines (Thunder Bluff halls)"),
-        ("hide", 3, "orange-tan stretched hide panels with stitching"),
-        ("thatch", 3, "golden prairie-grass thatch"),
-        ("canvas", 2, "white canvas panels with seams"),
-        ("plank", 2, "brown timber shingles"),
-        ("sod", 2, "grass sod with tiny flowers"),
-        ("scrap", 1, "rusty corrugated metal"))]
-    n += [
-        Need("az.mat.door.hide", "<=16x24", variants=2, note="doorway cut in a hide wall: dark interior, hide flap rolled up on one side"),
-        Need("az.mat.door.plank", "<=16x24", variants=2, note="plank door in a timber wall with iron straps"),
-        Need("az.mat.door.gate", "<=32x32", note="double palisade gate with a bull-skull ornament"),
-        Need("az.hill.face", "16x16", variants=4, note="earth wall under a grassy lip (top 3 rows green), vertical roots/streaks, seamless sideways; "
-             "the 4-12 px step of a rolling hill"),
-        Need("az.hill.face_dry", "16x16", variants=2, note="same for dry straw-coloured ground (dirt, dry grass)"),
-    ]
-    return n
 
 
 def items() -> list[Need]:
@@ -349,8 +313,7 @@ def required(pack: Path = PACK) -> dict[str, list[Need]]:
     """Sprite module (``az_<key>``) -> what it must define."""
     return {"terrain": terrain(), "creatures": creatures(pack), "monsters": monsters(pack),
             "people_tauren": people_tauren(pack), "people_other": people_other(),
-            "structures": structures(), "thunder_bluff": thunder_bluff(), "materials": materials(), "items": items(),
-            "fx": fx()}
+            "structures": structures(), "thunder_bluff": thunder_bluff(), "items": items(), "fx": fx()}
 
 
 def check(registry, modules: list[str] | None = None, pack: Path = PACK) -> list[str]:
