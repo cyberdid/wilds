@@ -328,6 +328,10 @@ class AzApp:
         self.minimap_rect = pygame.Rect(0, 0, 0, 0)
         self.records = {quests.clean(r["title"]): r for k in ("npc", "mob") for r in content.load(sim.world.pack, k)}
         self.structures = settlements.build_structures(self.world)
+        self.built_up: set[tuple[int, int]] = set()  # tiles around buildings stay clear of trees and scrub
+        for s in self.structures:
+            r = s.size // 2 + 2 if s.size > 1 else 1
+            self.built_up.update((s.pos[0] + dx, s.pos[1] + dy) for dx in range(-r, r + 1) for dy in range(-r, r + 1))
         self.by_chunk: dict[tuple[int, int], list[tuple[str, object]]] = {}
         for s in self.structures:
             self.by_chunk.setdefault((s.pos[0] // CHUNK, s.pos[1] // CHUNK), []).append(("structure", s))
@@ -654,6 +658,8 @@ class AzApp:
         if terr not in GRASSES:
             if terr is Terrain.DIRT and h % 37 == 0:
                 f.sprite(self.painter.variant("az.deco.stones", x, y), gx, gy, solid=False, z=z)
+            return
+        if (x, y) in self.built_up:
             return
         # Mulgore: open lime-gold pasture; tall pines stand alone or in tight clumps far apart
         n = self.relief.noise.fractal(x / 40 + 31, y / 40 + 5, 2)

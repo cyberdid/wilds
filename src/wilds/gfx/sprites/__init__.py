@@ -34,8 +34,7 @@ AZEROTH_MODULES = (
     "az_items",
     "az_fx",
 )
-# structures (bigger tents, tall totems, well-totems, wooden gate) are being redrawn: held out until complete
-AZEROTH_DONE: tuple[str, ...] = tuple(m for m in AZEROTH_MODULES if m != "az_structures")
+AZEROTH_DONE: tuple[str, ...] = AZEROTH_MODULES
 
 
 def load(module: str) -> None:
