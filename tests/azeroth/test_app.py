@@ -74,7 +74,9 @@ def test_relief_stands_the_platforms_above_the_mesa(app):
     kind = rel.kind(*hub.center, Terrain.MESA)
     assert kind == "platform"
     assert rel.height(*hub.center, kind) > rel.height(hub.center[0], hub.center[1], "mesa") > 0
-    assert rel.height(0, 0, "ground") == 0
+    ground = rel.height(hub.center[0] + 90, hub.center[1], "ground")
+    assert 0 <= ground <= 48 and ground % 8 == 0 and ground < rel.height(*hub.center, kind)
+    assert rel.height(0, 0, "water") == 0
 
 
 def test_the_view_switches_between_25d_and_three_quarter(app):

@@ -126,7 +126,7 @@ class ZoneTerrain:
         if in_lake:
             return Terrain.SHALLOWS if fine > 0.74 else Terrain.WATER
         if cls == "r":
-            return Terrain.BOULDER if fine > 0.83 else (Terrain.MESA if patch > 0.36 else Terrain.DIRT)
+            return Terrain.BOULDER if fine > 0.86 else (Terrain.MESA if patch > 0.78 else (Terrain.DRY_GRASS if patch > 0.45 else Terrain.GRASS))
         if cls == "d":
             return Terrain.DIRT if fine > 0.8 else (Terrain.DRY_GRASS if patch > 0.3 else Terrain.GRASS)
         # grassland: patches of tall grass, sparse dirt and stones

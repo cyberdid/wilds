@@ -1479,7 +1479,7 @@ def _cobble() -> None:
                 border = min(x, y, T - 1 - x, T - 1 - y) < 2
                 cand = range(len(_COBBLE_SHARED)) if border else range(len(pts))
                 ds = sorted((dist(x + 0.5, y + 0.5, *pts[k]), k) for k in cand)
-                (d1, k1), (d2, _k2) = ds[0], ds[1]
+                (d1, k1), (d2, _) = ds[0], ds[1]
                 if d2 - d1 < 0.9:
                     ch = "m" if bayer(x, y) < 0.7 else "M"
                 else:
@@ -1553,6 +1553,254 @@ def _pine() -> None:
         register(f"az.tb.pine@{i}", art(g.grid(), legend=PINE, note="tall dark mountain pine"))
 
 
+def _cyl(t: float, light: str, mid: str, dark: str, deep: str | None = None) -> str:
+    """Colour for a column at t (0 = left rim, 1 = right rim) of a cylinder lit from the left."""
+    if t < 0.18:
+        return light
+    if t < 0.6:
+        return mid
+    if t < 0.9 or deep is None:
+        return dark
+    return deep
+
+
+PAINT = {  # paint name -> (lit, mid, dark, deep) on a cylinder
+    "cream": ("e", "d", "c", "b"), "red": ("q", "R", "r", "r"), "teal": ("%", "9", "8", "7"),
+    "wood": ("4", "3", "2", "1"), "line": ("b", "a", "a", "0"), "dark": ("V", "V", "v", "v"),
+}
+
+BULL = [
+    "J...............",
+    "Jj..............",
+    ".jj.............",
+    ".ijj............",
+    "..ijj...........",
+    "...ijjj.........",
+    "....hijjj.....kk",
+    ".....hiijjj.kddd",
+    ".......hhiijddee",
+    "........bdddddee",
+    ".......cbcddeeee",
+    "........cRRddeee",
+    ".........dVwdeee",
+    ".........dddqRRe",
+    "..........ddeeee",
+    "..........cdeeDD",
+    "...........cDDDD",
+    "...........cDVDD",
+    "............cDDj",
+    ".............ccj",
+]
+
+
+def _tower_totem() -> None:
+    """The High Rise tower: a tall painted cylinder (the wind rider roost) in bands of
+    red, teal hexagons and cream zigzags, a round window and an arched door, a wide rim
+    near the top and a great carved bull head with sweeping horns crowning it."""
+    W, H = 32, 96
+    c = Canvas(W, H)
+    x0, x1 = 5, 26
+    top, foot = 24, 88
+
+    def paint(x: int, y: int, name: str) -> None:
+        t = (x - x0) / (x1 - x0)
+        lit, mid, dark, deep = PAINT[name]
+        c.set(x, y, _cyl(t, lit, mid, dark, deep))
+
+    # body and bands, top to bottom
+    bands = []
+    y = top
+    pattern = ["red2", "hex8", "cream_zig4", "red2", "window8", "red1", "hex8", "red2", "cream_zig4",
+               "red2", "plain4", "door99"]
+    for item in pattern:
+        name = item.rstrip("0123456789")
+        n = int(item[len(name):])
+        bands.append((name, y, min(foot, y + n)))
+        y += n
+        if y >= foot:
+            break
+    for x in range(x0, x1 + 1):
+        for yy in range(top, foot + 1):
+            paint(x, yy, "cream")
+    for name, ya, yb in bands:
+        for yy in range(ya, yb):
+            for x in range(x0, x1 + 1):
+                k = yy - ya
+                if name == "red":
+                    paint(x, yy, "red")
+                elif name == "hex":
+                    # two rows of teal hexagons outlined in red, offset by half a cell
+                    row = k // 4
+                    off = 3 if row % 2 else 0
+                    cx = (x - x0 + off) % 6
+                    ky = k % 4
+                    if ky == 0 or cx == 0 or (ky in (1, 3) and cx in (1, 5)):
+                        paint(x, yy, "red")
+                    else:
+                        paint(x, yy, "teal")
+                elif name == "cream_zig":
+                    zig = abs(((x - x0) % 6) - 3)
+                    paint(x, yy, "red" if k == zig or k == zig - 1 else "cream")
+                elif name == "window" and k in range(1, 7):
+                    d = ((x + 0.5 - 15.5) / 3.5) ** 2 + ((k - 3.5) / 3.0) ** 2
+                    if d < 0.55:
+                        c.set(x, yy, "V" if d > 0.2 or x > 15 else "v")
+                    elif d < 1.0:
+                        paint(x, yy, "wood")
+                elif name == "door":
+                    d = abs(x + 0.5 - 15.5)
+                    if d < 4.5 and (k > 2 or d < 3):
+                        c.set(x, yy, "v" if d < 3.3 and k > 1 else "2" if x > 15 else "4")
+    for yy in range(top, foot + 1):  # the left rim catches light, the right is in shade
+        c.set(x0, yy, "e" if c.get(x0, yy) in "dcb" else c.get(x0, yy))
+        c.set(x1, yy, "a" if c.get(x1, yy) in "dcbe" else c.get(x1, yy))
+    # the rim near the top: a wide wooden ring with post ends
+    for yy in range(19, 24):
+        for x in range(2, 30):
+            t = (x - 2) / 27
+            k = yy - 19
+            if k == 0:
+                ch = "5" if t < 0.4 else "4"
+            elif k < 3:
+                ch = _cyl(t, "4", "3", "2", "1")
+            else:
+                ch = _cyl(t, "2", "1", "0", "0")
+            c.set(x, yy, ch)
+    for x in range(3, 29, 4):
+        c.set(x, 21, "1")
+    for x in range(4, 28, 6):  # feathers hanging from the rim
+        _stamp(c, x, 24, ["J", "j", "R" if x < 16 else "r"])
+    # the carved bull head with its horns
+    head = _right_shade([r for r in BULL])
+    _stamp(c, 0, 0, head)
+    # a wider stone footing
+    for yy in range(88, 96):
+        for x in range(2, 30):
+            nx, ny = (x + 0.5 - 16) / 14, (yy + 0.5 - 92) / 3.6
+            if nx * nx + ny * ny <= 1:
+                v = -nx * 0.5 - ny * 0.6 + (bayer(x, yy) - 0.5) * 0.4
+                c.set(x, yy, "N" if v > 0.5 else "n" if v > 0.1 else "M" if v > -0.35 else "m")
+    for yy in range(89, 92):  # steps up to the door
+        for x in range(11, 21):
+            c.set(x, yy, "4" if yy == 89 else "3" if yy == 90 else "2")
+    g = _finish(c)
+    register("az.tb.tower_totem", art(g.grid(), legend=TB, anchor=(16, 94),
+                                      note="High Rise tower: painted cylinder, bull head"))
+
+
+def _windmill_totem() -> None:
+    """A wind totem: a carved, painted pole with a four-blade pinwheel of hide sails on
+    wooden spars at the top, turning (4 frames = a quarter turn, the blades repeat)."""
+    W, H = 24, 40
+    frames = []
+    hub = (11.5, 10.5)
+    for f in range(4):
+        c = Canvas(W, H)
+        # the pole
+        for y in range(10, 38):
+            c.set(11, y, "4")
+            c.set(12, y, "2")
+        for y, name in ((16, "red"), (17, "red"), (22, "teal"), (23, "teal"), (28, "red"), (31, "cream"),
+                        (32, "cream")):
+            c.set(11, y, PAINT[name][0])
+            c.set(12, y, PAINT[name][2])
+        _stamp(c, 10, 19, ["eJJe", ".jj."])  # carved bone collar
+        # blades
+        for b in range(4):
+            ang = math.pi / 2 * b + f * math.pi / 8
+            dx, dy = math.cos(ang), math.sin(ang)
+            px, py = -dy, dx
+            for s10 in range(3, 100):
+                s_ = s10 / 10
+                if s_ > 10:
+                    break
+                wdt = 0.6 + 1.8 * min(1.0, s_ / 6)
+                for wv in (-wdt, -wdt / 2, 0, wdt / 2, wdt):
+                    x = hub[0] + dx * s_ + px * wv * (1 if s_ > 2.5 else 0)
+                    y = hub[1] + dy * s_ * 0.8 + py * wv * 0.8 * (1 if s_ > 2.5 else 0)
+                    xi, yi = int(x), int(y)
+                    if wv == 0 or s_ <= 2.5:
+                        ch = "3"  # the spar
+                    elif wv > 0:
+                        ch = "e" if b % 2 == 0 else "q"
+                    else:
+                        ch = "d" if b % 2 == 0 else "R"
+                    if c.get(xi, yi) != "3" or ch == "3":
+                        c.set(xi, yi, ch)
+        _stamp(c, 10, 9, ["jJ", "ij"])  # the hub
+        g = _finish(c, (12, 39.2, 4, 0.9))
+        for x in range(9, 15):  # a footing of stones
+            g.set(x, 38, "M" if x % 2 else "n")
+        frames.append(g.grid())
+    register("az.tb.windmill_totem", art(*frames, legend=TB, fps=6, anchor=(12, 38),
+                                         note="wind totem: painted pole, spinning pinwheel"))
+
+
+def _lift_tower() -> None:
+    """The rope elevator: a very tall carved pole with a crossbeam, pulley and horn
+    finial, a small cab riding on the rope (it climbs 2 px between frames), and a round
+    wooden landing disc at its foot with a ramp running down toward the viewer."""
+    W, H = 32, 80
+    frames = []
+    for f in range(2):
+        c = Canvas(W, H)
+        # landing disc: plank top, thick rim
+        for y in range(64, 80):
+            for x in range(W):
+                nx, ny = (x + 0.5 - 16) / 15.5, (y + 0.5 - 70) / 5.0
+                if nx * nx + ny * ny <= 1:
+                    k = (y - 65) % 3
+                    ch = "4" if k == 0 else "3"
+                    if nx < -0.5 and k == 0:
+                        ch = "5"
+                    if (x + (y // 3) * 5) % 11 == 0:
+                        ch = "1"  # board ends
+                    c.set(x, y, ch)
+                nyr = (y + 0.5 - 72.5) / 5.0
+                if nx * nx + nyr * nyr <= 1 and c.get(x, y) == "." and y > 70:
+                    c.set(x, y, "2" if nx < 0.3 else "1")
+        for x in range(1, 31, 5):  # posts under the rim
+            if c.get(x, 77) in "12":
+                c.set(x, 77, "0")
+        for y in range(73, 80):  # the ramp toward the viewer
+            for x in range(12, 20):
+                c.set(x, y, "4" if (y - 73) % 2 == 0 else "3")
+            c.set(11, y, "2")
+            c.set(20, y, "1")
+        # the tall pole, carved and painted in bands
+        for y in range(4, 69):
+            c.set(14, y, "4")
+            c.set(15, y, "3")
+            c.set(16, y, "3")
+            c.set(17, y, "2")
+        for y0, name in ((10, "red"), (11, "red"), (20, "teal"), (21, "teal"), (22, "teal"), (30, "cream"),
+                         (31, "cream"), (40, "red"), (50, "teal"), (51, "teal"), (60, "red"), (61, "red")):
+            for x in range(14, 18):
+                c.set(x, y0, _cyl((x - 14) / 3, *PAINT[name]))
+        for y in (15, 35, 45, 55):  # rope lashings
+            for x in range(14, 18):
+                c.set(x, y, "d" if x < 16 else "c")
+        # crossbeam, pulley and horn finial
+        for x in range(8, 25):
+            c.set(x, 4, "4")
+            c.set(x, 5, "2")
+        _stamp(c, 12, 0, ["J......J", "jJ....Jj", ".jJ44Jj."])
+        _stamp(c, 21, 5, [".ii.", "i00i", ".ii."] if f == 0 else [".ji.", "j00i", ".ij."])
+        cab_y = 40 - f * 2
+        for y in range(8, cab_y):  # the hoist rope, twisted
+            c.set(22, y, "j" if (y + f) % 2 else "i")
+        for y in range(8, 64):  # the counter rope down to the disc
+            c.set(24, y, "i" if (y + f) % 2 else "h")
+        # the cab: a small plank basket with hide sides and red trim
+        cab = ["..jj....", ".j..j...", "44444444", "4dddddc3", "3dRRRdc2", "3ddddcc2", "33333322",
+               ".1....1."]
+        _stamp(c, 18, cab_y - 2, cab)
+        g = _finish(c)
+        frames.append(g.grid())
+    register("az.tb.lift_tower", art(*frames, legend=TB, fps=2, anchor=(16, 79),
+                                     note="rope elevator: tall carved pole, cab, landing disc"))
+
+
 _platform()
 _inlay()
 _platform_edge()
@@ -1575,3 +1823,6 @@ _banner_pole()
 _cliff_face()
 _cobble()
 _pine()
+_tower_totem()
+_windmill_totem()
+_lift_tower()

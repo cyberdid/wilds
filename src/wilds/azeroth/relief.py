@@ -22,6 +22,7 @@ PLATFORM_HEIGHT = 72  # the rises stand on sheer cliffs
 BRIDGE_HEIGHT = 68
 CLIFF_BASE, CLIFF_VAR = 14, 10
 MOUNTAIN_BASE, MOUNTAIN_VAR = 30, 38
+HILL_GAIN, HILL_STEP = 150, 8  # the prairie rolls up to ~45 px in 8 px terraces
 STEP = 4  # heights are quantised so the block cache stays small
 
 
@@ -31,11 +32,16 @@ class Relief:
         self.noise = ValueNoise(world.seed * 13 + 3)
         self.platforms = settlements.platforms(world)
         self.bridges = settlements.bridge_tiles(world)
+        self.flat = [(world.nearest_passable(p.pos, 30) or p.pos, settlements.RECIPES[p.title][0])
+                     for p in world.placements if p.title in settlements.RECIPES]  # villages sit on level ground
+        self._heights: dict[tuple[int, int, str], int] = {}
 
     def kind(self, x: int, y: int, terr: Terrain) -> str:
         """ground | mesa | cliff | mountain | platform | bridge | void"""
         if terr is Terrain.VOID:
             return "void"
+        if terr in (Terrain.WATER, Terrain.SHALLOWS):
+            return "water"
         if self.platforms_near(x, y):
             if settlements.on_platform(self.world, (x, y), self.platforms):
                 return "platform"
@@ -48,6 +54,27 @@ class Relief:
                    for p in self.platforms)
 
     def height(self, x: int, y: int, kind: str) -> int:
+        key = (x, y, kind)
+        h = self._heights.get(key)
+        if h is None:
+            if len(self._heights) > 400_000:
+                self._heights.clear()
+            h = self._heights[key] = self._height(x, y, kind)
+        return h
+
+    def hill(self, x: int, y: int) -> int:
+        """Rolling prairie: broad low swells, levelled around villages."""
+        n = self.noise.fractal(x / 60 + 7, y / 60 + 7, 3)
+        lift = max(0.0, n - 0.40) * HILL_GAIN
+        for (cx, cy), r in self.flat:
+            d = math.hypot(x - cx, (y - cy) / 0.75)
+            if d < r + 14:
+                lift *= max(0.0, (d - r * 0.8) / (r * 0.2 + 14))
+        return self._q(lift, HILL_STEP)
+
+    def _height(self, x: int, y: int, kind: str) -> int:
+        if kind == "ground":
+            return self.hill(x, y)
         if kind == "platform":
             return PLATFORM_HEIGHT
         if kind == "bridge":
@@ -64,5 +91,5 @@ class Relief:
         return 0
 
     @staticmethod
-    def _q(v: float) -> int:
-        return int(v) // STEP * STEP
+    def _q(v: float, step: int = STEP) -> int:
+        return int(v) // step * step

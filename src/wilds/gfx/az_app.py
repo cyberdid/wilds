@@ -22,6 +22,7 @@ import sys
 import threading
 import time
 import traceback
+import zlib
 from collections import deque
 from pathlib import Path
 
@@ -32,9 +33,9 @@ from ..azeroth.scale import CHUNK, TICK_SECONDS
 from ..azeroth.terrain import Terrain
 from . import hud
 from . import text as txt
-from .bank import SpriteBank, _to_diamond
+from .bank import SpriteBank, _to_diamond, _to_wall
 from .lighting import TAU7_SKY, sky
-from .render import PROJECTIONS, TILE, Frame, Renderer
+from .render import PROJECTIONS, TILE, Frame, Placed, Renderer
 from .sprites import load_all, load_azeroth
 
 TPS = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
@@ -93,6 +94,8 @@ class Painter:
         self._composite: dict[tuple, pygame.Surface] = {}
         self._diamond: dict[tuple, pygame.Surface] = {}
         self._masks: dict[tuple, pygame.Surface] = {}
+        self._faces: dict[tuple, pygame.Surface] = {}
+        self._blocks: dict[tuple, pygame.Surface] = {}
 
     def variant(self, base: str, x: int, y: int) -> str:
         try:
@@ -174,6 +177,49 @@ class Painter:
                     surf.blit(self.bank.base(ov)[o.frame_index(t) % len(o.frames)], (0, 0))
             self._composite[key] = surf
         return surf, key
+
+    def hill_face(self, top: pygame.Surface, key: tuple) -> pygame.Surface:
+        """The earth wall of a hill step: a lip of the top's own greens over soil with vertical streaks."""
+        f = self._faces.get(key)
+        if f is None:
+            if "az.hill.face" in self.bank:  # drawn art wins over the generated fallback
+                f = self.bank.base(self.variant("az.hill.face", key[1] if len(key) > 1 else 0, 0))[0]
+            else:
+                f = pygame.Surface((16, 16), pygame.SRCALPHA)
+                rng = random.Random(zlib.crc32(repr(key).encode()))
+                lip = [top.get_at((rng.randrange(16), rng.randrange(16)))[:3] for _ in range(16)]
+                for x in range(16):
+                    streak = rng.choice((-14, 0, 0, 10))
+                    for y in range(16):
+                        if y < 3:
+                            c = tuple(max(0, v - 20 * y) for v in lip[x])
+                        else:
+                            base = (112, 84, 54) if (x + y // 5) % 4 else (96, 70, 44)
+                            c = tuple(max(0, min(255, v + streak - y + rng.randrange(-6, 7))) for v in base)
+                        f.set_at((x, y), c)
+            self._faces[key] = f
+        return f
+
+    def block(self, top: pygame.Surface, key: tuple, face: pygame.Surface, face_key: tuple, height: int,
+              south: bool, east: bool) -> pygame.Surface:
+        """An extruded isometric cube whose top is an already blended ground tile."""
+        k = (key, face_key, height, south, east)
+        s = self._blocks.get(k)
+        if s is None:
+            s = pygame.Surface((32, 16 + height), pygame.SRCALPHA)
+            if south:
+                s.blit(_to_wall(face, height, left=True, shade=236), (0, 8))
+            if east:
+                s.blit(_to_wall(face, height, left=False, shade=176), (16, 8))
+            roof = self.diamond(top, key).copy()
+            delta = (min(height, 48) // 8 - 2) * 7  # higher ground catches more light: hills read as hills
+            if delta:
+                roof.fill((abs(delta),) * 3 + (0,), special_flags=pygame.BLEND_RGB_ADD if delta > 0 else pygame.BLEND_RGB_SUB)
+            s.blit(roof, (0, 0))
+            if south and east:
+                pygame.draw.line(s, (20, 15, 30), (16, 16), (16, 15 + height))
+            self._blocks[k] = s
+        return s
 
     def diamond(self, surf: pygame.Surface, key: tuple) -> pygame.Surface:
         d = self._diamond.get(key)
@@ -509,17 +555,25 @@ class AzApp:
                 terr, kind, hgt = grid[gy][gx], kinds[gy][gx], heights[gy][gx]
                 if kind == "void":
                     continue
-                if hgt == 0:
+                if hgt == 0 or (kind in ("ground", "water") and not iso):
                     surf, key = self.painter.composite(grid, gx, gy, x, y, now)
                     pos = f.proj.tile_origin(x, y)
                     f.ground.append((self.painter.diamond(surf, key) if iso else surf, (pos[0] - f.ox, pos[1] - f.oy)))
+                elif kind == "ground":  # a rolling-hill step: blended top, earth wall
+                    surf, key = self.painter.composite(grid, gx, gy, x, y, now)
+                    south, east = heights[gy + 1][gx] < hgt, heights[gy][gx + 1] < hgt
+                    fkey = ("hill", tile_hash(x, y) % 4, key[0])
+                    fsurf = self.painter.hill_face(surf, fkey)
+                    cube = self.painter.block(surf, key, fsurf, fkey, hgt, south, east)
+                    x0, y0 = f.proj.tile_origin(x, y)
+                    f.placed.append(Placed(cube, x0 - f.ox, y0 - f.oy - hgt, (x + y + 0.5, 0, x), solid=True))
                 else:
                     open_sides = "".join(s for s, (dx, dy) in SIDES.items() if heights[gy + dy][gx + dx] < hgt)
                     top, face = self._block_art(kind, x, y)
                     f.block(top, face, x, y, now, open_sides, hgt)
                 gxw, gyw = x * TILE + TILE // 2, y * TILE + TILE - 1
-                if kind == "ground":
-                    self._scatter(f, terr, x, y, gxw, gyw, seed, now)
+                if kind in ("ground", "water"):
+                    self._scatter(f, terr, x, y, gxw, gyw, seed, now, hgt)
                 elif kind in ("mesa", "platform"):
                     if kind == "platform":
                         self._scatter_top(f, x, y, gxw, gyw, hgt, seed, now)
@@ -581,38 +635,40 @@ class AzApp:
         elif h % 13 == 0:
             f.sprite(v("az.plant.wildflowers", x, y), gx, gy, now + (h % 7) * 0.3, z=z, solid=False)
 
-    def _scatter(self, f: Frame, terr: Terrain, x: int, y: int, gx: float, gy: float, seed: int, now: float) -> None:
+    def _scatter(self, f: Frame, terr: Terrain, x: int, y: int, gx: float, gy: float, seed: int, now: float, z: float = 0) -> None:
         """Plants, flowers and stones on open ground, deterministic per tile."""
         h = tile_hash(x, y, seed)
         bank = self.bank
         if terr in WATERS:
             if terr is Terrain.SHALLOWS and h % 5 == 0 and "az.plant.reeds" in bank.registry._variants:
-                f.sprite(self.painter.variant("az.plant.reeds", x, y), gx, gy, now + (h % 9) * 0.3)
+                f.sprite(self.painter.variant("az.plant.reeds", x, y), gx, gy, now + (h % 9) * 0.3, z=z)
             return
         if terr not in GRASSES:
             if terr is Terrain.DIRT and h % 37 == 0:
-                f.sprite(self.painter.variant("az.deco.stones", x, y), gx, gy, solid=False)
+                f.sprite(self.painter.variant("az.deco.stones", x, y), gx, gy, solid=False, z=z)
             return
         n = self.relief.noise.fractal(x / 18, y / 18, 2)
-        if n > 0.58 and h % 23 == 0 and "az.plant.tree" in bank.registry._variants:      # trees in loose groves
-            f.sprite(self.painter.variant("az.plant.tree", x, y), gx, gy, shadow=22)
+        if (n > 0.58 and h % 26 == 0 or h % 211 == 0) and "az.tb.pine" in bank.registry._variants:  # pine groves, lone pines
+            f.sprite(self.painter.variant("az.tb.pine", x, y), gx, gy, shadow=20, z=z)
+        elif n > 0.6 and h % 31 == 0 and "az.plant.tree" in bank.registry._variants:
+            f.sprite(self.painter.variant("az.plant.tree", x, y), gx, gy, shadow=22, z=z)
         elif h % 67 == 0 and "az.plant.dead_tree" in bank.registry._variants and n < 0.42:
-            f.sprite(self.painter.variant("az.plant.dead_tree", x, y), gx, gy, shadow=12)
+            f.sprite(self.painter.variant("az.plant.dead_tree", x, y), gx, gy, shadow=12, z=z)
         elif h % 29 == 0 and "az.plant.bush" in bank.registry._variants:
-            f.sprite(self.painter.variant("az.plant.bush", x, y), gx, gy, shadow=10)
+            f.sprite(self.painter.variant("az.plant.bush", x, y), gx, gy, shadow=10, z=z)
         elif h % 13 == 0 and "az.plant.grass_clump" in bank.registry._variants:
-            f.sprite(self.painter.variant("az.plant.grass_clump", x, y), gx, gy, now + (h % 11) * 0.27, solid=False)
+            f.sprite(self.painter.variant("az.plant.grass_clump", x, y), gx, gy, now + (h % 11) * 0.27, solid=False, z=z)
         elif h % 17 == 0:
             name = self.painter.variant("az.plant.wildflowers", x, y) if "az.plant.wildflowers" in bank.registry._variants \
                 else ("az.deco.flower_red", "az.deco.flower_yellow", "az.deco.flower_blue", "az.deco.tuft")[(h >> 6) % 4]
-            f.sprite(self._variant_name(name, x, y), gx, gy, now + (h % 7) * 0.3, solid=False)
+            f.sprite(self._variant_name(name, x, y), gx, gy, now + (h % 7) * 0.3, solid=False, z=z)
         elif h % 611 == 0:
             node = ("az.node.peacebloom", "az.node.silverleaf", "az.node.earthroot", "az.node.copper_vein",
                     "az.node.prairie_flower", "az.node.shiny_stone")[(h >> 8) % 6]
-            f.sprite(node, gx, gy, now + (h % 7))
+            f.sprite(node, gx, gy, now + (h % 7), z=z)
         elif h % 31 == 0:
             f.sprite(self._variant_name(("az.deco.stones", "az.deco.tuft", "az.deco.dry_bush", "az.deco.bones")[(h >> 5) % 4], x, y),
-                     gx, gy, solid=False)
+                     gx, gy, solid=False, z=z)
 
     def _scatter_mesa(self, f: Frame, x: int, y: int, gx: float, gy: float, z: float, seed: int, now: float) -> None:
         """Dry scrub, spires and stones on a mesa top."""
@@ -714,7 +770,7 @@ class AzApp:
 
     def _z(self, pos: tuple[int, int]) -> int:
         kind = self.relief.kind(pos[0], pos[1], self.world.tile(*pos))
-        return self.relief.height(pos[0], pos[1], kind) if kind in ("mesa", "platform", "bridge") else 0
+        return self.relief.height(pos[0], pos[1], kind)
 
     def _draw_plates(self, screen: pygame.Surface, view: pygame.Rect, f: Frame) -> None:
         size = 12 if self.zoom < 4 else 14
