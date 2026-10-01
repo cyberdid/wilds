@@ -31,6 +31,13 @@ _ramp("azs_hide", "#3b2517", "#65402a", "#8f6440", "#b98c5c", "#dab584", "#f1dbb
 _ramp("azs_stone", "#231e1d", "#3b3330", "#5a4f49", "#7d7068", "#a3958a", "#c9bcae")  # warm grey stone
 _ramp("azs_leaf", "#18260f", "#2b4416", "#46661f", "#6a8d2b", "#98b647", "#cbd97e")   # prairie green
 _ramp("azs_brier", "#1c150f", "#35281a", "#534027", "#735c37", "#977c4f")             # quilboar bramble
+# the tauren camps of the reference pictures: off-white stitched canvas, teal and crimson paint,
+# weathered grey-brown totem wood, the grey-teal roof of the lakeside lodge
+_ramp("azs_canvas", "#4d4238", "#7b6d5e", "#a6998a", "#cbc0b0", "#e6dece", "#f8f4ea")  # tent canvas
+_ramp("azs_teal", "#123a3c", "#1f6265", "#2f8f8c", "#57bdb0", "#9fe3d2")               # teal paint
+_ramp("azs_crim", "#2e0c10", "#5e1519", "#8f2220", "#bb3a2c", "#de6e55")               # crimson paint
+_ramp("azs_drift", "#221c19", "#3d332c", "#5d5045", "#7f6f60", "#a3927f", "#c6b7a2")   # weathered wood
+_ramp("azs_roof", "#1e2a2b", "#334544", "#4d6662", "#6d8a83", "#97b0a6")               # grey-teal roof
 
 WOOD = RAMPS["azs_wood"]
 HIDE = RAMPS["azs_hide"]
@@ -49,6 +56,13 @@ WATER = RAMPS["water"]
 GREY = RAMPS["grey"]
 BLUE = ["water1", "water2", "water3", "water4"]
 GOLD = ["gold0", "gold1", "gold2", "gold3"]
+CANVAS = RAMPS["azs_canvas"]
+TEAL = RAMPS["azs_teal"]
+PAINT_RED = RAMPS["azs_crim"]
+DRIFT = RAMPS["azs_drift"]
+ROOF = RAMPS["azs_roof"]
+STRAW = SAND[1:]
+_MATERIALS = [WOOD, HIDE, STONE, LEAF, BRIER, CANVAS, TEAL, PAINT_RED, DRIFT, ROOF, BONE, SAND, TENT]
 SHADOW = "ink:90"          # soft contact shadow on the ground (never outlined)
 SHADOW_CORE = "ink:140"    # its denser core right under the object
 DEEP = "ink2"
@@ -298,18 +312,6 @@ def dome_shade(p: Pic, cx: float, base: float, rx: float, ry: float, ramp: Seque
     return info
 
 
-def zigzag(colors: Sequence[str], mark: str, period: int = 4, scale: float = 1.0):
-    """Painted band: ``colors`` shaded by light, a zigzag of ``mark`` through it."""
-    def paint(x, y, u, t, v):
-        base = colors[max(0, min(len(colors) - 1, int(v * len(colors) + 0.2)))]
-        rows = 3
-        r = min(rows - 1, int(t * rows))
-        s = int(math.floor(math.asin(max(-1, min(1, u))) * scale * 8)) % period
-        zig = {0: (0,), 1: (1, period - 1), 2: (period // 2,)}[r] if period == 4 else ()
-        return mark if s in zig else base
-    return paint
-
-
 def door_arch(p: Pic, x0: int, x1: int, top: int, bottom: int, glow: str | None = None) -> None:
     """A dark rounded doorway, lighter toward the floor if a fire burns inside."""
     w = x1 - x0 + 1
@@ -361,192 +363,791 @@ def tusk_pair(p: Pic, x0: int, x1: int, base: int, height: int) -> None:
                 p.set(x - dirn, y, BONE[2])
 
 
-def lodge_poles(p: Pic, tops: Sequence[tuple[int, int, int, int]]) -> None:
-    for x0, y0, x1, y1 in tops:
-        pole(p, x0, y0, x1, y1)
+# --- 2.5D scene: a tiny z-buffered renderer for the big tauren pieces -------------------------------
+#
+# World units are pixels: x to the right, y toward the viewer, z up. The camera looks down from a high
+# angle, so a ground circle of radius r becomes a 2:1 ellipse (r by r/2) like the diamond tiles, and
+# heights stay upright. Surfaces are sampled densely, z-buffered, lit from the top-left, quantised to
+# ramps with an ordered dither, then frozen into an ordinary palette-name Pic.
+
+_L3 = (-0.55, 0.35, 0.76)
+_L3N = math.sqrt(sum(v * v for v in _L3))
+LIGHT3 = tuple(v / _L3N for v in _L3)
+FRONT = math.pi / 2           # the angle around a round tent that faces the viewer
 
 
-# --- longhouse ----------------------------------------------------------------------------
+def shade3(nx: float, ny: float, nz: float) -> float:
+    """Brightness 0..1 of a surface with normal n under the top-left sun (a little ambient)."""
+    n = math.sqrt(nx * nx + ny * ny + nz * nz) or 1.0
+    d = (nx * LIGHT3[0] + ny * LIGHT3[1] + nz * LIGHT3[2]) / n
+    return max(0.0, min(1.0, 0.2 + 0.85 * max(0.0, d) ** 0.85))
+
+
+class Scene:
+    """Painter with a depth buffer. ``ox, oy`` is the screen pixel under the world origin."""
+
+    def __init__(self, w: int, h: int, ox: float, oy: float) -> None:
+        self.w, self.h, self.ox, self.oy = w, h, ox, oy
+        self.col: list[list[str | None]] = [[None] * w for _ in range(h)]
+        self.dep = [[-1e9] * w for _ in range(h)]
+        self.oid = [[0] * w for _ in range(h)]
+        self._ids = 0
+
+    def new_id(self) -> int:
+        self._ids += 1
+        return self._ids
+
+    def screen(self, x: float, y: float, z: float) -> tuple[int, int]:
+        return int(math.floor(self.ox + x)), int(math.floor(self.oy + y * 0.5 - z))
+
+    def put(self, x: float, y: float, z: float, c, oid: int, bias: float = 0.0) -> None:
+        ix, iy = self.screen(x, y, z)
+        self.put_px(ix, iy, 2 * y + z + bias, c, oid)
+
+    def put_px(self, ix: int, iy: int, d: float, c, oid: int) -> None:
+        if 0 <= ix < self.w and 0 <= iy < self.h and d > self.dep[iy][ix]:
+            if callable(c):
+                c = c(ix, iy)
+            if c:
+                self.col[iy][ix], self.dep[iy][ix], self.oid[iy][ix] = c, d, oid
+
+    def lathe(self, cx: float, cy: float, prof: Sequence[tuple[float, float]], mat: Callable,
+              ds: float = 0.25) -> None:
+        """Surface of revolution through profile points (z, r), listed from the bottom outward/up.
+        ``mat(th, z, r, v, ix, iy)`` returns a palette name (``th`` = angle, FRONT faces the viewer).
+        Rasterised column by column, so the angle is exact for each pixel column and seams and
+        patterns come out as clean lines."""
+        oid = self.new_id()
+        samples = []
+        for (z0, r0), (z1, r1) in zip(prof, prof[1:]):
+            seg = math.hypot(z1 - z0, r1 - r0)
+            if seg == 0:
+                continue
+            nr, nz = (z1 - z0) / seg, -(r1 - r0) / seg       # outward normal in the (r, z) plane
+            for k in range(int(seg / ds) + 1):
+                t = k * ds / seg
+                samples.append((z0 + (z1 - z0) * t, r0 + (r1 - r0) * t, nr, nz))
+        rmax = max(r for _, r in prof)
+        for ix in range(int(math.floor(self.ox + cx - rmax)) - 1, int(math.ceil(self.ox + cx + rmax)) + 2):
+            dx = ix + 0.5 - self.ox - cx
+            for sgn in (1, -1):
+                prev = None
+                for z, r, nr, nz in samples:
+                    if abs(dx) > r:
+                        prev = None
+                        continue
+                    y = sgn * math.sqrt(r * r - dx * dx)
+                    th = math.atan2(y, dx) % math.tau
+                    c, s = dx / r if r else 0.0, y / r if r else 0.0
+                    v = shade3(nr * c, nr * s, nz)
+                    iy = int(math.floor(self.oy + (cy + y) * 0.5 - z))
+                    d = 2 * (cy + y) + z
+                    rows = [iy]
+                    if prev is not None and abs(iy - prev) > 1:   # close gaps on flat parts
+                        rows = range(min(iy, prev) + 1, max(iy, prev)) if iy != prev else [iy]
+                        rows = list(rows) + [iy]
+                    for yy in rows:
+                        self.put_px(ix, yy, d, lambda px, py, th=th, z=z, r=r, v=v: mat(th, z, r, v, px, py), oid)
+                    prev = iy
+
+    def quad(self, p0, a, b, mat: Callable, ds: float = 0.4, oid: int | None = None, tri: bool = False) -> None:
+        """Flat patch p0 + u*a + v*b (u, v in 0..1; a triangle u + v <= 1 if ``tri``);
+        ``mat(u, v, light, ix, iy)``."""
+        oid = oid or self.new_id()
+        n = (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
+        if 2 * n[1] + n[2] < 0:   # face the camera
+            n = (-n[0], -n[1], -n[2])
+        lv = shade3(*n)
+        nu = int(math.sqrt(sum(c * c for c in a)) / ds) + 1
+        nv = int(math.sqrt(sum(c * c for c in b)) / ds) + 1
+        for i in range(nu + 1):
+            u = i / nu
+            for j in range(nv + 1):
+                w = j / nv
+                if tri and u + w > 1.0001:
+                    break
+                self.put(p0[0] + u * a[0] + w * b[0], p0[1] + u * a[1] + w * b[1], p0[2] + u * a[2] + w * b[2],
+                         lambda ix, iy, u=u, w=w: mat(u, w, lv, ix, iy), oid)
+
+    def rod(self, p0, p1, rad: float, ramp: Sequence[str], hi: float = 0.9, lo: float = 0.2,
+            oid: int | None = None) -> None:
+        """A round timber from p0 to p1, ``rad`` px thick each side, lit on its upper-left flank."""
+        oid = oid or self.new_id()
+        sx0, sy0 = p0[0], p0[1] * 0.5 - p0[2]
+        sx1, sy1 = p1[0], p1[1] * 0.5 - p1[2]
+        ln = math.hypot(sx1 - sx0, sy1 - sy0) or 1.0
+        px, py = -(sy1 - sy0) / ln, (sx1 - sx0) / ln     # screen perpendicular
+        if px + py > 0:                                  # make +side point to the upper-left (lit)
+            px, py = -px, -py
+        steps = int(max(ln, math.dist(p0, p1)) / 0.35) + 1
+        for i in range(steps + 1):
+            t = i / steps
+            x, y, z = (p0[k] + (p1[k] - p0[k]) * t for k in range(3))
+            k = -rad
+            while k <= rad + 1e-6:
+                f = (k + rad) / (2 * rad) if rad else 0.5   # 0 = shadow flank, 1 = lit flank
+                c = ramp[max(0, min(len(ramp) - 1, int((lo + (hi - lo) * f) * len(ramp))))]
+                # move in screen space: x directly, y through z (keeps depth of the axis)
+                self.put(x + px * k, y, z - py * k, c, oid, bias=(rad - abs(k)) * 0.5)
+                k += 0.5
+
+    def disc(self, cx: float, cy: float, z: float, r: float, mat: Callable) -> None:
+        """A flat horizontal disc (a platform top); ``mat(rr, th, ix, iy)``."""
+        oid = self.new_id()
+        lv = shade3(0, 0, 1)
+        rr = 0.0
+        while rr <= r:
+            n = max(6, int(math.tau * rr / 0.5))
+            for i in range(n):
+                th = i * math.tau / n
+                self.put(cx + rr * math.cos(th), cy + rr * math.sin(th), z,
+                         lambda ix, iy, rr=rr, th=th: mat(rr, th, lv, ix, iy), oid)
+            rr += 0.4
+
+    def pic(self, edge: float = 7.0) -> Pic:
+        """Freeze into a Pic. Where a nearer part overlaps a farther one, the farther pixel along
+        the boundary turns dark: the inner contour lines of pixel art."""
+        p = Pic(self.w, self.h)
+        for y in range(self.h):
+            for x in range(self.w):
+                c = self.col[y][x]
+                if c is None:
+                    continue
+                d, o = self.dep[y][x], self.oid[y][x]
+                dark = False
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    xx, yy = x + dx, y + dy
+                    if 0 <= xx < self.w and 0 <= yy < self.h and self.col[yy][xx] is not None:
+                        dd = self.dep[yy][xx] - d
+                        if dd > edge or (self.oid[yy][xx] != o and dd > 1.5):
+                            dark = True
+                            break
+                p.px[y][x] = darker(c, 2) if dark else c
+        return p
+
+
+def darker(name: str, d: int) -> str:
+    """The same material ``d`` steps darker, for contour lines (ink if it has no ramp)."""
+    for ramp in _MATERIALS:
+        if name in ramp:
+            i = ramp.index(name)
+            return ramp[i - d] if i - d >= 0 else "ink"
+    return "ink" if name not in ("ink", "ink2") else name
+
+
+def wrap(a: float) -> float:
+    """Angle difference folded into -pi..pi."""
+    return (a + math.pi) % math.tau - math.pi
+
+
+def hexcell(u: float, v: float, s: float) -> tuple[int, int, float]:
+    """Pointy-top hexagon grid of size ``s``: (column, row, distance to the cell's border)."""
+    hw, hh = s * math.sqrt(3), s * 1.5
+    j0 = int(math.floor(v / hh))
+    best = []
+    for j in (j0 - 1, j0, j0 + 1, j0 + 2):
+        off = hw / 2 if j % 2 else 0.0
+        i0 = int(math.floor((u - off) / hw))
+        for i in (i0 - 1, i0, i0 + 1, i0 + 2):
+            best.append((math.hypot(u - (i * hw + off), v - j * hh), i, j))
+    best.sort()
+    (d1, i, j), (d2, _, _) = best[0], best[1]
+    return i, j, (d2 - d1) / 2
+
+
+# --- materials of a tauren camp ---------------------------------------------------------------------
+
+
+def cord(v: float) -> str:
+    return WOOD[1] if v > 0.45 else WOOD[0]
+
+
+def canvas(seams: int = 10, off: float = 0.0, ramp: Sequence[str] = (), rings: Sequence[float] = (),
+           bands: Sequence[tuple[float, float, Callable]] = (), door: Callable | None = None,
+           tick: int = 3, gain: float = 1.0) -> Callable:
+    """Off-white stitched canvas: vertical seams laced with dark cord (a seam line with short
+    cross ticks every ``tick`` px), optional laced rings at heights ``rings``, painted ``bands``
+    (z0, z1, painter) and a ``door(th, z, r, v, ix, iy)`` cut-out."""
+    ramp = ramp or CANVAS
+
+    def mat(th, z, r, v, ix, iy):
+        if door:
+            c = door(th, z, r, v, ix, iy)
+            if c:
+                return c
+        for z0, z1, paint in bands:
+            if z0 <= z < z1:
+                c = paint(th, z - z0, r, v, ix, iy)
+                if c:
+                    return c
+        a = (th / math.tau * seams + off) % 1.0
+        dist = min(a, 1 - a) * math.tau * r / seams          # arc px to the nearest seam
+        if dist < 0.5:
+            return cord(v) if int(z) % tick else step(ramp, tone(ramp, v * gain, ix, iy), -1)
+        if dist < 1.6 and int(z) % tick == 0:
+            return cord(v)
+        for rz in rings:
+            if abs(z - rz) < 0.5:
+                return cord(v) if int(th * r) % 3 else step(ramp, tone(ramp, v * gain, ix, iy), -1)
+        return tone(ramp, v * gain, ix, iy, 0.1)
+    return mat
+
+
+def paint_band(kind: str, height: float) -> Callable:
+    """Painted bands on canvas: 'tri' red lines around a row of teal triangles, 'hex' teal and
+    cream hexagons netted in red, 'step' teal stepped diamonds between red lines."""
+    def paint(th, t, r, v, ix, iy):
+        u = wrap(th - FRONT) * r
+        red = PAINT_RED[3] if v > 0.5 else PAINT_RED[2] if v > 0.28 else PAINT_RED[1]
+        teal = TEAL[3] if v > 0.5 else TEAL[2] if v > 0.28 else TEAL[1]
+        if kind == "hex":
+            i, j, e = hexcell(u, t + 1.0, 2.0)
+            if e < 0.45 or t < 0.6 or t > height - 0.6:
+                return red
+            return teal if (i + 2 * j) % 3 else tone(CANVAS, v + 0.1, ix, iy)
+        if t < 1 or t >= height - 1:
+            return red
+        tt = (t - 1) / max(1.0, height - 2)
+        if kind == "tri":
+            ph = (u / 4.0) % 1.0
+            return teal if abs(ph - 0.5) * 2 < 1 - tt else None
+        ph = (u / 6.0) % 1.0
+        dd = abs(ph - 0.5) * 2 + abs(tt - 0.5) * 2
+        return teal if dd < 0.75 else (red if dd < 0.95 else None)
+    return paint
+
+
+def arch_door(width: float, height: float, glow: bool = True, cone: bool = False) -> Callable:
+    """A doorway centred on the front of a round wall (rounded) or a cone (triangular flap)."""
+    def door(th, z, r, v, ix, iy):
+        u = wrap(th - FRONT) * r
+        if cone:
+            half = width / 2 * max(0.0, 1 - z / height)
+        else:
+            top = height - width / 2
+            half = width / 2 if z < top else math.sqrt(max(0.0, (width / 2) ** 2 - (z - top) ** 2))
+        if abs(u) >= half or z >= height:
+            return None
+        if abs(u) >= half - 0.9:
+            return CANVAS[1] if u < 0 else WOOD[0]
+        if glow and z < 2.5:
+            return FIRE[3] if bayer(ix, iy) < 0.5 - z * 0.15 else FIRE[2]
+        if glow and z < 4.5 and bayer(ix, iy) < 0.3:
+            return FIRE[1]
+        return DEEP
+    return door
+
+
+def planks(ramp: Sequence[str], width: float = 2.6, gain: float = 1.0) -> Callable:
+    """Vertical timber planks around a round base (lathe material)."""
+    def mat(th, z, r, v, ix, iy):
+        u = th * r / width
+        if u % 1.0 < 1 / width:
+            return ramp[max(0, int(v * gain * len(ramp)) - 2)]
+        return tone(ramp, v * gain + ((int(u) * 37) % 5 - 2) * 0.03, ix, iy, 0.1)
+    return mat
+
+
+def ring_posts(sc: Scene, cx: float, cy: float, r: float, n: int, top: float, off: float = 0.0,
+               rad: float = 1.0, base: float = 0.0, skip_front: float = 0.0) -> None:
+    """A ring of upright posts, lighter carved caps on top."""
+    for i in range(n):
+        th = off + i * math.tau / n
+        if skip_front and abs(wrap(th - FRONT)) < skip_front:
+            continue
+        x, y = cx + r * math.cos(th), cy + r * math.sin(th)
+        sc.rod((x, y, base), (x, y, top), rad, WOOD[1:])
+        sc.put(x - 0.5, y, top + 0.6, WOOD[5], sc.new_id(), bias=2)
+
+
+def apex_poles(sc: Scene, cx: float, cy: float, z0: float, z1: float, spread: float,
+               angles: Sequence[float], rad: float = 0.75) -> None:
+    """Timber poles crossing at a cone's smoke hole and fanning out above it."""
+    for a in angles:
+        sc.rod((cx - math.cos(a) * 1.0, cy - math.sin(a) * 1.0, z0),
+               (cx + math.cos(a) * spread, cy + math.sin(a) * spread, z1), rad, WOOD[1:])
+
+
+HORNS = [
+    "t.........t",
+    "Tt.......tT",
+    ".Tt.....tT.",
+    "..TtwhwtT..",
+    "...hHHHd...",
+    "....hHd....",
+]
+HORN_LG = {"t": "bone4", "T": "bone3", "h": "azs_wood4", "H": "azs_wood3", "d": "azs_wood1"}
+
+
+def finial(p: Pic, cx: int, top: int) -> None:
+    """Crossed horns lashed to the tip of a tent: the tauren roof ornament."""
+    p.stamp(HORNS, HORN_LG, cx - 5, top)
+
+
+def finish(p: Pic, cx: float, gy: float, rx: float, ry: float) -> Pic:
+    p.outline()
+    p.shadow(cx, gy, rx, ry)
+    return p
+
+
+# --- great round tents ------------------------------------------------------------------------------
 
 
 def _hut_large() -> None:
-    W, H = 48, 40
-    p = Pic(W, H)
-    cx, base = 24.0, 37.0
-    # crossed poles above both ends (behind the hide: only the tips show)
-    lodge_poles(p, [(4, 22, 12, 3), (14, 22, 6, 3), (34, 22, 42, 3), (44, 22, 36, 3)])
-    zz = zigzag([RED[1], RED[2], RED[2], RED[3]], BONE[4])
-    dome_shade(p, cx, base, 21.5, 23.5, HIDE[1:5], ribs=(-0.72, -0.45, 0.45, 0.72), flat=2.0,
-               band=(-0.6, -0.47), paint=zz, seams=(-0.25,))
-    # hem: earth piled against the hide
-    for x in range(3, 45):
-        if p.get(x, 36):
-            p.set(x, 36, HIDE[1])
-            p.set(x, 37 - (1 if bayer(x, 3) > 0.7 else 0), MESA[2] if x < 24 else MESA[1])
-    # blue sun discs painted either side of the door
-    for sx in (11, 36):
-        p.ellipse(sx + 0.5, 28.5, 3.2, 3.2, lambda x, y, sx=sx: BLUE[2] if x + y < 40 + (sx - 11) else BLUE[1])
-        p.ellipse(sx + 0.5, 28.5, 1.5, 1.5, lambda x, y: BONE[4])
-    # door: timber posts, dark arch, tusks, skull
-    p.rect(17, 19, 2, 18, lambda x, y: WOOD[3] if x == 17 else WOOD[1])
-    p.rect(29, 19, 2, 18, lambda x, y: WOOD[3] if x == 29 else WOOD[1])
-    p.hline(16, 31, 18, WOOD[4])
-    p.hline(16, 31, 19, WOOD[2])
-    door_arch(p, 19, 28, 20, 36, glow="fire2")
-    # hide flap tied back on the left of the doorway
-    p.poly([(19, 20), (23, 20), (19, 31)], lambda x, y: HIDE[4] if x < 20 else HIDE[3])
-    p.line(19, 31, 22, 21, HIDE[2])
-    tusk_pair(p, 15, 32, 36, 12)
-    skull(p, 24, 11)
-    p.outline()
-    p.shadow(24, 38.2, 23, 2.2)
-    register("az.obj.hut_large", _art(p, note="tauren hide-and-timber longhouse: bone-framed door, painted band"))
+    """Camp Narache's great tent: a timber drum, a wide flared canvas eave pierced by a ring of
+    posts, a stitched canvas bell above, painted band and crossed horns at the top."""
+    W, H = 64, 56
+    cx, cy = 32.0, 0.0
+    sc = Scene(W, H, 0, 41)
+    door = arch_door(8, 9)
+    sc.lathe(cx, cy, [(0, 18.5), (9.5, 18.5), (10.5, 29.5), (11.5, 29.8), (19, 14.5)],
+             lambda th, z, r, v, ix, iy: (door(th, z, r, v, ix, iy) if z < 9.5 else None)
+             or (planks(WOOD[1:], 3.0)(th, z, r, v, ix, iy) if z < 10 else
+                 canvas(12, 0.5, rings=(13.5,), tick=3)(th, z, r, v, ix, iy)))
+    band = paint_band("hex", 4.0)
+    sc.lathe(cx, cy, [(18.5, 15.2), (22, 14.5), (28, 12.0), (33, 8.5), (37, 4.5), (39.5, 1.2), (39.6, 0)],
+             canvas(10, 0.0, bands=((19.5, 23.5, band),), tick=3))
+    ring_posts(sc, cx, cy, 27.5, 14, 21, off=0.2, rad=0.9)
+    apex_poles(sc, cx, cy, 36, 46, 4.5, (0.4, 2.7, 1.6, 4.3))
+    p = sc.pic()
+    finial(p, 32, 0)
+    register("az.obj.hut_large", _art(finish(p, 32, 51.5, 31, 4.2),
+             note="Camp Narache's great tent: timber drum, flared canvas eave, ring of posts, stitched bell"))
 
 
-# --- small huts ---------------------------------------------------------------------------------
+def _big_teepee() -> None:
+    """Bloodhoof's great teepee: a tall white stitched cone on a round timber platform with
+    steps, carved posts on the rim and a bundle of long crossed poles fanning out of the top."""
+    W, H = 64, 80
+    cx, cy = 32.0, 0.0
+    sc = Scene(W, H, 0, 62)
+    # the round timber platform and its rim posts
+    sc.lathe(cx, cy, [(0, 28.5), (5, 28.5), (5, 0)],
+             lambda th, z, r, v, ix, iy: planks(WOOD[1:], 2.4)(th, z, r, v, ix, iy) if z < 4.9
+             else tone(WOOD[2:], 0.35 + v * 0.5 + (0.12 if int(r) % 3 == 0 else 0), ix, iy, 0.15))
+    # steps up to the door
+    for k in range(3):
+        y0 = 28.5 + (3 - k) * 2.5
+        sc.quad((cx - 6, y0, 0), (12, 0, 0), (0, 0, 1.7 * (k + 1)),
+                lambda u, w, lv, ix, iy: WOOD[2] if w > 0.85 else tone(WOOD[1:4], lv, ix, iy))
+        sc.quad((cx - 6, y0 - 2.5, 1.7 * (k + 1)), (12, 0, 0), (0, 2.5, 0),
+                lambda u, w, lv, ix, iy: WOOD[4] if u > 0.04 else WOOD[3])
+    # the cone: dark hide wrap at the foot, a laced band, white stitched canvas up to the smoke hole
+    door = arch_door(11, 15, cone=True)
+    wrap_mat = planks(HIDE[0:4], 4.0)
+    band = paint_band("tri", 4.0)
+    cone_mat = canvas(14, 0.5, bands=((12, 16, band), (33, 35, paint_band("tri", 2.0))), door=door, tick=3)
+    sc.lathe(cx, cy, [(5, 23.0), (8, 22.0), (48, 2.4), (49, 0)],
+             lambda th, z, r, v, ix, iy: (door(th, z, r, v, ix, iy) or wrap_mat(th, z, r, v, ix, iy))
+             if z < 8.5 else cone_mat(th, z, r, v, ix, iy))
+    ring_posts(sc, cx, cy, 26.5, 10, 13, off=0.35, rad=1.2, base=5, skip_front=0.45)
+    # the pole bundle: long poles through the smoke hole, fanned out and leaning
+    angles = [0.3, 0.9, 1.5, 2.1, 2.7, 3.4, 4.0, 4.7, 5.3, 5.9]
+    for i, a in enumerate(angles):
+        ln = 21 + (i * 7) % 6
+        sc.rod((cx - math.cos(a) * 2, cy - math.sin(a) * 2, 40),
+               (cx + math.cos(a) * (8 + (i % 3) * 2), cy + math.sin(a) * (8 + (i % 3)), 40 + ln), 1.0, WOOD[1:])
+    p = sc.pic()
+    register("az.obj.big_teepee", _art(finish(p, 32, 76, 31, 4.5),
+             note="Bloodhoof's great teepee: white stitched cone, timber platform, steps, pole bundle"))
+
+
+# --- medium tents -----------------------------------------------------------------------------------
 
 
 def _hut_small(v: int) -> None:
-    W, H = 32, 32
-    p = Pic(W, H)
-    hide = HIDE[1:5] if v == 0 else SAND[1:5]
-    band = [RED[1], RED[2], RED[2], RED[3]] if v == 0 else [BLUE[0], BLUE[1], BLUE[2], BLUE[3]]
-    lodge_poles(p, [(9, 16, 18, 2), (22, 16, 13, 2), (15, 14, 15, 1)] if v == 0 else
-                [(8, 16, 17, 3), (23, 16, 14, 3)])
-    dome_shade(p, 16, 29.5, 13.5, 18 if v == 0 else 16, hide, ribs=(-0.55, 0.0, 0.55),
-               band=(-0.58, -0.44), paint=zigzag(band, BONE[4] if v == 0 else RED[3]))
-    # smoke hole ring near the top
-    top = 12 if v == 0 else 14
-    p.hline(14, 17, top + 1, WOOD[1])
-    p.hline(14, 17, top, WOOD[4])
-    # doorway
-    p.rect(11, 18, 1, 11, WOOD[3])
-    p.rect(20, 18, 1, 11, WOOD[1])
-    door_arch(p, 12, 19, 18, 28, glow="fire1" if v == 0 else None)
-    if v == 0:
-        p.poly([(12, 18), (15, 18), (12, 26)], lambda x, y: hide[3] if x < 13 else hide[2])
-        tusk_pair(p, 10, 21, 28, 8)
-    else:
-        # rolled-up door flap across the top of the doorway, hoof marks painted beside
-        p.hline(11, 20, 18, hide[3])
-        p.hline(11, 20, 19, hide[2])
-        for hx, hy in ((6, 22), (24, 22)):
-            p.stamp(["r.r", "r.r"], {"r": RED[2]}, hx, hy)
-    for x in range(3, 29):
-        if p.get(x, 28) and p.get(x, 28) not in (DEEP, "ink"):
-            p.set(x, 29, MESA[2] if x < 16 else MESA[1])
-    p.outline()
-    p.shadow(16, 30.4, 15, 1.8)
-    register(f"az.obj.hut_small@{v}", _art(p, note="small tauren hut: hide dome on bent poles"))
+    W, H = 48, 44
+    cx, cy = 24.0, 0.0
+    sc = Scene(W, H, 0, 33)
+    if v == 0:   # Sungraze: painted hide wall, flared eave, tall canvas cone
+        door = arch_door(7, 8)
+        wall = hide_wall()
+        sc.lathe(cx, cy, [(0, 14.5), (8.5, 14.5), (9.5, 20.5), (10.2, 20.6), (13, 15)],
+                 lambda th, z, r, vv, ix, iy: (door(th, z, r, vv, ix, iy) or wall(th, z, r, vv, ix, iy))
+                 if z < 8.6 else canvas(10, 0.5, bands=((10.2, 12.8, paint_band("step", 2.6)),))(th, z, r, vv, ix, iy))
+        sc.lathe(cx, cy, [(12.5, 15.4), (16, 13), (30, 2.2), (31, 0)], canvas(9, 0.0))
+        apex_poles(sc, cx, cy, 27, 37, 4, (0.5, 2.6, 1.6))
+        p = sc.pic()
+        finial(p, 24, 0)
+    elif v == 1:  # round hide lodge: a tan bell, red-and-teal band, ring of short posts
+        door = arch_door(7, 9)
+        sc.lathe(cx, cy, [(0, 19.0), (4, 19.4), (9, 18.4), (15, 15.6), (21, 11.0), (25, 6.0), (27.5, 2.2), (28, 0)],
+                 canvas(8, 0.5, ramp=HIDE[1:], bands=((9, 13, paint_band("tri", 4.0)),), door=door, gain=1.05))
+        ring_posts(sc, cx, cy, 20.5, 10, 6, off=0.3, rad=0.8, skip_front=0.4)
+        apex_poles(sc, cx, cy, 24, 34, 4.5, (0.6, 2.5, 1.55, 4.2))
+        p = sc.pic()
+        finial(p, 24, 3)
+    else:         # two-tier canvas cone with a hex band and crossed poles
+        door = arch_door(7, 10, cone=False)
+        sc.lathe(cx, cy, [(0, 19.5), (2, 19.0), (12, 12.5), (13, 12.2)],
+                 canvas(12, 0.5, bands=((5.5, 9.5, paint_band("hex", 4.0)),), door=door))
+        sc.lathe(cx, cy, [(12.6, 12.6), (14, 11.4), (31, 2.0), (32, 0)], canvas(9, 0.0, rings=(20,)))
+        apex_poles(sc, cx, cy, 28, 38, 4, (0.5, 2.6, 1.6, 4.4))
+        p = sc.pic()
+        finial(p, 24, 0)
+    register(f"az.obj.hut_small@{v}", _art(finish(p, 24, 40.5, 23, 3.4),
+             note=["tent with a painted hide wall, flared eave and a canvas cone",
+                   "round tan hide lodge with a red-and-teal band and posts",
+                   "two-tier canvas tent with a hex band"][v]))
 
 
-# --- tipis -------------------------------------------------------------------------------------------
+def hide_wall() -> Callable:
+    """Tan hide wall painted with teal diamonds in red outline (Camp Sungraze)."""
+    def mat(th, z, r, v, ix, iy):
+        u = wrap(th - FRONT) * r
+        ph = ((u + 5) / 10.0) % 1.0
+        dd = abs(ph - 0.5) * 2 * 5 + abs(z - 4.5)
+        if 4 < abs(u) < 14 or abs(u) > 17:
+            if dd < 2.6:
+                return TEAL[3] if v > 0.45 else TEAL[2]
+            if dd < 3.6:
+                return PAINT_RED[2]
+        return tone(HIDE[1:5], v + (0.1 if int(z) % 4 == 0 else 0), ix, iy, 0.12)
+    return mat
 
 
 def _tent(v: int) -> None:
-    W, H = 32, 28
-    p = Pic(W, H)
-    ax, ay, base, half = 16.0, 4.0, 25.0, 12.5
-    hide = [HIDE[1:5], SAND[1:5], HIDE[0:4]][v]
-    for x0, x1 in ((16, 10), (16, 21), (15, 15), (17, 13)):  # pole tips above the smoke flap
-        pole(p, x0, 8, x1, 0)
-    for y in range(int(ay), int(base) + 1):
-        t = (y + 0.5 - ay) / (base - ay)
-        hw = half * t
-        for x in range(W):
-            u = (x + 0.5 - ax) / max(0.8, hw)
-            if abs(u) > 1:
-                continue
-            nz = math.sqrt(max(0.0, 1 - u * u))
-            vv = (lambert(u, -0.35, nz) + 0.3) / 1.25
-            lvl = vv * len(hide) - 0.4 + (bayer(x, y) - 0.5) * 0.5
-            for s in (-0.5, 0.5):  # pole ridges under the hide
-                d = (u - s) * hw
-                if -1 <= d < 0:
-                    lvl += 1
-                elif 0 <= d < 1:
-                    lvl -= 1
-            c = hide[max(0, min(len(hide) - 1, int(round(lvl))))]
-            xs = int(math.floor(math.asin(u) * 9))
-            if v == 0:
-                if 17 <= y <= 19:  # red band, white zigzag
-                    r = y - 17
-                    c = (BONE[4] if xs % 4 in ((0,), (1, 3), (2,))[r] else (RED[2] if vv > 0.45 else RED[1]))
-                elif y >= 23 and (xs % 4) < 2 and (y - 23) <= (1 - xs % 2):
-                    c = RED[2] if vv > 0.45 else RED[1]
-            elif v == 1:
-                if y in (14, 21):
-                    c = BLUE[2] if vv > 0.45 else BLUE[1]
-                elif 16 <= y <= 19 and xs % 6 in (1, 2, 3) and (y in (17, 18) or xs % 6 == 2):
-                    c = BONE[4] if y == 16 or xs % 6 == 1 else BONE[3]  # sun discs
-            else:
-                if 9 <= y <= 12 and (y - 9 + xs) % 3 == 0:
-                    c = BONE[3]  # white rays near the top
-                if y == 20 or y == 22:
-                    c = RED[2] if vv > 0.45 else RED[1]
-            p.set(x, y, c)
-    # smoke flaps open at the top
-    p.stamp(["hH.Hh", ".H.H."], {"h": hide[3], "H": hide[1]}, 14, 6)
-    # doorway: a triangle flap folded back
-    p.poly([(13, 25.9), (19, 25.9), (16, 15)], DEEP)
-    p.poly([(12.5, 25.9), (15, 25.9), (16, 15)], lambda x, y: hide[3] if x < 14 else hide[2])
-    p.line(16, 15, 16, 25, "ink")
-    p.hline(2, 29, 25, lambda x, y: step(hide, p.get(x, y), -1))
-    # stakes
-    for sx in (3, 28):
-        p.set(sx, 26, WOOD[3])
-    p.outline()
-    p.shadow(16, 26.3, 15, 1.7)
-    register(f"az.obj.tent@{v}", _art(p, note=["hide tipi, red zigzag band", "orange hide tipi, blue sun band",
-                                                "dark hide tipi, white rays"][v]))
+    """Tall conical tents with laced seams and crossed horns (three patterns)."""
+    W, H = 40, 48
+    cx, cy = 20.0, 0.0
+    sc = Scene(W, H, 0, 39)
+    if v == 0:
+        door = arch_door(8, 13, cone=True)
+        sc.lathe(cx, cy, [(0, 15.0), (1, 14.6), (33, 2.0), (34, 0)],
+                 canvas(9, 0.5, bands=((14, 18, paint_band("tri", 4.0)), (3, 5, paint_band("tri", 2.0))), door=door))
+        apex_poles(sc, cx, cy, 30, 41, 4, (0.5, 2.6, 1.6, 4.3))
+    elif v == 1:
+        door = arch_door(8, 12, cone=True)
+        sc.lathe(cx, cy, [(0, 14.5), (1, 14.2), (34, 1.8), (35, 0)],
+                 canvas(8, 0.5, ramp=HIDE[1:], bands=((22, 25, paint_band("step", 3.0)),
+                                                       (4, 8, paint_band("hex", 4.0))), door=door, gain=1.05))
+        apex_poles(sc, cx, cy, 31, 42, 3.5, (0.7, 2.4, 1.55))
+    else:          # flared skirt halfway up, painted hide wall below (Camp Sungraze)
+        door = arch_door(6, 7)
+        wall = hide_wall()
+        sc.lathe(cx, cy, [(0, 11.0), (8, 11.0), (9, 16.5), (9.8, 16.6), (12.5, 11.4)],
+                 lambda th, z, r, vv, ix, iy: (door(th, z, r, vv, ix, iy) or wall(th, z, r, vv, ix, iy))
+                 if z < 8.1 else canvas(10, 0.5, bands=((9.8, 12.4, paint_band("step", 2.6)),))(th, z, r, vv, ix, iy))
+        sc.lathe(cx, cy, [(12, 11.8), (14, 10.4), (35, 1.6), (36, 0)], canvas(8, 0.0))
+        apex_poles(sc, cx, cy, 32, 42, 3.5, (0.5, 2.6, 1.6))
+    p = sc.pic()
+    finial(p, 20, 0)
+    register(f"az.obj.tent@{v}", _art(finish(p, 20, 45, 18, 3),
+             note=["white laced cone tent, teal-and-red bands", "tan hide cone tent, stepped and hex bands",
+                   "Sungraze tent: canvas cone over a flared eave and a painted hide wall"][v]))
 
 
-# --- inn ---------------------------------------------------------------------------------------------
+# --- inn, stable, stilt lodge -----------------------------------------------------------------------
 
 
 def _inn() -> None:
+    """A round canvas lodge with a hide awning over a warm doorway and an ale sign."""
     W, H = 48, 40
-    p = Pic(W, H)
-    lodge_poles(p, [(14, 16, 24, 1), (32, 16, 22, 1), (20, 12, 25, 0), (28, 12, 21, 0)])
-    zz = zigzag([RED[1], RED[2], RED[2], RED[3]], BONE[4])
-    dome_shade(p, 23.5, 37, 20.5, 27, HIDE[1:5], ribs=(-0.66, -0.33, 0.0, 0.33, 0.66),
-               band=(-0.78, -0.68), paint=zz, seams=(-0.45,))
-    p.hline(20, 27, 10, WOOD[4])
-    p.hline(20, 27, 11, WOOD[1])
-    # hide awning over the door on two poles
-    p.poly([(12, 21), (35, 21), (38, 26), (9, 26)],
-           lambda x, y: tone(TENT[1:], 0.8 - (x - 9) / 45 - (y - 21) * 0.05, x, y, 0.1))
-    p.hline(9, 38, 26, TENT[1])
-    for x in range(10, 38, 4):
-        p.set(x, 27, TENT[2])
-    for px_ in (11, 36):
-        p.vline(px_, 27, 36, WOOD[3])
-        p.vline(px_ + 1, 27, 36, WOOD[1])
-    door_arch(p, 18, 29, 27, 36, glow="win_warm")
+    cx, cy = 22.0, 0.0
+    sc = Scene(W, H, 0, 31)
+    door = arch_door(8, 8.5, glow=True)
+    wall = hide_wall()
+    sc.lathe(cx, cy, [(0, 15.0), (8.5, 15.0), (9.5, 19.5), (10.2, 19.6), (12.5, 15)],
+             lambda th, z, r, v, ix, iy: (door(th, z, r, v, ix, iy) or wall(th, z, r, v, ix, iy))
+             if z < 8.6 else canvas(12, 0.5)(th, z, r, v, ix, iy))
+    sc.lathe(cx, cy, [(12, 15.4), (14, 14), (25, 4.5), (27, 1.5), (27.5, 0)],
+             canvas(10, 0.0, bands=((14.5, 18.5, paint_band("hex", 4.0)),)))
+    # hide awning on two poles over the door
+    sc.quad((cx - 8, 15.5, 10.5), (16, 0, 0), (0, 7, -3.5),
+            lambda u, w, lv, ix, iy: PAINT_RED[2] if w > 0.82 else tone(HIDE[2:], lv + 0.1, ix, iy, 0.1))
+    for x in (cx - 7.5, cx + 7.5):
+        sc.rod((x, 22.5, 0), (x, 22.5, 7.5), 0.6, WOOD[1:])
+    apex_poles(sc, cx, cy, 23, 33, 3.5, (0.5, 2.6, 1.6))
     # sign on a post at the right: a mug of ale
-    p.vline(43, 20, 37, WOOD[3])
-    p.vline(44, 20, 37, WOOD[1])
-    p.hline(38, 45, 20, WOOD[4])
+    sc.rod((41, 8, 0), (41, 8, 22), 0.7, WOOD[1:])
+    sc.rod((35, 8, 21.5), (44, 8, 21.5), 0.5, WOOD[1:])
+    p = sc.pic()
     p.stamp(["kkkkkkk", "kpppppk", "kpyyGpk", "kpyYGyk", "kpyYGpk", "kpppppk", "kkkkkkk"],
-            {"p": WOOD[4], "y": "gold2", "Y": "gold1", "G": BONE[4]}, 38, 22)
-    p.set(40, 21, "ink")
-    p.set(44, 21, "ink")
-    for x in range(3, 45):
-        if p.get(x, 36) in HIDE:
-            p.set(x, 37, MESA[2] if x < 24 else MESA[1])
-    p.outline(skip=())
-    p.shadow(24, 38.3, 23, 2)
-    register("az.obj.inn", _art(p, note="tauren inn: tall hide lodge, awning, warm doorway, ale sign"))
+            {"p": WOOD[4], "y": "gold2", "Y": "gold1", "G": BONE[4]}, 35, 13)
+    p.set(36, 12, "ink")
+    p.set(40, 12, "ink")
+    finial(p, 22, 0)
+    register("az.obj.inn", _art(finish(p, 23, 37.5, 22, 2.6),
+             note="tauren inn: round canvas lodge, painted hide wall, awning, warm door, ale sign"))
+
+
+def box_frame(phi: float) -> Callable:
+    """World point of a building's local (a along its length, b across, z) rotated by phi."""
+    c, s = math.cos(phi), math.sin(phi)
+    return lambda cx, cy, a, b, z: (cx + a * c - b * s, cy + a * s + b * c, z)
+
+
+def _stable() -> None:
+    """An open stable: canvas lean-to roof on six posts over hay and a water trough."""
+    W, H = 40, 32
+    sc = Scene(W, H, 0, 24)
+    P = box_frame(-0.32)
+    cx, cy, A, B = 20.0, -1.0, 15.0, 6.5
+
+    def v3(a, b, z):
+        return P(0, 0, a, b, z)
+
+    def at(a, b, z):
+        return P(cx, cy, a, b, z)
+    # hay heap and trough under the roof
+    sc.lathe(at(-7, 0, 0)[0], at(-7, 0, 0)[1], [(0, 6), (2, 5.5), (4, 3.5), (5, 0)],
+             lambda th, z, r, v, ix, iy: tone(STRAW, v + 0.1 + (0.15 if bayer(ix * 3, iy) > 0.8 else 0), ix, iy, 0.3))
+    sc.quad(at(3, 3, 0), v3(9, 0, 0), (0, 0, 3), lambda u, w, lv, ix, iy: WOOD[3] if w > 0.7 else tone(WOOD[1:4], lv, ix, iy))
+    sc.quad(at(3, 3, 3), v3(9, 0, 0), v3(0, -3, 0), lambda u, w, lv, ix, iy: WATER[4] if 0.1 < u < 0.9 and 0.2 < w < 0.9 else WOOD[4])
+    # posts
+    for a in (-A, 0, A):
+        sc.rod(at(a, B, 0), at(a, B, 11), 0.8, WOOD[1:])
+        sc.rod(at(a, -B, 0), at(a, -B, 16), 0.8, WOOD[1:])
+    # roof: canvas sloping toward the viewer, laced edges and a red-teal hem
+    sc.quad(at(-A - 2, -B - 1, 17), v3(2 * A + 4, 0, 0), (v3(0, 2 * B + 4, 0)[0], v3(0, 2 * B + 4, 0)[1], -7),
+            lambda u, w, lv, ix, iy: (PAINT_RED[2] if w > 0.93 else TEAL[2] if w > 0.86 else
+                                      cord(lv) if int(u * 9 + 0.5) != int(u * 9 + 0.35) or u < 0.02 or u > 0.98 else
+                                      tone(CANVAS, lv, ix, iy, 0.1)))
+    p = sc.pic()
+    register("az.obj.stable", _art(finish(p, 20, 29, 19, 2.5), note="open stable: canvas lean-to on posts, hay, trough"))
+
+
+def _stilt_lodge() -> None:
+    """Bloodhoof's lodge by the lake: a timber house up on stilts with a deck, a sloped grey-teal
+    roof with crossed poles at the ridge ends, and a ladder down to the grass."""
+    W, H = 56, 48
+    sc = Scene(W, H, 0, 37)
+    P = box_frame(-0.42)
+    cx, cy = 27.0, -2.0
+    A, B, S, WH = 15.0, 7.0, 7.0, 9.0   # half length, half depth, stilt height, wall height
+
+    def at(a, b, z):
+        return P(cx, cy, a, b, z)
+
+    def vec(a, b, z):
+        return P(0, 0, a, b, z)
+    # stilts and braces
+    for a in (-A, -A / 3, A / 3, A):
+        for b in (-B, B + 3):
+            sc.rod(at(a, b, 0), at(a, b, S + 0.5), 0.8, WOOD[1:])
+    sc.rod(at(-A, B + 3, 0.5), at(-A / 3, B + 3, S - 1), 0.5, WOOD[1:])
+    sc.rod(at(A / 3, B + 3, S - 1), at(A, B + 3, 0.5), 0.5, WOOD[1:])
+    # deck (wider than the house toward the front)
+    sc.quad(at(-A - 1, -B - 1, S), vec(2 * A + 2, 0, 0), vec(0, 2 * B + 5, 0),
+            lambda u, w, lv, ix, iy: WOOD[2] if int(u * 14) != int(u * 14 + 0.12) else tone(WOOD[2:], lv, ix, iy, 0.12))
+    sc.quad(at(-A - 1, B + 4, S - 1.5), vec(2 * A + 2, 0, 0), (0, 0, 1.5),
+            lambda u, w, lv, ix, iy: tone(WOOD[1:4], lv, ix, iy, 0.1))
+    # walls: horizontal logs
+    logs = lambda u, w, lv, ix, iy: WOOD[1] if (w * WH) % 2.2 < 0.6 else tone(WOOD[2:], lv + 0.05, ix, iy, 0.1)
+    sc.quad(at(-A, B, S), vec(2 * A, 0, 0), (0, 0, WH), lambda u, w, lv, ix, iy:
+            (DEEP if abs(u - 0.42) < 0.09 and w < 0.78 else logs(u, w, lv, ix, iy)))
+    sc.quad(at(A, B, S), vec(0, -2 * B, 0), (0, 0, WH), logs)
+    sc.quad(at(-A, B, S), vec(0, -2 * B, 0), (0, 0, WH), logs)
+    # gable ends, roof slopes (front lower, toward the viewer), ridge poles crossed at the ends
+    R = 8.0
+    for a in (-A, A):
+        sc.quad(at(a, B, S + WH), vec(0, -2 * B, 0), (vec(0, -B, 0)[0], vec(0, -B, 0)[1], R),
+                lambda u, w, lv, ix, iy: tone(WOOD[1:4], lv, ix, iy, 0.1), tri=True)
+    roof = lambda u, w, lv, ix, iy: (ROOF[1] if (w * 6) % 1.0 < 0.18 else
+                                     tone(ROOF, lv + (0.08 if int(u * 18) % 2 else 0), ix, iy, 0.12))
+    sc.quad(at(-A - 2, B + 2.5, S + WH - 1.5), vec(2 * A + 4, 0, 0),
+            (vec(0, -B - 2.5, 0)[0], vec(0, -B - 2.5, 0)[1], R + 1.5), roof)
+    sc.quad(at(-A - 2, -B - 2.5, S + WH - 1.5), vec(2 * A + 4, 0, 0),
+            (vec(0, B + 2.5, 0)[0], vec(0, B + 2.5, 0)[1], R + 1.5), roof)
+    for a, s in ((-A - 2, -1), (A + 2, 1)):
+        sc.rod(at(a, 0, S + WH + R - 1), at(a + s * 3, -3, S + WH + R + 4), 0.6, WOOD[1:])
+        sc.rod(at(a, 0, S + WH + R - 1), at(a + s * 3, 3, S + WH + R + 4), 0.6, WOOD[1:])
+    # ladder from the deck to the grass
+    for side in (-2.2, 2.2):
+        sc.rod(at(-2 + side, B + 4, S), at(-2 + side, B + 9, 0), 0.5, WOOD[2:])
+    for k in range(1, 4):
+        t = k / 4
+        sc.rod(at(-4.2, B + 4 + 5 * t, S * (1 - t)), at(0.2, B + 4 + 5 * t, S * (1 - t)), 0.4, WOOD[3:])
+    p = sc.pic()
+    register("az.obj.stilt_lodge", _art(finish(p, 28, 44.5, 26, 3.2),
+             note="timber lodge on stilts by the lake: log walls, deck, grey-teal roof, ladder"))
 
 
 def _buildings() -> None:
     _hut_large()
-    for v in range(2):
+    _big_teepee()
+    for v in range(3):
         _hut_small(v)
     for v in range(3):
         _tent(v)
     _inn()
+    _stilt_lodge()
+    _eagle_totem()
 
+
+# --- totems ---------------------------------------------------------------------------------------
+
+_FACE_LG = {"h": DRIFT[4], "H": DRIFT[5], "m": DRIFT[3], "d": DRIFT[1], "D": DRIFT[0], "o": CANVAS[5],
+            "t": TEAL[3], "T": TEAL[1], "r": PAINT_RED[2], "R": PAINT_RED[1], "y": BONE[4], "Y": BONE[3]}
+FACE_BEAR = [
+    ".thhmmmdT.",
+    "thmmmmmmdT",
+    "hmookmookd",
+    "hmmmhhmmmd",
+    ".mmhHhmmd.",
+    ".mrrrrrRd.",
+    ".mrokokRd.",
+    "..mmmmmd..",
+    "...dddd...",
+]
+FACE_EAGLE = [
+    "tthmmmmdTT",
+    ".thmmmmdT.",
+    "hmookmookd",
+    "hmmmyymmmd",
+    ".mmmyYmmd.",
+    "..mmyYmd..",
+    ".tthmYdTT.",
+    "..hmmmmd..",
+    "...dddd...",
+]
+FACE_WOLF = [
+    "h........d",
+    "hh......dd",
+    "hmhhmmmmdd",
+    "hmookookdd",
+    ".mmmhmmmd.",
+    "..mmhmmd..",
+    "..mkkkkd..",
+    "..mowowd..",
+    "...dddd...",
+]
+TOTEM_TOPS = [
+    [   # curved bull horns over a cap
+        "y..............y",
+        "Yy............yY",
+        ".Yy..........yY.",
+        "..YyyhhmmmmdyY..",
+        "....hmmmmmmdd...",
+        "....rrrrrrRR....",
+    ],
+    [   # eagle head on spread arms with teal tips
+        "......hmmd......",
+        ".....hokmmd.....",
+        ".....hmmmyYY....",
+        "......mmmd......",
+        "tTthhmmmmmmddtTT",
+        ".tthmmmmmmmmdTT.",
+        "....rrrrrrRR....",
+    ],
+    [   # carved kodo head with sweeping horns and feather tufts
+        "Yy............yY",
+        ".Yy..........yY.",
+        "..Yyy.hmmd.yyY..",
+        "o...yhmmmmdy...o",
+        "r...hookmokd...R",
+        "r...hmmmmmmd...R",
+        ".....mmhhmd.....",
+        "......mmmd......",
+    ],
+]
+
+
+def totem_mat(zones: Sequence[tuple[float, float, str]]) -> Callable:
+    """Weathered pole: hexagon bands (teal and cream cells netted in red), painted rings, wood."""
+    def mat(th, z, r, v, ix, iy):
+        u = wrap(th - FRONT) * r
+        for z0, z1, kind in zones:
+            if z0 <= z < z1:
+                red = PAINT_RED[2] if v > 0.4 else PAINT_RED[1]
+                if kind == "hex":
+                    i, j, e = hexcell(u + 1.0, z - z0 + 0.5, 1.9)
+                    if e < 0.42 or z - z0 < 0.8 or z1 - z < 0.8:
+                        return red
+                    if (i + 2 * j) % 3 == 0:
+                        return tone(CANVAS, v + 0.1, ix, iy, 0.1)
+                    return TEAL[3] if v > 0.55 else TEAL[2] if v > 0.3 else TEAL[1]
+                if kind == "red":
+                    return red
+                if kind == "teal":
+                    return TEAL[3] if v > 0.5 else TEAL[1]
+        grain = 0.06 if int(u * 1.5 + z * 0.15) % 3 == 0 else 0.0
+        return tone(DRIFT[1:], v + grain, ix, iy, 0.12)
+    return mat
+
+
+def _totem(v: int) -> None:
+    """VERY tall carved totems (about four tauren high): stacked faces between bands of hexagons."""
+    W, H = 16, 72
+    sc = Scene(W, H, 0, 68)
+    zones = [
+        [(3, 16, "hex"), (27, 38, "hex"), (49, 50.5, "red"), (51, 52, "teal")],
+        [(3, 12, "hex"), (23, 24, "red"), (24.5, 25.5, "teal"), (35, 46, "hex")],
+        [(3, 20, "hex"), (31, 44, "hex"), (55, 56, "red")],
+    ][v]
+    top = [55, 49, 57][v]
+    sc.lathe(8.0, 0.0, [(0, 4.3), (3, 4.0), (top, 3.5), (top, 0)], totem_mat(zones))
+    p = sc.pic()
+    faces = [[(17, FACE_BEAR), (39, FACE_EAGLE)], [(13, FACE_WOLF), (26, FACE_BEAR)],
+             [(21, FACE_EAGLE), (45, FACE_WOLF)]][v]
+    for z, face in faces:
+        p.stamp(face, _FACE_LG, 3, 68 - z - len(face))
+    crest = TOTEM_TOPS[v]
+    p.stamp(crest, _FACE_LG, 0, 68 - top - len(crest) + (1 if v != 1 else 6))
+    if v == 1:
+        p.stamp(crest[:4], _FACE_LG, 0, 68 - top - 9)
+    # stones heaped around the foot
+    p.stamp(["..abb.ab.abb..", ".abbcabbcabbc.", "abbccbbccbbccc"],
+            {"a": STONE[4], "b": STONE[3], "c": STONE[1]}, 1, 67)
+    register(f"az.obj.totem_pole@{v}", _art(finish(p, 8, 70.2, 7.5, 1.6),
+             note=["very tall totem: bear and eagle faces, hexagon bands, bull horns",
+                   "very tall totem: wolf and bear faces, eagle head on spread arms",
+                   "very tall totem: eagle and wolf faces, kodo head with sweeping horns"][v]))
+
+
+def eagle_wing(p: Pic, cx: int, side: int, tip_y: float, lit: bool) -> None:
+    """One spread wing in screen space: carved covert, cream band, teal and red-tipped feathers."""
+    s0 = cx + side * 3
+    span = 13
+    for i in range(span + 1):
+        x = s0 + side * i
+        t = i / span
+        lead = 8 + (tip_y - 8) * t - math.sin(t * math.pi) * 2.2
+        trail = 16 + (tip_y + 2 - 16) * t ** 0.8 + (1 if (i % 3 == 2 and t > 0.2) else 0)
+        for y in range(int(round(lead)), int(round(trail)) + 1):
+            fy = (y - lead) / max(1.0, trail - lead)
+            d = 0 if lit else -1
+            if t < 0.3 and fy < 0.7 or fy < 0.35:
+                c = DRIFT[4 + d] if y == int(round(lead)) else DRIFT[3 + d]
+            elif fy < 0.6:
+                c = CANVAS[4 + d]
+            elif t > 0.45 and fy > 0.82:
+                c = PAINT_RED[2 + d]
+            else:
+                c = TEAL[3 + d] if (i % 3) != 1 else TEAL[2 + d]
+            p.set(x, y, c)
+
+
+def _eagle_totem() -> None:
+    """A carved pole on a round stone plinth, an eagle with spread wings on top (wings flap)."""
+    W, H = 32, 56
+    frames = []
+    for fr in range(2):
+        sc = Scene(W, H, 0, 51)
+        sc.lathe(16.0, 0.0, [(0, 7.0), (2.6, 6.6), (2.6, 0)],
+                 lambda th, z, r, v, ix, iy: STONE[1] if z < 2.5 and int(th * r / 3) % 4 == 0 else
+                 tone(STONE[1:], v + (0.08 if r < 4 else 0), ix, iy, 0.15))
+        sc.lathe(16.0, 0.0, [(2.5, 2.4), (38, 2.0), (38, 0)],
+                 totem_mat([(8, 9, "red"), (9.5, 10.5, "teal"), (22, 30, "hex"), (36, 37, "red")]))
+        p = sc.pic()
+        tip = 4.0 if fr == 0 else 8.0
+        eagle_wing(p, 16, -1, tip, True)
+        eagle_wing(p, 15, 1, tip + 0.5, False)
+        p.stamp([
+            "..hmmd..",
+            ".hoommd.",
+            ".hokmmd.",
+            "hmmyYYdd",
+            ".hmmyYd.",
+            ".hmmmmd.",
+            "hmttTTdd",
+            "hmmmmmmd",
+            ".hmmmmd.",
+            ".hmdhmd.",
+            "..d..d..",
+        ], _FACE_LG, 12, 4)
+        frames.append(finish(p, 16, 52, 8, 2))
+    register("az.obj.eagle_totem", _art(frames, fps=2, note="eagle totem: carved pole on a stone plinth, eagle with spread wings"))
 
 
 # --- fire -----------------------------------------------------------------------------------------
@@ -602,102 +1203,6 @@ def _bonfire() -> None:
         p.shadow(8, 15, 8, 1.2)
         frames.append(p)
     register("az.obj.bonfire", _art(frames, fps=6, note="camp bonfire: crossed logs in a stone ring"))
-
-
-# --- totem poles ----------------------------------------------------------------------------------
-
-_CARVE = {"h": WOOD[4], "H": WOOD[5], "m": WOOD[3], "d": WOOD[1], "D": WOOD[0], "o": BONE[4],
-          "y": "gold2", "Y": "gold1", "t": BONE[3], "T": BONE[2]}
-FACE_BEAR = [
-    ".hhhhhhhhd.",
-    "hmdddmdddmD",
-    "hmokdmokddD",
-    "hrrmmhmmRRD",
-    ".mmmmhmmmD.",
-    ".mkkkkkkkD.",
-    ".mkokokokD.",
-    ".mmkkkkkmD.",
-    "..ddddddD..",
-]
-FACE_BIRD = [
-    "hhhhhhhhhdD",
-    "hbbbhmmbbBD",
-    "hbokbmbokBD",
-    "hbbbmmmBBBD",
-    ".mmmyyymmD.",
-    "..mmyYYmD..",
-    "...mYYYD...",
-    ".rrrrrRRRD.",
-    "..ddddddD..",
-]
-FACE_WOLF = [
-    "H.........D",
-    "hh.......dD",
-    "hmhhhhhmmdD",
-    "hmokmmmokdD",
-    ".mmmmhmmmD.",
-    "..mmmhmmD..",
-    "..mkkkkkD..",
-    "..boooooB..",
-    "...ddddD...",
-]
-WINGS = [
-    "r.......",
-    "rr......",
-    "brr.....",
-    ".bbrm...",
-    "..bbrmm.",
-    "...bbrmm",
-    ".....rhm",
-    "......hm",
-]
-TOTEM_PAINT = [{"r": RED[2], "R": RED[1], "b": BLUE[2], "B": BLUE[1]},
-               {"r": BLUE[2], "R": BLUE[1], "b": RED[2], "B": RED[1]},
-               {"r": "gold2", "R": "gold1", "b": LEAF[3], "B": LEAF[2]}]
-
-
-def _totem(v: int) -> None:
-    W, H = 16, 40
-    p = Pic(W, H)
-    lg = {**_CARVE, **TOTEM_PAINT[v]}
-    top = 8
-    for y in range(top, 37):
-        for x in range(5, 11):
-            p.set(x, y, cyl(WOOD[1:5], x, 5, 10, y))
-    faces = [[FACE_BIRD, FACE_BEAR], [FACE_BEAR, FACE_WOLF], [FACE_WOLF, FACE_BIRD]][v]
-    y = 10
-    for face in faces:
-        p.stamp(face, lg, 2, y)
-        y += 10
-    # painted rings near the foot
-    for yy, key in ((y + 1, "r"), (y + 3, "b")):
-        for x in range(5, 11):
-            p.set(x, yy, step([lg[key.upper()], lg[key]], lg[key], 0 if x < 8 else -1))
-    if v == 0:  # thunderbird with spread wings
-        wing = [row + row[::-1] for row in WINGS]
-        p.stamp(wing, lg, 0, 2)
-        for x in range(8, 16):  # right wing in shade
-            for yy in range(2, 10):
-                p.set(x, yy, lambda xx, y2: {lg["r"]: lg["R"], lg["b"]: lg["B"], WOOD[3]: WOOD[2],
-                                            WOOD[4]: WOOD[3]}.get(p.get(xx, y2), p.get(xx, y2)))
-        p.stamp([".hmd.", "hokmd", "hmmmd", ".yYd.", "..Y.."], lg, 6, 0)
-    elif v == 1:  # kodo skull with sweeping horns on top
-        p.rect(5, 7, 6, 3, lambda x, y: cyl(WOOD[1:5], x, 5, 10, y))
-        skull(p, 8, 0)
-    else:  # drum-shaped cap hung with feathers
-        p.stamp(["..hhhhhhhhhd..", ".hmmmmmmmmmmd.", "hmrrrrrrrRRRdD", ".dddddddddddD."], lg, 1, 4)
-        for fx, fy in ((1, 8), (4, 9), (11, 9), (14, 8)):
-            p.vline(fx, fy, fy + 3, BONE[4] if fx < 8 else BONE[3])
-            p.set(fx, fy + 4, RED[2])
-        p.stamp(["..H..", ".hmd.", "hmmmd"], lg, 5, 1)
-    # stones heaped around the foot
-    p.stamp(["..abb.ab.abb..", ".abbcabbcabbc.", "abbccbbccbbccc"],
-            {"a": STONE[4], "b": STONE[3], "c": STONE[1]}, 1, 36)
-    p.outline()
-    p.shadow(8, 39, 7, 1)
-    register(f"az.obj.totem_pole@{v}", _art(p, note=["totem: thunderbird, owl and bear",
-                                                     "totem: kodo skull, bear and wolf",
-                                                     "totem: feathered drum, wolf and bird"][v]))
 
 
 # --- camp props -------------------------------------------------------------------------------------
@@ -879,46 +1384,6 @@ def _forge() -> None:
         p.shadow(12, 23, 12, 1)
         frames.append(p)
     register("az.obj.forge", _art(frames, fps=6, note="stone forge, glowing coals, hide bellows"))
-
-
-def _stable() -> None:
-    p = Pic(40, 32)
-    # back wall of hide, shadowed under the roof
-    p.rect(4, 10, 32, 19, lambda x, y: tone(HIDE[0:3], 0.8 - (y - 10) * 0.03 - x * 0.006, x, y, 0.08))
-    # hay heaped in the left stall
-    p.ellipse(11, 29, 7, 5, lambda x, y: tone(SAND[1:], 1.0 - (y - 24) * 0.12 - (x - 4) * 0.02, x, y, 0.4))
-    for x in range(6, 17, 3):
-        p.set(x, 24 + (x % 2), SAND[4])
-    # water trough in the right stall
-    p.rect(24, 24, 11, 5, lambda x, y: WOOD[3] if y == 24 else (WOOD[2] if x < 33 else WOOD[1]))
-    p.hline(25, 33, 25, WATER[3])
-    p.set(26, 25, WATER[5])
-    # stall divider rails
-    for ry in (18, 23):
-        p.hline(4, 35, ry, WOOD[4])
-        p.hline(4, 35, ry + 1, WOOD[2])
-    for px_ in (3, 19, 36):
-        p.vline(px_, 9, 29, WOOD[3])
-        p.vline(px_ + 1, 9, 29, WOOD[1])
-    # slanted hide roof on the frame, poles crossed at both ends
-    pole(p, 2, 9, 6, 0)
-    pole(p, 8, 9, 3, 0)
-    pole(p, 32, 9, 37, 0)
-    pole(p, 38, 9, 33, 0)
-    p.poly([(4, 3), (36, 3), (39.5, 10), (0.5, 10)],
-           lambda x, y: tone(HIDE[1:5], 0.95 - (y - 3) * 0.06 - x * 0.008, x, y, 0.08))
-    for x in range(1, 39):
-        p.set(x, 10, HIDE[1])
-        if x % 4 == 1:
-            p.set(x, 11, HIDE[2])
-    p.hline(4, 36, 3, WOOD[4])
-    for x in (10, 20, 30):  # red painted marks along the eave
-        p.stamp(["rRr", ".r."], {"r": RED[2], "R": RED[3]}, x, 6)
-    for x in range(4, 36):
-        p.set(x, 29, MESA[2] if p.get(x, 29) is None or x % 3 else MESA[1])
-    p.outline()
-    p.shadow(20, 30.5, 20, 1.5)
-    register("az.obj.stable", _art(p, note="stable: hide roof on poles, hay and trough stalls"))
 
 
 def _training_dummy() -> None:

@@ -637,27 +637,22 @@ class AzApp:
             if terr is Terrain.DIRT and h % 37 == 0:
                 f.sprite(self.painter.variant("az.deco.stones", x, y), gx, gy, solid=False, z=z)
             return
-        n = self.relief.noise.fractal(x / 18, y / 18, 2)
-        if (n > 0.58 and h % 26 == 0 or h % 211 == 0) and "az.tb.pine" in bank.registry._variants:  # pine groves, lone pines
+        # Mulgore: open lime-gold pasture; tall pines stand alone or in tight clumps far apart
+        n = self.relief.noise.fractal(x / 40 + 31, y / 40 + 5, 2)
+        if (n > 0.74 and h % 7 == 0 or h % 600 == 0) and "az.tb.pine" in bank.registry._variants:
             f.sprite(self.painter.variant("az.tb.pine", x, y), gx, gy, shadow=20, z=z)
-        elif n > 0.6 and h % 31 == 0 and "az.plant.tree" in bank.registry._variants:
-            f.sprite(self.painter.variant("az.plant.tree", x, y), gx, gy, shadow=22, z=z)
-        elif h % 310 == 0 and "az.plant.dead_tree" in bank.registry._variants and n < 0.42:
-            f.sprite(self.painter.variant("az.plant.dead_tree", x, y), gx, gy, shadow=12, z=z)
-        elif h % 71 == 0 and "az.plant.bush" in bank.registry._variants:
-            f.sprite(self.painter.variant("az.plant.bush", x, y), gx, gy, shadow=10, z=z)
-        elif h % 19 == 0 and "az.plant.grass_clump" in bank.registry._variants:
+        elif h % 15 == 0 and "az.plant.grass_clump" in bank.registry._variants:  # golden tufts: the ground texture
             f.sprite(self.painter.variant("az.plant.grass_clump", x, y), gx, gy, now + (h % 11) * 0.27, solid=False, z=z)
-        elif h % 27 == 0:
-            name = self.painter.variant("az.plant.wildflowers", x, y) if "az.plant.wildflowers" in bank.registry._variants \
-                else ("az.deco.flower_red", "az.deco.flower_yellow", "az.deco.flower_blue", "az.deco.tuft")[(h >> 6) % 4]
-            f.sprite(self._variant_name(name, x, y), gx, gy, now + (h % 7) * 0.3, solid=False, z=z)
-        elif h % 611 == 0:
+        elif h % 330 == 0 and "az.plant.wildflowers" in bank.registry._variants:
+            f.sprite(self.painter.variant("az.plant.wildflowers", x, y), gx, gy, now + (h % 7) * 0.3, solid=False, z=z)
+        elif h % 420 == 0 and "az.plant.bush" in bank.registry._variants:
+            f.sprite(self.painter.variant("az.plant.bush", x, y), gx, gy, shadow=10, z=z)
+        elif h % 811 == 0:
             node = ("az.node.peacebloom", "az.node.silverleaf", "az.node.earthroot", "az.node.copper_vein",
                     "az.node.prairie_flower", "az.node.shiny_stone")[(h >> 8) % 6]
             f.sprite(node, gx, gy, now + (h % 7), z=z)
-        elif h % 53 == 0:
-            f.sprite(self._variant_name(("az.deco.stones", "az.deco.tuft", "az.deco.dry_bush", "az.deco.bones")[(h >> 5) % 4], x, y),
+        elif h % 260 == 0:
+            f.sprite(self._variant_name(("az.deco.stones", "az.deco.tuft", "az.deco.bones")[(h >> 5) % 3], x, y),
                      gx, gy, solid=False, z=z)
 
     def _scatter_mesa(self, f: Frame, x: int, y: int, gx: float, gy: float, z: float, seed: int, now: float) -> None:

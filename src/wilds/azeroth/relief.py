@@ -79,13 +79,25 @@ class Relief:
         tiles = ((vx - 1, vy - 1), (vx, vy - 1), (vx - 1, vy), (vx, vy))
         if any(self.world.terrain.tile(*t) in (Terrain.WATER, Terrain.SHALLOWS, Terrain.VOID) for t in tiles):
             return 0
+        wet = self._water_distance(vx, vy)
+        if wet < 1:
+            return 0
         n = 0.7 * self.noise.fractal(vx / 55 + 7, vy / 55 + 7, 2) + 0.3 * self.noise.fractal(vx / 22 + 70, vy / 22 + 11, 2)
         lift = max(0.0, n - 0.38) * HILL_GAIN
         for (cx, cy), r in self.flat:
             d = math.hypot(vx - cx, (vy - cy) / 0.75)
             if d < r + 14:
                 lift *= max(0.0, (d - r * 0.8) / (r * 0.2 + 14))
-        return int(lift)
+        return int(lift * min(1.0, wet / 14))  # banks slope gently down to the water
+
+    def _water_distance(self, vx: int, vy: int) -> int:
+        """Rough tiles to the nearest lake (probed along 8 directions), capped at 14."""
+        tile = self.world.terrain.tile
+        for r in (1, 3, 6, 10, 14):
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)):
+                if tile(vx + dx * r, vy + dy * r) in (Terrain.WATER, Terrain.SHALLOWS):
+                    return r - 1
+        return 14
 
     def corners(self, x: int, y: int) -> tuple[int, int, int, int]:
         """Heights of a tile's north, east, south and west corners (screen top, right, bottom, left)."""
