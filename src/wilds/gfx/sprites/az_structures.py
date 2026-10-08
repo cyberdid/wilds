@@ -2359,6 +2359,9 @@ def _wilds() -> None:
     _harpy_nest()
     _kodo_bones()
     _great_gate()
+    for v in range(3):
+        _log_wall(v)
+    _log_wall_post()
     _mine_entrance()
     _goblin_shack()
     _ore_cart()
@@ -3099,6 +3102,43 @@ def _great_gate() -> None:
         p.shadow(64, 106, 63, 4)
         frames.append(p)
     register("az.obj.great_gate", _art(frames, fps=4, note="the Great Gate: carved wooden eagle towers, stake gate, torch totems, palisade"))
+
+
+def _log_wall(v: int) -> None:
+    """A continuous stretch of the Great Gate's palisade: round carved logs with sharpened
+    tops, lashed by a painted hide rope. 32 px = 2 tiles wide, and it tiles edge to edge -
+    the front logs sit at x = 4,12,20,28 (step 8, none on the seam) and a darker back row
+    fills the gaps, so no background shows through and two tiles meet without a join."""
+    W, H = 32, 32
+    sc = Scene(W, H, 0, 29)
+    base = (25, 24, 26)[v]
+    for x in (0, 8, 16, 24):          # back row: darker, shorter, fills the gaps between front logs
+        sc.rod((x, 2.0, 0), (x, 2.0, base - 3), 3.2, WOOD[0:4])
+        sc.rod((x, 2.0, base - 3), (x, 2.0, base + 1), 1.0, WOOD[1:4])
+    for i, x in enumerate((4, 12, 20, 28)):   # front row: the lit logs that form the seamless silhouette
+        h = base + (2 if (v == 1 and i % 2) else 0)   # v1: a jagged skyline of alternating heights
+        sc.rod((x, -2.0, 0), (x, -2.0, h), 3.5, WOOD[1:])
+        sc.rod((x, -2.0, h), (x, -2.0, h + 4), 1.1, WOOD[3:])
+    for z in (8, 17):                 # hide-rope lashings run past both edges so they tile
+        sc.rod((-4, -0.4, z), (36, -0.4, z), 0.9, HIDE[2:])
+    band = (TEAL, PAINT_RED, TEAL)[v]
+    sc.rod((-4, -0.6, 13), (36, -0.6, 13), 0.7, band[1:])  # a painted band along the middle rope
+    p = sc.pic()
+    p.shadow(16, 30.5, 16, 1.2)
+    register(f"az.obj.log_wall@{v}", _art(p, note="continuous carved-log palisade, sharpened tops, painted lashing"))
+
+
+def _log_wall_post() -> None:
+    """The tall carved end post that caps each wing of the Great Gate wall: a thick log with
+    painted teal-and-red bands and bull horns on top."""
+    W, H = 16, 48
+    sc = Scene(W, H, 0, 44)
+    sc.lathe(8.0, 0.0, [(0, 4.6), (3, 4.4), (38, 4.0), (41, 2.8), (41, 0)],
+             totem_mat([(9, 11, "red"), (11.5, 13, "teal"), (26, 28, "red"), (28.5, 30, "teal")]))
+    p = sc.pic()
+    p.stamp(TOTEM_TOPS[0], _FACE_LG, 0, 44 - 41 - len(TOTEM_TOPS[0]) + 2)
+    register("az.obj.log_wall_post", _art(finish(p, 8, 46.0, 5.0, 1.4),
+             note="Great Gate wall end post: thick banded log with bull horns"))
 
 
 # --- goblin wagon ------------------------------------------------------------------------------------
