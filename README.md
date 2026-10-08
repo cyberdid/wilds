@@ -244,8 +244,14 @@ uv sync
 uv run wilds --chapter azeroth --explore                     # просто оглянути Мулгор (герой стоїть, його не вбити)
 uv run wilds --chapter azeroth --explore --start "Thunderhorn Water Well"
 uv run wilds --chapter azeroth                               # герой на правилах проходить квести Мулгору
+uv run wilds --chapter azeroth --brain claude --model haiku  # героєм-тауреном керує Claude (haiku)
+uv run wilds --chapter azeroth --brain codex                 # або Codex
 uv run wilds --chapter azeroth --shot shot.png --start "Great Gate"   # кадр без вікна
 ```
+
+Як і в інших главах, `--brain claude`/`--brain codex` віддає рішення й щоденник моделі (думки — українською),
+а правила лишаються рефлекс-запасним варіантом, якщо виклик впаде. Розмови (прийняти/здати квест) у Мулгорі
+детерміновані, тож модель лише вирішує, що робити, і пише щоденник.
 
 Керування: WASD або перетягування мишею рухають камеру, клік по мінікарті переносить, цифри 1–9 телепортують
 по місцях, `f` стежить за героєм, `i` перемикає 2.5D і вид 3/4, `[` `]` або колесо змінюють масштаб,

@@ -3,10 +3,11 @@ The reference opponent for tests and the reflex fallback when a model call fails
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from ..sim import Conversation, Decision, Reflection
 from . import quests as q
+from .actions import ACTION_HELP
 
 if TYPE_CHECKING:
     from .sim import ZoneSim
@@ -102,3 +103,84 @@ class ExploreBrain(ScriptedZoneBrain):
     def decide(self, sim: "ZoneSim") -> Decision:
         sim.hero.hp = sim.hero.max_hp = 10**6  # nothing can hurt a tourist
         return Decision("rest", "300", "Оглядаю Мулгор.")
+
+
+# --- Claude / Codex brains --------------------------------------------------------------------------
+
+
+def _obj(props: dict[str, Any]) -> dict[str, Any]:
+    return {"type": "object", "properties": props, "required": list(props), "additionalProperties": False}
+
+
+def decision_schema(strict: bool) -> dict[str, Any]:
+    return _obj({
+        "thought": {"type": "string", "description": "1-2 short first-person sentences"},
+        "action": {"type": "string", "enum": list(ACTION_HELP)},
+        "target": {"type": "string", "description": "action target name, or empty string"},
+    })
+
+
+def reflection_schema(strict: bool) -> dict[str, Any]:
+    return _obj({
+        "diary": {"type": "string", "description": "first-person diary entry, max 90 words"},
+        "trait": {"type": "string", "description": "a new trait formed (max 6 words) or empty"},
+        "goal": {"type": "string", "description": "concrete next priority, max 15 words"},
+    })
+
+
+class _AzBrainMixin:
+    """decide/reflect through a model; falls back to the scripted brain on any failure.
+    Mulgore never asks the brain to converse (quests are resolved inside the Talk action)."""
+
+    def _setup(self) -> None:
+        from .observe import system_prompt
+
+        self.system = system_prompt(self.lang)
+        self.fallback = ScriptedZoneBrain()
+
+    def decide(self, sim: "ZoneSim") -> Decision:
+        from .observe import build_observation
+
+        out = self.ask(sim, "decide", self.system, build_observation(sim), decision_schema(self.strict_schemas))
+        if out is None or not isinstance(out.get("action"), str):
+            return self._reflex(sim)
+        return Decision(out["action"], str(out.get("target", "") or ""), str(out.get("thought", "") or "").strip())
+
+    def reflect(self, sim: "ZoneSim") -> Reflection:
+        from .observe import build_reflection_prompt, reflection_system
+
+        out = self.ask(sim, "reflect", reflection_system(self.lang), build_reflection_prompt(sim),
+                       reflection_schema(self.strict_schemas))
+        if out is None or not str(out.get("diary", "")).strip():
+            return self.fallback.reflect(sim)
+        return Reflection(str(out["diary"]), str(out.get("trait", "") or ""), str(out.get("goal", "") or ""))
+
+    def converse(self, sim: "ZoneSim") -> Conversation:
+        return self.fallback.converse(sim)
+
+    def _reflex(self, sim: "ZoneSim") -> Decision:
+        decision = self.fallback.decide(sim)
+        decision.thought = f"(інстинкт: {self.last_error[:60]}) {decision.thought}"
+        return decision
+
+
+def make_claude_brain(**kwargs):
+    from ..brain.claude import ClaudeBrain
+
+    class AzClaudeBrain(_AzBrainMixin, ClaudeBrain):
+        name = "claude"
+
+    brain = AzClaudeBrain(**kwargs)
+    brain._setup()
+    return brain
+
+
+def make_codex_brain(**kwargs):
+    from ..brain.codex import CodexBrain
+
+    class AzCodexBrain(_AzBrainMixin, CodexBrain):
+        name = "codex"
+
+    brain = AzCodexBrain(**kwargs)
+    brain._setup()
+    return brain

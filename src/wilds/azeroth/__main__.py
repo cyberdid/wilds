@@ -12,14 +12,17 @@ PACK = Path(__file__).resolve().parents[3] / "data" / "azeroth" / "mulgore"
 def main(argv: list[str] | None = None) -> None:
     import argparse
 
+    import shutil
+
     from ..__main__ import add_gfx_args, window_size
-    from .brain import ExploreBrain, ScriptedZoneBrain
+    from .brain import ExploreBrain, ScriptedZoneBrain, make_claude_brain, make_codex_brain
     from .sim import ZoneSim
     from .world import ZoneWorld
 
     p = argparse.ArgumentParser(prog="wilds --chapter azeroth", description="Мулгор у справжньому масштабі.")
     p.add_argument("--chapter", default="azeroth")
-    p.add_argument("--brain", default="scripted", help="поки що лише scripted (правила)")
+    p.add_argument("--brain", choices=["scripted", "claude", "codex"], default="scripted",
+                   help="хто керує героєм: scripted (правила), claude (`claude -p`) або codex (`codex exec`)")
     p.add_argument("--model", default=None)
     p.add_argument("--effort", default="low")
     p.add_argument("--think", action="store_true")
@@ -35,12 +38,24 @@ def main(argv: list[str] | None = None) -> None:
     add_gfx_args(p)
     p.set_defaults(zoom=2, view="iso")  # Мулгор — 2.5D за замовчуванням
     args, _unknown = p.parse_known_args(argv)
-    if args.brain != "scripted":
-        print("Мозок на ШІ для Мулгору ще не написано: граю правилами (--brain scripted).", file=sys.stderr)
     seed = args.seed if args.seed is not None else random.randrange(1_000_000)
     world = ZoneWorld(args.pack, seed=seed)
     sim = ZoneSim(world, seed=seed)
-    brain = ExploreBrain() if args.explore else ScriptedZoneBrain()
+    if args.explore:
+        brain = ExploreBrain()
+    elif args.brain in ("claude", "codex"):
+        if not shutil.which(args.brain):
+            sys.exit(f"Не знайдено `{args.brain}`. Встановіть і залогіньтесь, або --brain scripted.")
+        effort = None if args.effort == "none" else args.effort
+        log_dir = Path(args.log_dir) if args.log_dir else None
+        if args.brain == "claude":
+            brain = make_claude_brain(model=args.model or "haiku", effort=effort, thinking=args.think,
+                                      lang=args.lang, log_dir=log_dir)
+        else:
+            brain = make_codex_brain(model=args.model or "gpt-5.6-luna", effort=effort, lang=args.lang,
+                                     log_dir=log_dir)
+    else:
+        brain = ScriptedZoneBrain()
     if args.explore and not args.start:
         args.start = "Bloodhoof Village"
     if args.start:
