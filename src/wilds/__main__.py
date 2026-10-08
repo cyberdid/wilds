@@ -20,7 +20,7 @@ from .worldgen import generate
 
 def _chapter(argv: list[str] | None) -> str:
     pre = argparse.ArgumentParser(add_help=False)
-    pre.add_argument("--chapter", choices=["tau7", "cyberpunk"], default="tau7")
+    pre.add_argument("--chapter", choices=["tau7", "cyberpunk", "azeroth"], default="tau7")
     known, _ = pre.parse_known_args(argv)
     return known.chapter
 
@@ -44,8 +44,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                    help="продовжити останнє збереження з теки saves/")
     p.add_argument("--headless", type=int, metavar="TICKS", default=0,
                    help="без інтерфейсу: прогнати N тіків і вивести підсумок")
-    p.add_argument("--chapter", choices=["tau7", "cyberpunk"], default="tau7",
-                   help="tau7 (типово) - виживання; cyberpunk - друга глава після порятунку")
+    p.add_argument("--chapter", choices=["tau7", "cyberpunk", "azeroth"], default="tau7",
+                   help="tau7 (типово) - виживання; cyberpunk - друга глава після порятунку; "
+                        "azeroth - Мулгор у справжньому масштабі")
     p.add_argument("--legacy-dir", default="legacy", help="куди/звідки писати/читати спадок персонажа")
     p.add_argument("--no-legacy", action="store_true", help="не писати спадок при порятунку")
     p.add_argument("--campaign", action="store_true",
@@ -172,6 +173,11 @@ def _city_save_requested(argv: list[str] | None) -> bool:
 
 
 def main(argv: list[str] | None = None) -> None:
+    if _chapter(argv) == "azeroth":
+        from .azeroth.__main__ import main as azeroth_main
+
+        azeroth_main(argv)
+        return
     if _chapter(argv) == "cyberpunk" or _city_save_requested(argv):
         from .cyberpunk.__main__ import main as cyberpunk_main
 
