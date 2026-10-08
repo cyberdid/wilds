@@ -77,6 +77,9 @@ def main(argv: list[str] | None = None) -> None:
         print(f"{world.clock()} | {sim.status()}")
         return
     from ..gfx.az_app import AzApp
+    from .route import coarse_map
+
+    coarse_map(world)  # build the routing map now (a few seconds) instead of on the first go_to in-window
 
     diary_dir = Path(args.log_dir) if args.log_dir else None
     AzApp(sim, brain, seed, speed=args.speed, sprites_dir=args.sprites, size=window_size(args), zoom=args.zoom, view=args.view,

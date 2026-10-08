@@ -41,6 +41,7 @@ TPS = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
 ZOOMS = (1, 2, 3, 4, 5, 6)
 PANEL_W = 400
 FPS = 60
+SIM_BUDGET = 0.008  # max seconds of simulation per frame, so the window stays responsive
 SCREENSHOT_DIR = Path("screenshots")
 HELP = [
     ("Керування", "pixel"),
@@ -418,13 +419,20 @@ class AzApp:
                 self._think(sim.pending)
                 self._drain()
             else:
+                # Run as many whole ticks as the speed asks for, but never spend more than a
+                # few ms per frame on the simulation: a real-scale zone's ticks (creatures,
+                # respawns, chasing) add up, and blocking the main thread is what made the OS
+                # report the window as "not responding". Any backlog is capped, not chased.
                 self.acc += dt * self.tps
-                n = min(int(self.acc), 6000)
-                self.acc -= n
-                for _ in range(n):
+                deadline = time.monotonic() + SIM_BUDGET
+                while self.acc >= 1:
                     sim.tick()
+                    self.acc -= 1
                     if sim.pending or sim.over:
                         self.acc = 0.0
+                        break
+                    if time.monotonic() >= deadline:
+                        self.acc = min(self.acc, float(self.tps))  # drop the backlog, keep up to 1s
                         break
         self._effects()
         self._animate(dt)
