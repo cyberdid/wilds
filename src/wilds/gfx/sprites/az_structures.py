@@ -3169,8 +3169,218 @@ def _wagon() -> None:
              note="ravaged goblin wagon: dark timber box, rusty shingle roof torn open, a wheel lost"))
 
 
+# --- the Great Gate's log wall ------------------------------------------------------------------------
+# Pieces stand one every 32 px along a screen-horizontal line, so the wall is built to join:
+# every piece is a whole number of logs (no log cut by the frame), the first and last log are
+# the same height in every variant (edge columns opaque from the ground to the same row), and
+# the bands, rope and ground row sit on the same rows everywhere.
+
+WALL_FOOT = 30                      # last row of wood; row 31 is the ground shadow strip
+WALL_EDGE_TIP = 3                   # tip row of the first / last log of every piece
+WALL_TEAL, WALL_ROPE, WALL_RED = (9, 10), (14, 15), (19, 20, 21)
+WALL_LOGS = (                       # log widths (sum 32) and tip rows per variant
+    ((5, 5, 6, 5, 6, 5), (3, 1, 4, 2, 5, 3)),
+    ((5, 6, 5, 6, 5, 5), (3, 5, 2, 4, 1, 3)),
+    ((5, 5, 5, 6, 6, 5), (3, 2, 5, 1, 4, 3)),
+)
+
+
+LOG_TOPS = {5: (3, 1, 0, 1, 3), 6: (3, 1, 0, 0, 1, 3)}   # column drop below the tip; last = crevice
+
+
+def _log_top(w: int, k: int, tip: int) -> int:
+    """Top row of column k of a sharpened log w px wide. The first column and the crevice
+    (last column) both sit 3 rows under the tip, so a piece's two edges always match."""
+    return tip + LOG_TOPS[w][k]
+
+
+def _log_wall(v: int) -> None:
+    W = H = 32
+    p = Pic(W, H)
+    r = rng_for("log_wall", v)
+    widths, tips = WALL_LOGS[v]
+    x0 = 0
+    logs = []
+    for w, tip in zip(widths, tips):
+        logs.append((x0, w, tip))
+        grain = {x0 + r.randrange(0, w - 1): (r.randint(4, 14), r.randint(16, 28)) for _ in range(2)}
+        for k in range(w):
+            x = x0 + k
+            top = _log_top(w, k, tip)
+            shoulder = tip + 3
+            for y in range(top, WALL_FOOT + 1):
+                if k == w - 1:          # crevice between two logs
+                    c = WOOD[0] if y > shoulder else WOOD[1]
+                elif y <= shoulder:      # the hewn point: fresh wood, lit facet on the left
+                    face = k <= LOG_TOPS[w].index(0)
+                    c = (WOOD[5] if y < shoulder else HIDE[4]) if face else (WOOD[4] if y < shoulder else WOOD[3])
+                    if k == 0 and y == shoulder:
+                        c = WOOD[4]
+                else:
+                    c = cyl(WOOD[1:], k, 0, w - 2, y, lo=0.1, hi=0.95)
+                    if x in grain and grain[x][0] <= y <= grain[x][1]:
+                        c = step(WOOD, c, -1)     # weathered grain streak
+                    if y in (shoulder + 1,) and k < w - 2:
+                        c = step(WOOD, c, -1)     # the lip under the hewn cone
+                p.set(x, y, c)
+        x0 += w
+
+    # painted bands (a few chips worn off) and a rope lashing on the same rows in every piece
+    for x0, w, tip in logs:
+        for k in range(w):
+            x = x0 + k
+            crev = k == w - 1
+            lit = 0.95 - k / max(1, w - 2) * 0.75
+            for i, y in enumerate(WALL_TEAL):
+                if crev:
+                    p.set(x, y, TEAL[0])
+                elif r.random() > 0.04:
+                    p.set(x, y, tone(TEAL[1:], lit + 0.1 - i * 0.2, x, y, 0.1))
+            for i, y in enumerate(WALL_RED):
+                if crev:
+                    p.set(x, y, PAINT_RED[0])
+                elif r.random() > 0.04:
+                    p.set(x, y, tone(PAINT_RED[1:], lit + 0.12 - i * 0.14, x, y, 0.1))
+            for i, y in enumerate(WALL_ROPE):   # twisted strands, lit on each log's round face
+                if crev:
+                    c = SAND[1]
+                elif (x + y) % 2:
+                    c = SAND[4] if lit > 0.6 else SAND[3]
+                else:
+                    c = SAND[2] if lit > 0.3 else SAND[1]
+                p.set(x, y, c)
+            if not crev:                        # the rope's shadow on the wood under it
+                p.set(x, WALL_ROPE[-1] + 1, WOOD[1] if lit > 0.5 else WOOD[0])
+        p.set(x0 + w - 1, WALL_ROPE[-1] + 1, SAND[1])    # the rope dips into each crevice
+
+    # knots and a crack or two, away from the bands
+    free_rows = [y for y in range(7, 28) if y not in WALL_TEAL + WALL_ROPE + WALL_RED
+                 and y - 1 not in WALL_TEAL + WALL_ROPE + WALL_RED]
+    for i in range(3):
+        x0, w, tip = logs[r.randrange(len(logs))]
+        kx = x0 + r.randint(1, max(1, w - 4))
+        ky = r.choice([y for y in free_rows if y > tip + 5 and y + 1 in free_rows] or free_rows)
+        p.set(kx, ky, WOOD[1])
+        p.set(kx + 1, ky, WOOD[0])
+        p.set(kx, ky + 1, WOOD[0])
+        p.set(kx + 1, ky + 1, WOOD[2])
+        p.set(kx, ky - 1, step(WOOD, p.get(kx, ky - 1), 1))
+    for i in range(2):
+        x0, w, tip = logs[r.randrange(1, len(logs) - 1)]
+        cx = x0 + r.randint(1, w - 3)
+        cy = r.randint(23, 25)
+        p.vline(cx, cy, cy + r.randint(2, 3), WOOD[0])
+
+    # one charm per piece, kept off the joints
+    if v == 0:   # a painted white hoof-and-sun mark
+        x0, w, _ = logs[2]
+        p.stamp([".a.", "aba", ".a."], {"a": BONE[4], "b": PAINT_RED[2]}, x0 + 1, 24)
+    elif v == 1:  # a feather talisman hanging from the rope
+        x0, w, _ = logs[3]
+        fx = x0 + 2
+        p.vline(fx, WALL_ROPE[-1] + 1, WALL_ROPE[-1] + 2, SAND[2])
+        p.stamp(["ab", "ab", "ab", "rR"], {"a": BONE[4], "b": BONE[2], "r": PAINT_RED[3], "R": PAINT_RED[1]},
+                fx, WALL_ROPE[-1] + 3)
+    else:         # a little hide pouch with teal beads
+        x0, w, _ = logs[2]
+        fx = x0 + 1
+        p.set(fx + 1, WALL_ROPE[-1] + 1, SAND[2])
+        p.stamp(["tbt", "hHd", "hHd", ".d."], {"t": TEAL[3], "b": BONE[4], "h": HIDE[4], "H": HIDE[3], "d": HIDE[1]},
+                fx, WALL_ROPE[-1] + 2)
+
+    # the base sinks into soft shadow and a few prairie tufts
+    for y in range(24, WALL_FOOT + 1):
+        for x in range(W):
+            c = p.get(x, y)
+            d = (y - 24) / (WALL_FOOT - 24)
+            if c and bayer(x, y) < d * 1.4:
+                p.set(x, y, step(WOOD, step(HIDE, step(SAND, c, -1), -1), -1))
+                if d > 0.66 and bayer(x, y) < d * 0.7:
+                    p.set(x, y, step(WOOD, p.get(x, y), -1))
+    for i in range(2):                  # prairie grass clumps at the foot
+        tx = 3 + r.randrange(0, 22)
+        p.stamp(["..a..", "a.ab.", "abbcb", "bccdc"], {"a": LEAF[4], "b": LEAF[3], "c": LEAF[2], "d": LEAF[1]},
+                tx, WALL_FOOT - 3)
+    p.outline()
+    for x in range(W):           # the shadow strip runs the whole width: pieces join without a step
+        p.set(x, H - 1, SHADOW_CORE if p.get(x, H - 1) is None else p.get(x, H - 1))
+    register(f"az.obj.log_wall@{v}", _art(p, note=[
+        "Great Gate wall: sharpened carved logs, teal and red bands, rope lashing, painted mark",
+        "Great Gate wall: sharpened carved logs, teal and red bands, rope lashing, feather talisman",
+        "Great Gate wall: sharpened carved logs, teal and red bands, rope lashing, hide pouch"][v]))
+
+
+POST_CROWN = [            # 16 wide: kodo-horned carved head with a fan of feathers (rows 0..16)
+    ".......rR.......",
+    ".......rR.......",
+    "....r..bB..R....",
+    ".b..r..bB..R..B.",
+    "bB..t..tT..T..Bn",
+    "bB..b..bB..B..Bn",
+    "bB..b..bB..B..Bn",
+    "bbB.b..bB..B.BBn",
+    "nbbblmmmmmddBBBn",
+    ".nnRlmmmmmdDRnn.",
+    "....ltTmmtTD....",
+    "....lkwmmwkD....",
+    "....lmmlmmdD....",
+    "....lrmlmmRD....",
+    ".....lmmmmd.....",
+    ".....lkmmkd.....",
+    ".....lmmmdD.....",
+]
+
+
+def _log_wall_post() -> None:
+    """16x48 end post: a thick log banded on the wall's rows, a carved kodo head, horns and feathers."""
+    W, H = 16, 48
+    p = Pic(W, H)
+    off = H - 32                     # wall rows -> post rows (both stand on the bottom row)
+    x0, x1 = 4, 11
+    for y in range(len(POST_CROWN), off + WALL_FOOT + 1):
+        for x in range(x0, x1 + 1):
+            c = cyl(WOOD[1:], x, x0, x1, y, lo=0.08, hi=0.95)
+            if y in (17, off + 4, off + 26):          # carved rings: a groove with a lit lip under it
+                c = WOOD[0]
+            elif y in (18, off + 5, off + 27):
+                c = step(WOOD, c, 1)
+            p.set(x, y, c)
+    # bands and rope on the same rows as the wall, a touch wider (the post is fatter)
+    for x in range(x0 - 1, x1 + 2):
+        lit = 0.95 - (x - x0 + 1) / 9 * 0.8
+        for i, y in enumerate(WALL_TEAL):
+            p.set(x, off + y, tone(TEAL[1:], lit + 0.1 - i * 0.2, x, y, 0.1))
+        for i, y in enumerate(WALL_RED):
+            p.set(x, off + y, tone(PAINT_RED[1:], lit + 0.12 - i * 0.14, x, y, 0.1))
+        for y in WALL_ROPE:
+            p.set(x, off + y, (SAND[4] if lit > 0.6 else SAND[3]) if (x + y) % 2 else (SAND[2] if lit > 0.3 else SAND[1]))
+        if x0 <= x <= x1:
+            p.set(x, off + WALL_ROPE[-1] + 1, WOOD[1] if lit > 0.5 else WOOD[0])
+    p.stamp(["ab", "ab", "rR"], {"a": BONE[4], "b": BONE[2], "r": PAINT_RED[3], "R": PAINT_RED[1]},
+            x1 + 1, off + WALL_ROPE[-1] + 1)       # a feather tied to the lashing
+    # carved chevrons between the head and the teal band
+    for y in range(20, off + WALL_TEAL[0] - 1):
+        for x in range(x0 + 1, x1):
+            if abs(x - 7.5) - 0.5 == (y - 20) % 4:
+                p.set(x, y, WOOD[1] if x < 9 else WOOD[0])
+    p.stamp(POST_CROWN, {"l": WOOD[4], "m": WOOD[3], "d": WOOD[2], "D": WOOD[1], "t": TEAL[3], "T": TEAL[1],
+                         "r": PAINT_RED[3], "R": PAINT_RED[1], "b": BONE[4], "B": BONE[3], "n": BONE[1]})
+    # base in shadow
+    for y in range(off + 24, off + WALL_FOOT + 1):
+        for x in range(W):
+            c = p.get(x, y)
+            if c and bayer(x, y) < (y - off - 24) / 6 * 1.4:
+                p.set(x, y, step(WOOD, c, -1))
+    p.outline()
+    p.shadow(8.5, H - 1.2, 6.5, 1.3)
+    register("az.obj.log_wall_post", _art(p, note="Great Gate wall end post: banded log, carved kodo head, horns and feathers"))
+
+
 def _extras() -> None:
     _water_well()
+    for v in range(3):
+        _log_wall(v)
+    _log_wall_post()
     _hide_longhouse()
     for v in range(2):
         _windbreak(v)

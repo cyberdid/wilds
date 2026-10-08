@@ -91,7 +91,7 @@ def test_the_great_gate_has_an_unbroken_log_wall_either_side():
     gate = next(s for s in built if s.sprite == "az.obj.great_gate")
     wall = {s.pos for s in built if s.sprite == "az.obj.log_wall"}
     for sign in (1, -1):
-        run = [(gate.pos[0] + sign * k, gate.pos[1] - sign * k) for k in range(3, 3 + settlements.GATE_WALL)]
+        run = [(gate.pos[0] + sign * k, gate.pos[1] - sign * k) for k in range(2, 2 + settlements.GATE_WALL)]
         assert all(p in wall for p in run), "the wall has a gap"
     assert sum(1 for s in built if s.sprite == "az.obj.log_wall_post") == 2
 
