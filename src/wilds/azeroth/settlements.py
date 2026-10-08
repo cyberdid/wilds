@@ -190,7 +190,7 @@ def gate_line(world: "ZoneWorld") -> tuple[Pos, list[Pos]] | None:
     gate = world.nearest_passable(place.pos, 30) or place.pos
     tiles: list[Pos] = []
     for sign in (1, -1):
-        for k in range(3, GATE_WALL + 3):  # the gate itself spans about 4 tiles; the wall starts beside it
+        for k in range(2, GATE_WALL + 2):  # the gate spans about 4 tiles; the wall starts flush against its wings
             p = (gate[0] + sign * k, gate[1] - sign * k)
             if not _free(world, p):
                 break
