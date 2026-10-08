@@ -33,8 +33,9 @@ AZEROTH_MODULES = (
     "az_thunder_bluff",
     "az_items",
     "az_fx",
+    "az_atlas",
 )
-AZEROTH_DONE: tuple[str, ...] = ()
+AZEROTH_DONE: tuple[str, ...] = ("az_terrain", "az_atlas")
 
 
 def load(module: str) -> None:

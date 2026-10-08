@@ -108,10 +108,11 @@ class MulgoreViewer:
 
     def _select(self, entry: CatalogEntry) -> None:
         self.selected_key = entry.key
-        if entry.tile is not None:
-            self.camera_x, self.camera_y = entry.tile
+        position = self.renderer.map_position(entry)
+        if position is not None:
+            self.camera_x, self.camera_y = position
             if self.pixels_per_tile < 2:
-                self.pixels_per_tile = 2.0
+                self.pixels_per_tile = 16.0
             self._clamp_camera()
 
     def _toggle_search(self, active: bool) -> None:
@@ -123,7 +124,7 @@ class MulgoreViewer:
 
     def _zoom_at(self, screen_point: tuple[int, int], steps: float) -> None:
         old_scale = self.renderer.effective_scale(self.pixels_per_tile)
-        requested = min(12.0, max(0.125, old_scale * (1.2 ** steps)))
+        requested = min(16.0, max(0.125, old_scale * (1.2 ** steps)))
         new_scale = self.renderer.effective_scale(requested)
         world_x = self.camera_x + (screen_point[0] - self.map_viewport.centerx) / old_scale
         world_y = self.camera_y + (screen_point[1] - self.map_viewport.centery) / old_scale
@@ -137,10 +138,10 @@ class MulgoreViewer:
         origin_x = self.map_viewport.centerx - self.camera_x * scale
         origin_y = self.map_viewport.centery - self.camera_y * scale
         bounds = (
-            max(0, math.floor((self.map_viewport.left - origin_x) / scale)),
-            max(0, math.floor((self.map_viewport.top - origin_y) / scale)),
-            min(self.geo.width, math.ceil((self.map_viewport.right - origin_x) / scale)),
-            min(self.geo.height, math.ceil((self.map_viewport.bottom - origin_y) / scale)),
+            max(0, math.floor((self.map_viewport.left - origin_x) / scale) - 2),
+            max(0, math.floor((self.map_viewport.top - origin_y) / scale) - 2),
+            min(self.geo.width, math.ceil((self.map_viewport.right - origin_x) / scale) + 2),
+            min(self.geo.height, math.ceil((self.map_viewport.bottom - origin_y) / scale) + 2),
         )
         return [entry for entry in self.catalog.visible(bounds)
                 if self.renderer._allowed(entry, self.filters)]
@@ -152,23 +153,48 @@ class MulgoreViewer:
         entries = self._visible_entries()
         if scale < 2:
             clusters: dict[tuple[int, int], list[CatalogEntry]] = {}
+            cell_size = self.renderer.cluster_cell_size(scale)
+            radius = self.renderer.cluster_radius(scale)
             for entry in entries:
-                center = self.renderer._marker_center(entry, origin_x, origin_y, scale)
-                bucket = (center[0] // 24, center[1] // 24)
+                center = self.renderer._screen_anchor(entry, origin_x, origin_y, scale)
+                bucket = (center[0] // cell_size, center[1] // cell_size)
                 clusters.setdefault(bucket, []).append(entry)
             for bucket, group in clusters.items():
                 if len(group) < 2:
                     continue
-                center = (bucket[0] * 24 + 12, bucket[1] * 24 + 12)
-                if math.dist(position, center) <= 14:
-                    self.camera_x = sum(entry.tile[0] for entry in group if entry.tile is not None) / len(group)
-                    self.camera_y = sum(entry.tile[1] for entry in group if entry.tile is not None) / len(group)
-                    self.pixels_per_tile = min(12.0, max(2.0, scale * 2.5))
+                center = (bucket[0] * cell_size + cell_size // 2,
+                          bucket[1] * cell_size + cell_size // 2)
+                if math.dist(position, center) <= radius + 3:
+                    positions = [self.renderer.map_position(entry) for entry in group]
+                    positions = [position for position in positions if position is not None]
+                    self.camera_x = sum(position[0] for position in positions) / len(positions)
+                    self.camera_y = sum(position[1] for position in positions) / len(positions)
+                    self.pixels_per_tile = min(16.0, max(8.0, scale * 2.5))
                     self._clamp_camera()
                     return
+        if scale >= 2:
+            origin_x = self.map_viewport.centerx - self.camera_x * scale
+            origin_y = self.map_viewport.centery - self.camera_y * scale
+            draw_order = sorted(entries, key=lambda entry: (
+                self.renderer._screen_anchor(entry, origin_x, origin_y, scale)[1],
+                entry.kind == "gameobject",
+            ))
+            for entry in reversed(draw_order):
+                center = self.renderer._screen_anchor(entry, origin_x, origin_y, scale)
+                if entry.spawn is not None:
+                    hit = self.renderer._world_sprite_hit(entry, center, scale, position)
+                    if not hit:
+                        hit = math.dist(position, center) <= max(3, min(8, round(scale * 0.2)))
+                else:
+                    hit = math.dist(position, center) <= max(9, min(16, round(scale * 0.8) + 7))
+                if hit:
+                    self._select(entry)
+                    return
+            self.selected_key = None
+            return
         candidates = []
         for entry in entries:
-            center = self.renderer._marker_center(entry, origin_x, origin_y, scale)
+            center = self.renderer._screen_anchor(entry, origin_x, origin_y, scale)
             distance = math.dist(position, center)
             if distance <= max(9, min(16, round(scale * 0.8) + 7)):
                 candidates.append((distance, entry.title.casefold(), entry))
@@ -411,7 +437,7 @@ class MulgoreViewer:
         pygame.draw.rect(surface, (62, 88, 68), pygame.Rect(panel_x + 12, 40, 152, 19), border_radius=5)
         self._text(surface, "VANILLA 1.12.1-1.12.3", (panel_x + 17, 43), (220, 238, 220), self._small_font)
         pygame.draw.rect(surface, (78, 66, 43), pygame.Rect(panel_x + 170, 40, 118, 19), border_radius=5)
-        self._text(surface, "PROCEDURAL PREVIEW", (panel_x + 174, 43), (250, 222, 172), self._small_font)
+        self._text(surface, "PIXEL ART PREVIEW", (panel_x + 174, 43), (250, 222, 172), self._small_font)
 
         self._search_rect = pygame.Rect(panel_x + 12, 68, PANEL_WIDTH - 24, 30)
         pygame.draw.rect(surface, (21, 24, 29), self._search_rect, border_radius=5)
@@ -476,7 +502,7 @@ class MulgoreViewer:
         self._text(surface, "ring = Wiki source-map coordinate", (panel_x + 31, y), MUTED, self._small_font)
         pygame.draw.polygon(surface, (244, 162, 70), ((panel_x + 14, y + 18), (panel_x + 20, y + 24),
                                                        (panel_x + 14, y + 30), (panel_x + 8, y + 24)))
-        self._text(surface, "orange = approximate feature", (panel_x + 31, y + 18), MUTED, self._small_font)
+        self._text(surface, "orange = approximate / edge", (panel_x + 31, y + 18), MUTED, self._small_font)
 
         coverage_top = height - 122
         detail_bottom = max(520, coverage_top - 8)
@@ -520,9 +546,9 @@ class MulgoreViewer:
         banner = pygame.Rect(12, 12, 236, 36)
         pygame.draw.rect(surface, (22, 27, 32), banner, border_radius=5)
         pygame.draw.rect(surface, (94, 106, 116), banner, 1, border_radius=5)
-        self._text(surface, "PROCEDURAL PREVIEW", (banner.x + 9, banner.y + 4),
+        self._text(surface, "PIXEL ART PREVIEW", (banner.x + 9, banner.y + 4),
                    (250, 222, 172), self._small_font)
-        self._text(surface, "north up  |  2 yards / tile", (banner.x + 9, banner.y + 19),
+        self._text(surface, "reconstructed terrain | 2 yd / tile", (banner.x + 9, banner.y + 19),
                    MUTED, self._small_font)
         scale = self.renderer.effective_scale(self.pixels_per_tile)
         status = pygame.Rect(10, height - 27, min(450, self.map_viewport.width - 20), 19)

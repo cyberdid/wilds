@@ -102,7 +102,7 @@ def terrain() -> list[Need]:
         Need("az.cliff.face", "16x16", variants=3, note="cliff wall at the land's edge"),
         Need("az.boulder", "<=16x16", variants=3, note="boulder, blocks the way"),
     ]
-    for kind in ("water", "dirt", "cliff"):
+    for kind in ("water", "dirt", "cliff", "drygrass", "grass"):
         for side in ("n", "s", "e", "w"):
             n.append(Need(f"az.edge.{kind}.{side}", "16x16", note=f"overlay: {kind} meets grass, grass to the {side}"))
         for corner in ("ne", "nw", "se", "sw"):
@@ -257,11 +257,33 @@ def fx() -> list[Need]:
     ]
 
 
+def atlas() -> list[Need]:
+    """Static atlas archetypes used to draw the source-backed world placements."""
+    return [
+        Need("az.atlas.actor.tauren", "16x24", note="Mulgore tauren atlas archetype"),
+        Need("az.atlas.actor.humanoid", "16x20", note="other humanoid atlas archetype"),
+        Need("az.atlas.actor.wolf", "16x16"), Need("az.atlas.actor.boar", "16x16"),
+        Need("az.atlas.actor.strider", "16x24"), Need("az.atlas.actor.kodo", "32x24"),
+        Need("az.atlas.actor.bird", "16x16"), Need("az.atlas.actor.snake", "12x12"),
+        Need("az.atlas.actor.critter", "12x12"), Need("az.atlas.actor.spirit", "16x24"),
+        Need("az.atlas.actor.quilboar", "16x16"),
+        Need("az.atlas.object.herb", "16x16"), Need("az.atlas.object.ore", "16x16"),
+        Need("az.atlas.object.fire", "16x16"), Need("az.atlas.object.chest", "16x16"),
+        Need("az.atlas.object.crate", "16x16"), Need("az.atlas.object.barrel", "16x16"),
+        Need("az.atlas.object.totem", "16x24"), Need("az.atlas.object.well", "16x20"),
+        Need("az.atlas.object.tent", "32x28"), Need("az.atlas.object.hut", "40x32"),
+        Need("az.atlas.object.stone", "16x16"), Need("az.atlas.object.banner", "16x24"),
+        Need("az.atlas.object.mailbox", "16x16"), Need("az.atlas.object.plant", "16x16"),
+        Need("az.atlas.object.generic", "16x16"),
+    ]
+
+
 def required(pack: Path = PACK) -> dict[str, list[Need]]:
     """Sprite module (``az_<key>``) -> what it must define."""
     return {"terrain": terrain(), "creatures": creatures(pack), "monsters": monsters(pack),
             "people_tauren": people_tauren(pack), "people_other": people_other(),
-            "structures": structures(), "thunder_bluff": thunder_bluff(), "items": items(), "fx": fx()}
+            "structures": structures(), "thunder_bluff": thunder_bluff(), "items": items(), "fx": fx(),
+            "atlas": atlas()}
 
 
 def check(registry, modules: list[str] | None = None, pack: Path = PACK) -> list[str]:

@@ -43,6 +43,22 @@ One tile = 16 px = 2 yards.
 | `az.edge.cliff.corner.nw` | 16x16 | 1 |  | overlay: inner corner nw |
 | `az.edge.cliff.corner.se` | 16x16 | 1 |  | overlay: inner corner se |
 | `az.edge.cliff.corner.sw` | 16x16 | 1 |  | overlay: inner corner sw |
+| `az.edge.drygrass.n` | 16x16 | 1 |  | overlay: drygrass meets grass, grass to the n |
+| `az.edge.drygrass.s` | 16x16 | 1 |  | overlay: drygrass meets grass, grass to the s |
+| `az.edge.drygrass.e` | 16x16 | 1 |  | overlay: drygrass meets grass, grass to the e |
+| `az.edge.drygrass.w` | 16x16 | 1 |  | overlay: drygrass meets grass, grass to the w |
+| `az.edge.drygrass.corner.ne` | 16x16 | 1 |  | overlay: inner corner ne |
+| `az.edge.drygrass.corner.nw` | 16x16 | 1 |  | overlay: inner corner nw |
+| `az.edge.drygrass.corner.se` | 16x16 | 1 |  | overlay: inner corner se |
+| `az.edge.drygrass.corner.sw` | 16x16 | 1 |  | overlay: inner corner sw |
+| `az.edge.grass.n` | 16x16 | 1 |  | overlay: grass meets grass, grass to the n |
+| `az.edge.grass.s` | 16x16 | 1 |  | overlay: grass meets grass, grass to the s |
+| `az.edge.grass.e` | 16x16 | 1 |  | overlay: grass meets grass, grass to the e |
+| `az.edge.grass.w` | 16x16 | 1 |  | overlay: grass meets grass, grass to the w |
+| `az.edge.grass.corner.ne` | 16x16 | 1 |  | overlay: inner corner ne |
+| `az.edge.grass.corner.nw` | 16x16 | 1 |  | overlay: inner corner nw |
+| `az.edge.grass.corner.se` | 16x16 | 1 |  | overlay: inner corner se |
+| `az.edge.grass.corner.sw` | 16x16 | 1 |  | overlay: inner corner sw |
 | `az.deco.flower_red` | <=16x16 | 1 | 2 | scattered, walkable decoration |
 | `az.deco.flower_yellow` | <=16x16 | 1 | 2 | scattered, walkable decoration |
 | `az.deco.flower_blue` | <=16x16 | 1 | 2 | scattered, walkable decoration |
@@ -459,3 +475,34 @@ One tile = 16 px = 2 yards.
 | `az.fx.cast_circle` | <=24x16 | 4 |  | ground circle while casting |
 | `az.fx.hit_spark` | <=8x8 | 3 |  |  |
 | `az.fx.level_up` | <=32x32 | 5 |  |  |
+
+## atlas
+
+| name | size | frames | variants | note |
+|---|---|---|---|---|
+| `az.atlas.actor.tauren` | 16x24 | 1 |  | Mulgore tauren atlas archetype |
+| `az.atlas.actor.humanoid` | 16x20 | 1 |  | other humanoid atlas archetype |
+| `az.atlas.actor.wolf` | 16x16 | 1 |  |  |
+| `az.atlas.actor.boar` | 16x16 | 1 |  |  |
+| `az.atlas.actor.strider` | 16x24 | 1 |  |  |
+| `az.atlas.actor.kodo` | 32x24 | 1 |  |  |
+| `az.atlas.actor.bird` | 16x16 | 1 |  |  |
+| `az.atlas.actor.snake` | 12x12 | 1 |  |  |
+| `az.atlas.actor.critter` | 12x12 | 1 |  |  |
+| `az.atlas.actor.spirit` | 16x24 | 1 |  |  |
+| `az.atlas.actor.quilboar` | 16x16 | 1 |  |  |
+| `az.atlas.object.herb` | 16x16 | 1 |  |  |
+| `az.atlas.object.ore` | 16x16 | 1 |  |  |
+| `az.atlas.object.fire` | 16x16 | 1 |  |  |
+| `az.atlas.object.chest` | 16x16 | 1 |  |  |
+| `az.atlas.object.crate` | 16x16 | 1 |  |  |
+| `az.atlas.object.barrel` | 16x16 | 1 |  |  |
+| `az.atlas.object.totem` | 16x24 | 1 |  |  |
+| `az.atlas.object.well` | 16x20 | 1 |  |  |
+| `az.atlas.object.tent` | 32x28 | 1 |  |  |
+| `az.atlas.object.hut` | 40x32 | 1 |  |  |
+| `az.atlas.object.stone` | 16x16 | 1 |  |  |
+| `az.atlas.object.banner` | 16x24 | 1 |  |  |
+| `az.atlas.object.mailbox` | 16x16 | 1 |  |  |
+| `az.atlas.object.plant` | 16x16 | 1 |  |  |
+| `az.atlas.object.generic` | 16x16 | 1 |  |  |

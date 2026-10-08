@@ -1,9 +1,11 @@
 # Mulgore static atlas
 
-The atlas is a standalone, top-down map for inspecting Mulgore. It shows static
-spawn records and searchable reference pages; it does not run a player, NPC
-movement, combat, or the game's simulation. Markers are geometric symbols. Sprite
-art is a later step.
+The atlas is a standalone, top-down map for inspecting Mulgore. It shows the full
+zone at the source scale, static spawn records, pixel-art terrain and searchable
+reference pages. It has no player, movement, combat or game simulation. At close
+zoom it draws all 3,948 imported MaNGOS spawn instances at their continuous world
+coordinates. At overview zoom it groups dense placements so the whole region stays
+legible.
 
 ## Sources and accuracy
 
@@ -20,16 +22,21 @@ the license terms for redistribution. See the upstream
 [license](https://github.com/mangoszero/database/blob/master/LICENSE.md) and the
 tracked [source manifest](../../data/azeroth/mulgore/source-manifest.json).
 
-The atlas uses the existing Mulgore macro map and procedural terrain detail. The
-coarse map mask is a position filter, not exact boundary geometry; zone bounds
-can include neighboring terrain. Noise, terrain transitions, and any displayed
-approximate route are previews, not surveyed Vanilla data. The atlas constructs
-`ZoneWorld` with `roads=False`; approximate routes are a separate optional layer.
+The atlas uses the existing Mulgore macro map and original, deterministic 16x16
+pixel-art terrain tiles. It does not have the original client terrain meshes or
+3D object models: terrain detail is a visual reconstruction, and spawned entities
+use hand-drawn sprite archetypes selected by source template name. Archetypes give
+the map a consistent pixel-art language; they do not claim to reproduce each
+MaNGOS `display_id` model. The coarse map mask is a position filter, not exact
+boundary geometry; zone bounds can include neighboring terrain. Noise, terrain
+transitions, and any displayed approximate route are previews, not surveyed
+Vanilla data. The atlas constructs `ZoneWorld` with `roads=False`; approximate
+routes are a separate optional layer.
 
 The transform keeps the source world coordinates in each spawn record. On map 1,
 world Y maps west-to-east and world X maps north-to-south. The display scale is
-2 yards per tile. Points near the coarse mask edge are retained and counted, but
-their markers are hidden by default.
+2 yards per tile. Points near the coarse mask edge are retained and shown by
+default with an amber edge cue; the layer can be hidden from the panel.
 
 Warcraft Wiki pages enrich the local reference catalog, but the current pack has
 no numeric `info.id` on its NPC, mob, or object pages. Therefore the importer
@@ -126,7 +133,8 @@ of the coarse Mulgore mask.
 | **Total** | **105,334** | **61,092** | **36,176** | **4,118** | **3,908** | **40** | **3,948** |
 
 “Included” is inside-mask plus edge-ambiguous. The 40 edge candidates are kept in
-the catalog but hidden on the map until the edge-ambiguous layer is enabled.
+the catalog and shown with amber cues by default; the edge-ambiguous layer can
+hide them.
 Conditional pool/event memberships are preserved on each matching spawn; the
 atlas does not evaluate event state.
 
